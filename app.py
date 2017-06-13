@@ -19,7 +19,7 @@ def calendarRead():
     custom_attribute = request.form['custom_attribute']
     # pdb.set_trace()
     # format start/end as ms since epoch
-    date_to_ms = lambda d: datetime.strptime(d, '%Y-%m-%d').timestamp()
+    date_to_ms = lambda d: datetime.strptime(d, '%Y-%m-%d').timestamp() * 1000
     start = date_to_ms(request.form['start'])
     end = date_to_ms(request.form['end'])
 
@@ -43,6 +43,7 @@ def calendarRead():
         events.append(event)
 
     # outputStr = json.dumps(events)
+    # pdb.set_trace()
     response = jsonify(events)  # TODO: apply this globally
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
