@@ -5,15 +5,15 @@ $(document).ready(function() {
   $('#calendar').fullCalendar({
       // put your options and callbacks here
       events: {
-	    url: '/url/to/calendarRead',
-	    type: 'POST',
-	    data: {
-	        custom_attribute: 'acbd'
-	    },
-	    error: function() {
-	        alert('There was an error while fetching events!');
-	    }
-	}
+    	    url: 'http://localhost:3000/calendarRead',
+    	    type: 'POST',
+    	    data: {
+    	        custom_attribute: 'acbd'
+    	    },
+    	    error: function() {
+    	        alert('There was an error while fetching events!');
+    	    }
+      }
   })
 
 
@@ -21,7 +21,7 @@ $(document).ready(function() {
 });
 
 function saveEventUpdate(event) {
-    url = '/url/to/calendarUpdate'
+    url = 'http://localhost:3000/calendarUpdate'
 
     // Create a copy of the event object
     data = $.extend({}, event);
