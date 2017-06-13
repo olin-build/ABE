@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from pymongo import MongoClient
 import os
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from bson.objectid import ObjectId
 import json
 from datetime import datetime
@@ -42,8 +42,10 @@ def calendarRead():
 
         events.append(event)
 
-    outputStr = json.dumps(events)
-    return render_template('{{!output}}', output=outputStr)
+    # outputStr = json.dumps(events)
+    response = jsonify(events)  # TODO: apply this globally
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 
 @app.route('/calendarUpdate', methods=['POST'])
