@@ -1,10 +1,14 @@
 #!/usr/bin/env python
-import pymongo
+from pymongo import MongoClient
 from flask import Flask, render_template, request
 from bson.objectid import ObjectId
 import json
 
 app = Flask(__name__)
+
+client = MongoClient()
+db = client.fullcalendar_test
+
 
 @app.route('/calendarRead', method='POST')
 def calendarRead():
@@ -18,7 +22,7 @@ def calendarRead():
     events = []
 
     # Ensure there is an index on start date
-    collection.ensure_index([('start', 1)]);
+    collection.ensure_index([('start', 1)])
 
     # Fetch the event objects from MongoDB
     recs = collection.find({'start':{'$gte': start, '$lte': end}}) # Can add filter here for customer or calendar ID, etc
@@ -34,6 +38,7 @@ def calendarRead():
 
     outputStr = json.dumps(events)
     return render_template('{{!output}}', output=outputStr)
+
 
 @app.route('/calendarUpdate', method='POST')
 def calendarUpdate():
@@ -69,7 +74,7 @@ def calendarUpdate():
     if(record_id is not None and record_id != ''):
         event_id = ObjectId(record_id)
         collection.update({'_id': event_id}, event) # Update record
-    else: 
+    else:
         record_id = collection.insert(event) # Insert record
 
     # Return the ID of the added (or updated) calendar entry
