@@ -1,5 +1,6 @@
-methods=#!/usr/bin/env python
+#!/usr/bin/env python
 from pymongo import MongoClient
+import os
 from flask import Flask, render_template, request
 from bson.objectid import ObjectId
 import json
@@ -10,7 +11,7 @@ client = MongoClient()
 db = client.fullcalendar_test
 
 
-@app.route('/calendarRead', methods='POST')
+@app.route('/calendarRead', methods=['POST'])
 def calendarRead():
     custom_attribute = request.forms.get('custom_attribute')
 
@@ -40,7 +41,7 @@ def calendarRead():
     return render_template('{{!output}}', output=outputStr)
 
 
-@app.route('/calendarUpdate', methods='POST')
+@app.route('/calendarUpdate', methods=['POST'])
 def calendarUpdate():
     custom_attribute = request.forms.get('custom_attribute')
 
@@ -85,8 +86,8 @@ def calendarUpdate():
     outputStr = json.dumps(output)
     return render_template('{{!output}}', output=outputStr)
 
-@app.route('/calendarDelete', method='POST')
-def calendarUpdate():
+@app.route('/calendarDelete', methods=['POST'])
+def calendarDelete():
     custom_attribute = request.forms.get('custom_attribute')
     collection = db['calendar']
 
