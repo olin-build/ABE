@@ -4,7 +4,7 @@ import os
 from flask import Flask, render_template, request
 from bson.objectid import ObjectId
 import json
-from datetime
+from datetime import datetime
 
 import pdb
 
@@ -19,7 +19,7 @@ def calendarRead():
     custom_attribute = request.form['custom_attribute']
     # pdb.set_trace()
     # format start/end as ms since epoch
-    date_to_ms = lambda d: datetime.date.strptime(d, '%Y-%m-%d').timestamp()
+    date_to_ms = lambda d: datetime.strptime(d, '%Y-%m-%d').timestamp()
     start = date_to_ms(request.form['start'])
     end = date_to_ms(request.form['end'])
 
