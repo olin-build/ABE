@@ -4,6 +4,9 @@ import os
 from flask import Flask, render_template, request
 from bson.objectid import ObjectId
 import json
+from datetime
+
+import pdb
 
 app = Flask(__name__)
 
@@ -14,9 +17,11 @@ db = client.fullcalendar_test
 @app.route('/calendarRead', methods=['POST'])
 def calendarRead():
     custom_attribute = request.form['custom_attribute']
-
-    start = int(request.form['start'])
-    end = int(request.form['end'])
+    # pdb.set_trace()
+    # format start/end as ms since epoch
+    date_to_ms = lambda d: datetime.date.strptime(d, '%Y-%m-%d').timestamp()
+    start = date_to_ms(request.form['start'])
+    end = date_to_ms(request.form['end'])
 
     collection = db['calendar']
 
