@@ -13,10 +13,10 @@ db = client.fullcalendar_test
 
 @app.route('/calendarRead', methods=['POST'])
 def calendarRead():
-    custom_attribute = request.forms.get('custom_attribute')
+    custom_attribute = request.form['custom_attribute']
 
-    start = int(request.forms.get('start'))
-    end = int(request.forms.get('end'))
+    start = int(request.form['start'])
+    end = int(request.form['end'])
 
     collection = db['calendar']
 
@@ -43,35 +43,35 @@ def calendarRead():
 
 @app.route('/calendarUpdate', methods=['POST'])
 def calendarUpdate():
-    custom_attribute = request.forms.get('custom_attribute')
+    custom_attribute = request.form['custom_attribute']
 
     collection = db['calendar']
 
     event = {}
-    event['title'] = request.forms.get('title')
+    event['title'] = request.form['title']
 
     # allDay is received from the POST object as a string - change to boolean
-    allDay_str = request.forms.get('allDay')
+    allDay_str = request.form['allDay']
     if(allDay_str == "true"):
         event['allDay'] = True
     else:
         event['allDay'] = False
 
     # We're receiving dates in ms since epoch, so divide by 1000
-    event['start'] = int(request.forms.get('start'))/1000
+    event['start'] = int(request.form['start'])/1000
 
     # Set end-date if it exists
-    end = request.forms.get('end')
+    end = request.form['end']
     if (end is not None and end != ''):
         event['end'] = int(end)/1000
 
     # Set entry colour if it exists
-    color = request.forms.get('color')
+    color = request.form['color']
     if (color is not None and color != ''):
-        event['color'] = request.forms.get('color')
+        event['color'] = request.form['color']
 
     # Add or update collection record, determined by whether it has an ID or not
-    record_id = request.forms.get('id')
+    record_id = request.form['id']
     if(record_id is not None and record_id != ''):
         event_id = ObjectId(record_id)
         collection.update({'_id': event_id}, event) # Update record
@@ -88,11 +88,11 @@ def calendarUpdate():
 
 @app.route('/calendarDelete', methods=['POST'])
 def calendarDelete():
-    custom_attribute = request.forms.get('custom_attribute')
+    custom_attribute = request.form['custom_attribute']
     collection = db['calendar']
 
     # Delete the collection record using the ID
-    record_id = request.forms.get('id')
+    record_id = request.forms['id']
     if(record_id is not None and record_id != ''):
         event_id = ObjectId(record_id)
         collection.remove({'_id': event_id}) # Delete record
