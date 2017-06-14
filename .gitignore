@@ -15,7 +15,8 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+# lib/  # conflicts with fullcalendar example code
+# TODO: selective whitelist
 lib64/
 parts/
 sdist/
