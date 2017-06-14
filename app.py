@@ -19,7 +19,9 @@ def calendarRead():
     custom_attribute = request.form['custom_attribute']
     # pdb.set_trace()
     # format start/end as ms since epoch
+
     date_to_ms = lambda d: datetime.strptime(d, '%Y-%m-%d').timestamp() * 1000
+
     start = date_to_ms(request.form['start'])
     end = date_to_ms(request.form['end'])
 
