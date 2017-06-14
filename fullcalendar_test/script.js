@@ -21,7 +21,7 @@ $(document).ready(function() {
 });
 
 function saveEventUpdate(event) {
-    url = 'http://localhost:3000/calendarUpdate'
+    url = 'https://abeweb.herokuapp.com/'
 
     // Create a copy of the event object
     data = $.extend({}, event);
