@@ -7,6 +7,9 @@ import json
 from datetime import datetime
 import importlib
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
 import pdb
 
 app = Flask(__name__)
@@ -14,11 +17,14 @@ app = Flask(__name__)
 # connect to MongoDB
 if os.getenv('MONGO_URI', False):  # use env variable first
     client = MongoClient(os.environ.get('MONGO_URI'))
+    logging.info("Using environment variable for MongoDB URI")
 elif os.path.isfile("mongo_config.py"):  # then check for config file
     from mongo_config import mongo_uri
     client = MongoClient(mongo_uri)
+    logging.info("Using config file for MongoDB URI")
 else:  # use localhost otherwise
     client = MongoClient()
+    logging.info("Using localhost for MongoDB URI")
 
 # Database organization
 db_setup = {
@@ -61,6 +67,7 @@ def calendarRead():
 
     # outputStr = json.dumps(events)
     # pdb.set_trace()
+    logging.debug("Found {1} events for start {2} and end {3}".format(len(events), request.form['start'], request.form['end']))
     response = jsonify(events)  # TODO: apply this globally
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
@@ -106,6 +113,7 @@ def calendarUpdate():
     # Return the ID of the added (or updated) calendar entry
     output = {}
     output['id'] = str(record_id)
+    logging.debug("Added/Updated entry {}".format(output["id"]))
 
     # Output in JSON
     outputStr = json.dumps(output)
@@ -121,6 +129,7 @@ def calendarDelete():
     if(record_id is not None and record_id != ''):
         event_id = ObjectId(record_id)
         collection.remove({'_id': event_id}) # Delete record
+        logging.debug("Deleted entry {}".format(output["id"]))
 
 
 if __name__ == '__main__':
