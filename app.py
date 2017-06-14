@@ -5,13 +5,28 @@ from flask import Flask, render_template, request, jsonify
 from bson.objectid import ObjectId
 import json
 from datetime import datetime
+import importlib
 
 import pdb
 
 app = Flask(__name__)
 
-client = MongoClient()
-db = client.fullcalendar_test
+# connect to MongoDB
+if os.getenv('MONGO_URI', False):  # use env variable first
+    client = MongoClient(os.environ.get('MONGO_URI'))
+elif os.path.isfile("mongo_config.py"):  # then check for config file
+    from mongo_config import mongo_uri
+    client = MongoClient(mongo_uri)
+else:  # use localhost otherwise
+    client = MongoClient()
+
+# Database organization
+db_setup = {
+    "name": "backend-testing",  # name of database
+    "events_collection": "calendar",  # collection that holds events
+}
+
+db = client[db_setup['name']]
 
 
 @app.route('/calendarRead', methods=['POST'])
@@ -23,7 +38,7 @@ def calendarRead():
     start = date_to_ms(request.form['start'])
     end = date_to_ms(request.form['end'])
 
-    collection = db['calendar']
+    collection = db[db_setup['events_collection']]
 
     events = []
 
@@ -53,7 +68,7 @@ def calendarRead():
 def calendarUpdate():
     custom_attribute = request.form['custom_attribute']
 
-    collection = db['calendar']
+    collection = db[db_setup['events_collection']]
 
     event = {}
     event['title'] = request.form['title']
@@ -97,7 +112,7 @@ def calendarUpdate():
 @app.route('/calendarDelete', methods=['POST'])
 def calendarDelete():
     custom_attribute = request.form['custom_attribute']
-    collection = db['calendar']
+    collection = db[db_setup['events_collection']]
 
     # Delete the collection record using the ID
     record_id = request.forms['id']
