@@ -8,7 +8,8 @@ from datetime import datetime
 import importlib
 
 import logging
-logging.basicConfig(level=logging.DEBUG)
+FORMAT = "%(levelname)s:ABE: _||_ %(message)s"
+logging.basicConfig(level=logging.DEBUG, format=FORMAT)
 
 import pdb
 
