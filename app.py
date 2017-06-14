@@ -67,7 +67,7 @@ def calendarRead():
 
     # outputStr = json.dumps(events)
     # pdb.set_trace()
-    logging.debug("Found {1} events for start {2} and end {3}".format(len(events), request.form['start'], request.form['end']))
+    logging.debug("Found {} events for start {} and end {}".format(len(events), request.form['start'], request.form['end']))
     response = jsonify(events)  # TODO: apply this globally
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
