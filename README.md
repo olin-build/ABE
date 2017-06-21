@@ -29,7 +29,7 @@ In order to connect to a mongodb instance other than your localhost, you can cre
 
 ## API
 
-### abe.olin.build/events
+### abe.olin.build/events/
 
 | HTTP Method | Action |
 | ------------- | ------------- |
@@ -54,7 +54,7 @@ In order to connect to a mongodb instance other than your localhost, you can cre
 | PATCH | partially update event with id "ShortScarletFrog" |
 | DELETE | delete event with id "ShortScarletFrog" |
 
-### abe.olin.build/labels
+### abe.olin.build/labels/
 
 | HTTP Method | Action |
 | ------------- | ------------- |

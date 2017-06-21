@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """Resource models for flask"""
-from flask import Flask, jsonify, render_template, request, abort
-from flask_restful import Resource, Api, reqparse
-from pprint import pprint, pformat
-import os
+from flask import jsonify, request, abort
+from flask_restful import Resource
+from mongoengine import ValidationError
 
-from helpers import mongo_to_dict
+from pprint import pprint, pformat
+import pdb
+
+from helpers import mongo_to_dict, request_to_dict
 
 import logging
 
@@ -31,19 +33,22 @@ class EventApi(Resource):
                 abort(404)
 
             # TODO: expand recurrences
-            return jsonify([mongo_to_dict(result) for result in results])
+            return jsonify([mongo_to_dict(result) for result in results])  # TODO: improve datetime output
 
     def post(self):
         """Create new event with parameters passed in through args or form"""
-        print('***REQUEST DATA***\n' + request.data)
-        received_data = dict(request.data)  # combines args and form
+        # pdb.set_trace()
+        received_data = request_to_dict(request)
+        logging.debug("Received POST data: {}".format(received_data))
         try:
             new_event = db.Event(**received_data)
+            # pdb.set_trace()
             new_event.save()
-        except Exception as error:
-            abort(400)
-
-        return "", 201
+        except ValidationError as error:
+            logging.warning("POST request rejected: {}".format(str(error)))
+            return error, 400
+        else:  # return success
+            return str(new_event.id), 201
 
     def put(self, event_id):
         """Replace individual event"""
@@ -79,15 +84,17 @@ class LabelApi(Resource):
 
     def post(self):
         """Create new label with parameters passed in through args or form"""
-        print('***REQUEST DATA***\n' + request.data)
-        received_data = dict(request.data)  # combines args and form
+        received_data = request_to_dict(request)
+        logging.debug("Received POST data: {}".format(received_data))
         try:
-            new_label = db.Label(**received_data)
-            new_label.save()
+            new_event = db.Label(**received_data)
+            # pdb.set_trace()
+            new_event.save()
         except ValidationError as error:
-            abort(400)
-
-        return 201
+            logging.warning("POST request rejected: {}".format(str(error)))
+            return error, 400
+        else:  # return success
+            return str(new_event.id), 201
 
     def put(self, label_name):
         """Replace individual event"""
