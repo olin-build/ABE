@@ -2,6 +2,7 @@
 """Main flask app"""
 from flask import Flask, render_template
 from flask_restful import Api
+from flask_cors import CORS
 import os
 
 import logging
@@ -11,6 +12,7 @@ logging.basicConfig(level=logging.DEBUG, format=FORMAT)
 from resource_models import EventApi, LabelApi
 
 app = Flask(__name__)
+CORS(app)
 api = Api(app)
 
 # Route resources

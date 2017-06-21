@@ -2,8 +2,6 @@
 """Resource models for flask"""
 from flask import Flask, jsonify, render_template, request, abort
 from flask_restful import Resource, Api, reqparse
-from flask_restful.utils import cors
-from flask_cors import CORS, cross_origin
 from pprint import pprint, pformat
 import json
 import os
@@ -16,7 +14,6 @@ import database as db
 class EventApi(Resource):
     """API for interacting with events"""
 
-    @cors.crossdomain(origin='*')
     def get(self, event_id=None):
         """Retrieve events"""
         if event_id:  # use event id if present
@@ -35,7 +32,6 @@ class EventApi(Resource):
             # TODO: expand recurrences
             return jsonify(result=[json.loads(result.to_json()) for result in results])
 
-    @cors.crossdomain(origin='*')
     def post(self):
         """Create new event with parameters passed in through args or form"""
         print('***REQUEST DATA***\n' + request.data)
@@ -48,17 +44,14 @@ class EventApi(Resource):
 
         return "", 201
 
-    @cors.crossdomain(origin='*')
     def put(self, event_id):
         """Replace individual event"""
         pass
 
-    @cors.crossdomain(origin='*')
     def patch(self, event_id):
         """Modify individual event"""
         pass
 
-    @cors.crossdomain(origin='*')
     def delete(self, event_id):
         """Delete individual event"""
         pass
@@ -67,7 +60,6 @@ class EventApi(Resource):
 class LabelApi(Resource):
     """API for interacting with all labels (searching, creating)"""
 
-    @cors.crossdomain(origin='*')
     def get(self, label_name=None):
         """Retrieve labels"""
         if label_name:  # use event id if present
@@ -84,7 +76,6 @@ class LabelApi(Resource):
             else:
                 return jsonify([json.loads(result.to_json()) for result in results])
 
-    @cors.crossdomain(origin='*')
     def post(self):
         """Create new label with parameters passed in through args or form"""
         print('***REQUEST DATA***\n' + request.data)
@@ -97,17 +88,14 @@ class LabelApi(Resource):
 
         return 201
 
-    @cors.crossdomain(origin='*')
     def put(self, label_name):
         """Replace individual event"""
         pass
 
-    @cors.crossdomain(origin='*')
     def patch(self, label_name):
         """Modify individual event"""
         pass
 
-    @cors.crossdomain(origin='*')
     def delete(self, label_name):
         """Delete individual event"""
         pass
