@@ -24,6 +24,16 @@ api.add_resource(LabelApi, '/labels/<string:label_name>', methods=['GET', 'PUT',
 def splash():
     return render_template('splash.html')
 
+
+@app.route('/add_event')
+def add_event():
+    return render_template('add_event.html')
+
+
+@app.route('/add_label')
+def add_label():
+    return render_template('add_label.html')
+
 if __name__ == '__main__':
     app.debug = os.getenv('FLASK_DEBUG', True) # updates the page as the code is saved
     HOST = '0.0.0.0' if 'PORT' in os.environ else '127.0.0.1'
