@@ -41,7 +41,7 @@ class EventApi(Resource):
         print('***REQUEST DATA***\n' + request.data)
         received_data = dict(request.data)  # combines args and form
         try:
-            new_event = db.User(**received_data)
+            new_event = db.Event(**received_data)
             new_event.save()
         except Exception as error:
             abort(400)
