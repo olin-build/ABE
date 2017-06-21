@@ -3,8 +3,9 @@
 from flask import Flask, jsonify, render_template, request, abort
 from flask_restful import Resource, Api, reqparse
 from pprint import pprint, pformat
-import json
 import os
+
+from helpers import mongo_to_dict
 
 import logging
 
@@ -22,7 +23,7 @@ class EventApi(Resource):
             if not result:
                 abort(404)
 
-            return jsonify(json.loads(result.to_json()))
+            return jsonify(mongo_to_dict(result))
         else:  # search database based on parameters
             # TODO: search based on parameters
             results = db.Event.objects()
@@ -30,7 +31,7 @@ class EventApi(Resource):
                 abort(404)
 
             # TODO: expand recurrences
-            return jsonify(result=[json.loads(result.to_json()) for result in results])
+            return jsonify([mongo_to_dict(result) for result in results])
 
     def post(self):
         """Create new event with parameters passed in through args or form"""
@@ -67,14 +68,14 @@ class LabelApi(Resource):
             if not result:
                 abort(404)
             else:
-                return jsonify(json.loads(result.to_json()))
+                return jsonify(mongo_to_dict(result))
         else:  # search database based on parameters
             # TODO: search based on terms
             results = db.Label.objects()
             if not results:
                 abort(404)
             else:
-                return jsonify([json.loads(result.to_json()) for result in results])
+                return jsonify([mongo_to_dict(result) for result in results])
 
     def post(self):
         """Create new label with parameters passed in through args or form"""
