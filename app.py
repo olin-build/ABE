@@ -2,10 +2,10 @@
 from pymongo import MongoClient
 import os
 from flask import Flask, render_template, request, jsonify
+from flask_cors import CORS, cross_origin
 from bson.objectid import ObjectId
-import json
 from datetime import datetime, timedelta
-import importlib
+from pprint import pprint, pformat
 
 import logging
 FORMAT = "%(levelname)s:ABE: _||_ %(message)s"
@@ -14,15 +14,20 @@ logging.basicConfig(level=logging.DEBUG, format=FORMAT)
 import pdb
 
 app = Flask(__name__)
+CORS(app)  # enable CORS default settings on all routes
 
 # connect to MongoDB
-if os.getenv('MONGO_URI', False):  # use env variable first
+if os.getenv('MONGO_URI', False):  # try env variable first
     client = MongoClient(os.environ.get('MONGO_URI'))
     logging.info("Using environment variable for MongoDB URI")
 elif os.path.isfile("mongo_config.py"):  # then check for config file
-    from mongo_config import mongo_uri
-    client = MongoClient(mongo_uri)
-    logging.info("Using config file for MongoDB URI")
+    import mongo_config
+    if mongo_config.use_local:
+        client = MongoClient()
+        logging.info("Using localhost for MongoDB URI")
+    else:
+        client = MongoClient(mongo_config.mongo_uri)
+        logging.info("Using config file for MongoDB URI")
 else:  # use localhost otherwise
     client = MongoClient()
     logging.info("Using localhost for MongoDB URI")
@@ -31,14 +36,16 @@ else:  # use localhost otherwise
 db_setup = {
     "name": "backend-testing",  # name of database
     "events_collection": "calendar",  # collection that holds events
+    "labels_collection": "labels",
 }
 
 db = client[db_setup['name']]
+logging.info("Using database {}".format(db_setup['name']))
 
 
 @app.route('/')
-def welcomePage():
-    return render_template('index.html')
+def splash():
+    return render_template('splash.html')
 
 
 @app.route('/calendarRead', methods=['POST'])
@@ -73,9 +80,7 @@ def calendarRead():
     # outputStr = json.dumps(events)
     # pdb.set_trace()
     logging.debug("Found {} events for start {} and end {}".format(len(events), request.form['start'], request.form['end']))
-    response = jsonify(events)  # TODO: apply this globally
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    return response
+    return jsonify(events)
 
 
 @app.route('/calendarUpdate', methods=['POST'])
@@ -114,9 +119,7 @@ def calendarUpdate():
     print('neat')
     # pdb.set_trace()
     # Output in JSON
-    response = jsonify(output)
-    response.headers.add('Access-Control-Allow-Origin', '*')  # Allows running client and server on same computer
-    return response
+    return jsonify(output)
 
 
 @app.route('/calendarDelete', methods=['POST'])
@@ -130,6 +133,32 @@ def calendarDelete():
         event_id = ObjectId(record_id)
         collection.remove({'_id': event_id}) # Delete record
         logging.debug("Deleted entry {}".format(output["id"]))
+
+
+@app.route('/labels', methods=['GET', 'POST'])
+def labels():
+    collection = db[db_setup['labels_collection']]
+    if request.method == 'GET':
+        results = collection.find({})
+        results = [result for result in results]
+        logging.debug("Found {} labels".format(len(results)))
+        # format return based on Accept header
+        if request.headers['Accept'] == 'application/json':
+            return jsonify(results)
+        else:
+            return pformat(results), {'Content-Type': 'text; charset=utf-8'}
+    elif request.method == 'POST':
+        new_label = {}
+        if request.form:
+            new_label = dict(request.form)
+
+        collection.insert(new_label)
+        return 'label added'
+
+
+@app.route('/labels/add', methods=['GET', 'POST'])
+def add_label_page():
+    return render_template('add_label.html')
 
 
 if __name__ == '__main__':
