@@ -1,13 +1,21 @@
 #!/usr/bin/env python3
 """Resource models for flask"""
-from flask import jsonify, request, abort, make_response
+
+from flask import jsonify, request, abort, Response, make_response
 from flask_restful import Resource
 from mongoengine import ValidationError
-
 from pprint import pprint, pformat
-import pdb
+from bson import json_util, objectid
+from datetime import datetime, timedelta
+from dateutil.rrule import rrule, MONTHLY, WEEKLY, DAILY, YEARLY
+from helpers import (
+    mongo_to_dict, request_to_dict, mongo_to_ics, event_query, get_to_event_search, 
+    recurring_to_full, update_sub_event
+    )
+from icalendar import Calendar
 
-from helpers import mongo_to_dict, request_to_dict, event_query, get_to_event_search
+import pdb
+import requests
 
 import logging
 
@@ -27,21 +35,57 @@ class EventApi(Resource):
 
             return jsonify(mongo_to_dict(result))
         else:  # search database based on parameters
-            query = event_query(get_to_event_search(request))
+
+            query_dict = get_to_event_search(request)
+            query = event_query(query_dict)
             results = db.Event.objects(**query)
             logging.debug('found {} events for query'.format(len(results)))
             if not results:
                 abort(404)
 
-            # TODO: expand recurrences
-            return jsonify([mongo_to_dict(result) for result in results])  # TODO: improve datetime output
+            if request.form: #when querying from full calendar
+                start = query_dict['start']
+                end = query_dict['end']
+            else: # when querying for testing
+                start = datetime(2017,7,1)
+                end = datetime(2017, 7, 20)
+            
+
+            events_list = []
+            for event in results:
+                # Replace the ID with its string version, since the object is not serializable this way
+                event['id'] = str(event['id'])
+                #del(event['id'])
+                # checks for recurrent events
+                if 'recurrence' in event:
+                    # checks for events from a recurrence that's been edited
+                    events_list = recurring_to_full(event, events_list, start, end)
+                else:
+                    events_list.append(dict(event.to_mongo()))
+
+            # TODO: fix dict to json conversion (ObjectIDs)
+            return json_util.dumps(events_list) #result=[json.loads(result.to_json()) for result in events])
 
     def post(self):
         """Create new event with parameters passed in through args or form"""
-        # pdb.set_trace()
         received_data = request_to_dict(request)
-        logging.debug("Received POST data: {}".format(received_data))
+        logging.debug("Received POST data: {}".format(received_data))  # combines args and form
         try:
+            ''' <-- implement this code for updating subevents
+            iso_to_dt = lambda s: datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ") - timedelta(hours=4)
+
+            received_data['start'] = iso_to_dt(received_data['start'])
+
+            if 'end' in received_data and received_data['end'] is not None:
+                received_data['end'] = iso_to_dt(received_data['end'])
+
+            if 'rec_id' in received_data and received_data['rec_id'] is not None:
+                received_data['rec_id'] = iso_to_dt(received_data['rec_id'])
+
+            if 'sid' in received_data and received_data['sid'] is not None:
+                update_sub_event(received_data)
+            else:
+            '''
             new_event = db.Event(**received_data)
             new_event.save()
         except ValidationError as error:
@@ -80,6 +124,7 @@ class EventApi(Resource):
         """Modify individual event"""
         pass
 
+
     def delete(self, event_id):
         """Delete individual event"""
         pass
@@ -88,6 +133,7 @@ class EventApi(Resource):
 class LabelApi(Resource):
     """API for interacting with all labels (searching, creating)"""
 
+
     def get(self, label_name=None):
         """Retrieve labels"""
         if label_name:  # use event id if present
@@ -95,6 +141,7 @@ class LabelApi(Resource):
             if not result:
                 abort(404)
             else:
+
                 return jsonify(mongo_to_dict(result))
         else:  # search database based on parameters
             # TODO: search based on terms
@@ -118,6 +165,7 @@ class LabelApi(Resource):
         else:  # return success
             return jsonify({'id': str(new_event.id)}), 201
 
+
     def put(self, label_name):
         """Replace individual event"""
         pass
@@ -128,4 +176,42 @@ class LabelApi(Resource):
 
     def delete(self, label_name):
         """Delete individual event"""
+        pass
+
+
+class ICSFeed(Resource):
+
+    def get(self, ics_name=None):
+        if ics_name:
+            # configure ics specs from fullcalendar to be mongoengine searchable
+            query = event_query(get_to_event_search(request))
+            results = db.Event.objects(**query)
+            response = mongo_to_ics(results)
+            cd = "attachment;filename="+ics_name+".ics"
+            return Response(response,
+                       mimetype="text/calendar",
+                       headers={"Content-Disposition": cd})
+
+
+
+    def post(self):
+        #reads outside ics feed
+        url = request_to_dict(request)
+        data = requests.get(url['url'].strip()).content.decode('utf-8')
+        cal = Calendar.from_ical(data)
+
+        for component in cal.walk():
+            if component.name == "VEVENT":
+                print(component.get('summary'))
+                print(component.get('dtstart'))
+                print(component.get('dtend'))
+                print(component.get('dtstamp'))
+
+    def put(self, ics_name):
+        pass
+
+    def patch(self, ics_name):
+        pass
+
+    def delete(self, ics_name):
         pass
