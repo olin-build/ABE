@@ -55,7 +55,7 @@ class EventApi(Resource):
             if 'start' in query_dict:
                 start = datetime.strptime(query_dict['start'], '%Y-%m-%d')
             else:
-                start = datetime(2017,7,1)
+                start = datetime(2017,6,1)
             if 'end' in query_dict:
                 end = datetime.strptime(query_dict['end'], '%Y-%m-%d')
             else:
@@ -70,6 +70,7 @@ class EventApi(Resource):
                     events_list = recurring_to_full(event, events_list, start, end)
                 else:
                     events_list.append(mongo_to_dict(event))
+                logging.debug("events_list: {}".format(events_list))
             return jsonify(events_list)
 
     def post(self):
@@ -77,21 +78,6 @@ class EventApi(Resource):
         received_data = request_to_dict(request)
         logging.debug("Received POST data: {}".format(received_data))  # combines args and form
         try:
-            ''' <-- implement this code for updating subevents
-            iso_to_dt = lambda s: datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ") - timedelta(hours=4)
-
-            received_data['start'] = iso_to_dt(received_data['start'])
-
-            if 'end' in received_data and received_data['end'] is not None:
-                received_data['end'] = iso_to_dt(received_data['end'])
-
-            if 'rec_id' in received_data and received_data['rec_id'] is not None:
-                received_data['rec_id'] = iso_to_dt(received_data['rec_id'])
-
-            if 'sid' in received_data and received_data['sid'] is not None:
-                update_sub_event(received_data)
-            else:
-            '''
             new_event = db.Event(**received_data)
             new_event.save()
         except ValidationError as error:
@@ -132,7 +118,14 @@ class EventApi(Resource):
         received_data = request_to_dict(request)
         logging.debug("Received PUT data: {}".format(received_data))
         try:
-            result.update(**received_data)
+            if 'sid' in received_data and received_data['sid'] is not None:
+                iso_to_dt = lambda s: datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ") - timedelta(hours=4)
+
+                if 'rec_id' in received_data and received_data['rec_id'] is not None:
+                    received_data['rec_id'] = iso_to_dt(received_data['rec_id'])
+                    update_sub_event(received_data, result)
+            else:
+                result.update(**received_data)
         except ValidationError as error:
             if 'application/json' in request.headers['Content-Type']:
                 return make_response(jsonify({
