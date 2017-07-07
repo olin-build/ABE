@@ -314,7 +314,7 @@ def update_sub_event(received_data, result):
     else:
         result.update(add_to_set__sub_events=rec_event)
 
-    logging.debug("Updated reccurence with event with id {}".format(record_id))
+    logging.debug("Updated reccurence with event with id {}".format(result))
 
     return(record_id)
 
