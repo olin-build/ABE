@@ -70,7 +70,6 @@ class EventApi(Resource):
                     events_list = recurring_to_full(event, events_list, start, end)
                 else:
                     events_list.append(mongo_to_dict(event))
-                logging.debug("events_list: {}".format(events_list))
             return jsonify(events_list)
 
     def post(self):
