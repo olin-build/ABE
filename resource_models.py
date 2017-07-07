@@ -122,7 +122,7 @@ class EventApi(Resource):
                 iso_to_dt = lambda s: datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ") - timedelta(hours=4)
 
                 if 'rec_id' in received_data and received_data['rec_id'] is not None:
-                    received_data['rec_id'] = iso_to_dt(received_data['rec_id'])
+                    received_data['rec_id'] = dateutil.parser.parse(str(received_data['rec_id']))
                     update_sub_event(received_data, result)
             else:
                 result.update(**received_data)
