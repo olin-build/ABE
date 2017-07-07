@@ -14,6 +14,7 @@ from bson import objectid
 from mongoengine import *
 
 import isodate
+import dateutil.parser
 
 import database as db
 
@@ -259,8 +260,8 @@ def recurring_to_full(event, events_list, start, end):
 
     return(events_list)
 
-def placeholder_recurring_creation(instance, events_list, event):
-    instance = datetime.strptime(str(instance), "%Y-%m-%d %H:%M:%S")
+def placeholder_recurring_creation(instance, events_list, event, edit_recurrence=False):
+    instance = dateutil.parser.parse(str(instance))
     try:
         event_end = datetime.strptime(str(event['end']), "%Y-%m-%d %H:%M:%S")
     except:
@@ -287,8 +288,10 @@ def placeholder_recurring_creation(instance, events_list, event):
         fake_object['sid'] = str(event['id'])
         fake_object['labels'] = event['labels']
         events_list.append(fake_object) #json.dumps(fake_object, default=json_util.default))
-
-    return(events_list)
+    if edit_recurrence == True:
+        return(fake_object)
+    else:
+        return(events_list)
 
 
 def update_sub_event(received_data):
