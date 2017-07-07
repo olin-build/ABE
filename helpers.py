@@ -316,7 +316,7 @@ def update_sub_event(received_data, result):
 
     logging.debug("Updated reccurence with event with id {}".format(result))
 
-    return(record_id)
+    return(result)
 
 def sub_event_to_full(sub_event, event):
     recurring_def_fields = ["end_recurrence", "recurrence", "sub_events"]
