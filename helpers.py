@@ -55,7 +55,7 @@ def list_field_to_dict(list_field):
 
     for item in list_field:
         if isinstance(item, EmbeddedDocument):
-            return_data.append(mongo_to_dict(item,[]))
+            return_data.append(mongo_to_dict(item))
         else:
             return_data.append(mongo_to_python_type(item,item))
 
