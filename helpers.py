@@ -2,6 +2,8 @@
 """Miscellaneous helper functions of varying usefulness
 helpful inspiration: https://gist.github.com/jason-w/4969476
 """
+from mongoengine import ValidationError
+
 import logging
 import pdb
 
@@ -220,6 +222,20 @@ def event_query(search_dict):
     return query
 
 
+def multi_search(table, thing_to_search, fields):
+    """Search multiple fields with the same input
+    This could be done with $or and __raw__ with mongoengine but ObjectID needs to be cast/checked correctly.
+    """
+    for field in fields:
+        try:
+            result = table.objects(**{field: thing_to_search}).first()
+        except ValidationError:
+            result = None
+        if result:
+            return result
+    return None
+
+
 def recurring_to_full(event, events_list, start, end):
     if 'sub_events' in event:
         for sub_event in event['sub_events']:
@@ -300,5 +316,3 @@ def update_sub_event(received_data):
         logging.debug("Updated entry with id {}".format(record_id))
 
     return(record_id)
-
-
