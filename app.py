@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Main flask app"""
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 from flask_restful import Api
 from flask_cors import CORS
 from flask_sslify import SSLify  # redirect to https
@@ -16,6 +16,15 @@ app = Flask(__name__)
 CORS(app)
 SSLify(app)
 api = Api(app)
+
+
+# add return representations
+@api.representation('application/json')
+def output_json(data, code, headers=None):
+    resp = jsonify(data)
+    resp.status_code = code
+    resp.headers.extend(headers or {})
+    return resp
 
 # Route resources
 api.add_resource(EventApi, '/events/', methods=['GET', 'POST'], endpoint='event')
