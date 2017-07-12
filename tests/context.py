@@ -5,6 +5,8 @@ https://python-guide-pt-br.readthedocs.io/en/latest/writing/structure/#test-suit
 """
 import os
 import sys
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-import sample
+sys.path.insert(0, os.path.abspath('..'))
+# sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# lib_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../modules'))
+# sys.path.append(lib_path)
+import abe

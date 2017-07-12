@@ -16,7 +16,7 @@ from mongoengine import *
 import isodate
 import dateutil.parser
 
-import database as db
+from . import database as db
 
 
 def mongo_to_dict(obj):
@@ -99,7 +99,7 @@ def create_ics_event(event,recurrence=False):
     else:
         uid = str(event['sid'])
         new_event.add('RECURRENCE-ID', event['rec_id'])
-        
+
     new_event.add('UID', uid)
     return(new_event)
 
@@ -144,7 +144,7 @@ def mongo_to_ics(events):
         recurrence = event['recurrence']
         if recurrence:
             new_event = create_ics_recurrence(new_event, recurrence)
-            
+
         if event['sub_events']:
             for sub_event in event['sub_events']:
                 full_sub_event = sub_event_to_full(mongo_to_dict(sub_event), event)
@@ -173,7 +173,7 @@ def ics_to_mongo(component, labels):
         rrule = component.get('rrule')
         rec_def = {}
         rec_def['frequency'] = str(rrule.get('freq')[0])
-        if 'until' in rrule:   
+        if 'until' in rrule:
             rec_def['until'] = rrule.get('until')[0]
         if 'BYDAY' in rrule:
             rec_def['by_day'] = rrule.get('BYDAY')
@@ -217,7 +217,7 @@ def event_query(search_dict):
     """Build mongo query for searching events based on query
     By default FullCalendar sends 'start' and 'end' as ISO8601 date strings
     Has two queries: one for regular events and one for recurring events"""
-    
+
     #the key in params dicts maps to the keys in the request given
     #the keys in the lambda functions map to the keys in MongoDb
     params_reg_event = {
@@ -238,7 +238,7 @@ def event_query(search_dict):
         'visibility': lambda a: {'visibility' : {'$in': a}},
     }
 
-    query_reg_event = {}    
+    query_reg_event = {}
     for key, get_pattern in params_reg_event.items():
         if key in search_dict.keys():
             query_reg_event.update(get_pattern(search_dict[key]))
@@ -277,7 +277,7 @@ def recurring_to_full(event, events_list, start, end):
                     events_list.append(sub_event_to_full(mongo_to_dict(sub_event), event))
 
     rule_list = instance_creation(event)
-    
+
     for instance in rule_list:
         if instance >= start and instance < end:
             events_list = placeholder_recurring_creation(instance, events_list, event)
@@ -304,7 +304,7 @@ def instance_creation(event):
             rByDay.append(day_list.index(i))
     else:
         rByDay = None
-    
+
     rule_list = list(rrule(freq=rFrequency, count=rCount, interval=rInterval, until=rUntil, bymonth=rByMonth, \
         bymonthday=rByMonthDay, byweekday=rByDay, dtstart=ensure_date_time(event['start'])))
 
@@ -350,7 +350,7 @@ def duplicate_query_check(sub_event_dict, parent_event):
     for field in sub_event_dict:
         if field in parent_event_dict:
             if sub_event_dict[field] == parent_event_dict[field]:
-               fields_to_pop.append(field) 
+               fields_to_pop.append(field)
     for field in fields_to_pop:
         sub_event_dict.pop(field)
 
@@ -397,7 +397,7 @@ def sub_event_to_full(sub_event_dict, event):
     if 'end' in sub_event_dict:
         sub_event_dict['end'] = dateutil.parser.parse(str(sub_event_dict['end']))
     if 'rec_id' in sub_event_dict:
-        sub_event_dict['rec_id'] = dateutil.parser.parse(str(sub_event_dict['rec_id']))     
+        sub_event_dict['rec_id'] = dateutil.parser.parse(str(sub_event_dict['rec_id']))
     return(sub_event_dict)
 
 def access_sub_event(parent_event, sub_event_id):
@@ -418,5 +418,3 @@ def create_new_sub_event_defintion(sub_event, updates, parent_event):
 def find_recurrence_end(event):
     rule_list = instance_creation(event)
     return(rule_list[-1])
-
-
