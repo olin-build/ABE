@@ -51,13 +51,15 @@ sample_events = [
        {'title':'Not a club',
         'start': datetime(2017, 7, 3, 16),
         'end': datetime(2017, 7, 3, 18),
-        'rec_id': datetime(2017,7,3,15)
+        'rec_id': datetime(2017,7,3,15),
+        'deleted': False,
         },
         {'location': 'LOOOOOOOD',
         'description': 'reading NEWL BOOKS',
         'start': datetime(2017, 6, 26, 15),
         'end': datetime(2017, 6, 26, 19),
-        'rec_id': datetime(2017,6,26,15)
+        'rec_id': datetime(2017,6,26,15),
+        'deleted': False,
         }
     ],
     },
@@ -83,7 +85,8 @@ sample_events = [
         'description': 'reading lame books',
         'start': datetime(2017, 7, 16, 16), 
         'end': datetime(2017, 7, 16, 18),
-        'rec_id': datetime(2017,7,19,15)
+        'rec_id': datetime(2017,7,19,15),
+        'deleted': False,
         },
     ],
     },
