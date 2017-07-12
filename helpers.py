@@ -379,7 +379,8 @@ def update_sub_event(received_data, parent_event, sub_event_id):
             updated_sub_event = db.RecurringEventExc(**updated_sub_event_dict)
             parent_event.update(pull__sub_events___id=sub_event_id)
             parent_event.update(add_to_set__sub_events=updated_sub_event_dict)
-
+            parent_event.recurrence_end = find_recurrence_end(parent_event)
+            parent_event.save()
     return(updated_sub_event)
 
 def sub_event_to_full(sub_event_dict, event):

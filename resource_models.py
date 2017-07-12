@@ -124,8 +124,8 @@ class EventApi(Resource):
                         result = create_sub_event(received_data, result)
                 else:
                     result.update(**received_data)
-                    result.recurrence_end = find_recurrence_end(result)
-                    result.save()
+    
+                    
         except ValidationError as error:
                 return {'error_type': 'validation',
                         'validation_errors': [str(err) for err in error.errors],
