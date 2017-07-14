@@ -2,104 +2,70 @@
 # -*- coding: utf-8 -*-
 """Sample data that can be added to the database"""
 from datetime import datetime
+from dateutil import parser
 
 sample_events = [
-  {
-    "visibility": "olin",
-    "title": "Coffee Break",
-    "start": datetime(2017, 6, 14, 15, 0),
-    "end": None,
-    "description": 'Fika (Swedish pronunciation: [²fiːka]) is a concept in Swedish (and Finnish) culture with the basic meaning "to have coffee", often accompanied with pastries, cookies or pie.',
-    "location": "Library",
-    "labels": ['food', 'library'],
-  },
-  {
-    "visibility": "public",
-    "title": "OWL",
-    "start": datetime(2017, 6, 15, 18, 30),
-    "end": datetime(2017, 6, 15, 18, 30),
-    "description": "Olin Workshop in the Library.\nTonight's topics include:\n- Pajama Jammy Jam reflections\n- parachute cleanup\n- workroom ideation",
-    "location": "Library",
-    "labels": ['clubs', 'OWL', 'library'],
-  },
-  {
-    "visibility": "students",
-    "title": "First Day of Work!",
-    "start": datetime(2017, 6, 1, 9, 15),
-    "end": datetime(2017, 6, 1, 17, 0),
-    "description": 'Bring clothes to work/paint in',
-    "location": "Library",
-    "labels": ['summer', 'library'],
-  },
-  {
-    "visibility": "olin",
-    'title':'Book Club',
-    'location': 'Quiet Reading Room',
-    'description': 'reading cool books',
-    'start': datetime(2017, 6, 1, 15), 
-    'end': datetime(2017, 6, 1, 16),
-    'recurrence_end': datetime(2017, 7, 26),
-    "labels": ["summer", "library"],
-    'recurrence' : {
-        'frequency' : 'WEEKLY',
-        'interval' : '1',
-        'until' : datetime(2017, 7, 26),
-        'by_day' : ["MO", 'TU']
-
-        },
-    'sub_events' : [
-       {'title':'Not a club',
-        'start': datetime(2017, 7, 3, 16),
-        'end': datetime(2017, 7, 3, 18),
-        'rec_id': datetime(2017,7,3,15),
-        'deleted': False,
-        },
-        {'location': 'LOOOOOOOD',
-        'description': 'reading NEWL BOOKS',
-        'start': datetime(2017, 6, 26, 15),
-        'end': datetime(2017, 6, 26, 19),
-        'rec_id': datetime(2017,6,26,15),
-        'deleted': False,
+    {
+        "visibility": "olin",
+        'title': 'Coffee Break',
+        'location': 'Quiet Reading Room',
+        'description': 'Fika (Swedish pronunciation: [²fiːka]) is a concept in Swedish (and Finnish) culture with the basic meaning "to have coffee", often accompanied with pastries, cookies or pie.',
+        'start': datetime(2017, 6, 1, 19),
+        'end': datetime(2017, 6, 1, 19, 30),
+        'recurrence_end': datetime(2017, 7, 31),
+        "labels": ["summer", "library", "owl"],
+        'recurrence': {
+            'frequency': 'WEEKLY',
+            'interval': '1',
+            'until': datetime(2017, 7, 31),
+            'by_day': ["MO", "TU", "WE", "TH", "FR"]
         }
-    ],
     },
-
     {
-    "visibility": "olin",
-    'title':'Newsch Celebration',
-    'location': 'Library',
-    'description': 'Doing cool newsch things',
-    'start': datetime(2017, 7, 5, 15),
-    'end': datetime(2017, 7, 5, 16),
-    'recurrence_end': datetime(2017, 7, 26),
-    "labels": ["summer", "library"],
-    'recurrence' : {
-        'frequency' : 'WEEKLY',
-        'interval' : '1',
-        'count' : '4',
-        'by_day' : ["WE"]
-        },
-    'sub_events' : [
-       {'title':'no more newsch',
-        'location': 'Loud Reading Room',
-        'description': 'reading lame books',
-        'start': datetime(2017, 7, 16, 16), 
-        'end': datetime(2017, 7, 16, 18),
-        'rec_id': datetime(2017,7,19,15),
-        'deleted': False,
-        },
-    ],
+        "visibility": "olin",
+        "title": "Extended Productivity Session",
+        "location": "Library",
+        "start": datetime(2017, 7, 13, 21),
+        "end": datetime(2017, 7, 14, 4),
+        "labels": ["summer", "library", "owl", 'featured'],
     },
-
     {
-    "visibility" : "olin",
-    "title": "Bowling!",
-    "start": datetime(2017, 6, 27, 17, 0),
-    "end": datetime(2017, 6, 27, 19, 0),
-    "description": 'Drive/Carpool to Lanes and Games\n- Appetizers\n- Pizza\n- Bowling\n- Etc.',
-    "location": "195 Concord Turnpike, Rte 2E\nCambridge, MA 02140",
-    "labels": ['summer', 'library', 'potluck'],
-  },
+        "visibility": "public",
+        "title": "OWL",
+        "start": datetime(2017, 6, 15, 18, 30),
+        "end": datetime(2017, 6, 15, 18, 30),
+        "description": "Olin Workshop in the Library.\nTonight's topics include:\n- Pajama Jammy Jam reflections\n- parachute cleanup\n- workroom ideation",
+        "location": "Library",
+        "labels": ['clubs', 'OWL', 'library'],
+    },
+    {
+        "visibility": "students",
+        "title": "First Day of Work!",
+        "start": datetime(2017, 6, 1, 9, 15),
+        "end": datetime(2017, 6, 1, 17, 0),
+        "description": 'Bring clothes to work/paint in',
+        "location": "Library",
+        "labels": ['summer', 'library'],
+    },
+    {
+        "visibility": "olin",
+        "title": "Bowling!",
+        "start": datetime(2017, 6, 27, 21, 0),
+        "end": datetime(2017, 6, 27, 23, 0),
+        "description": 'Drive/Carpool to Lanes and Games\n- Appetizers\n- Pizza\n- Bowling\n- Etc.',
+        "location": "195 Concord Turnpike, Rte 2E\nCambridge, MA 02140",
+        "labels": ['summer', 'library', 'potluck', 'featured'],
+    },
+    {
+        "_cls": "Event",
+        "title": "Midnight Memes",
+        "description": "![now including surreal memes](https://i.imgur.com/I1Nvebi.jpg)",
+        "location": "EH3nw",
+        "start": parser.parse("2017-07-15T03:59:53Z"),
+        "end": parser.parse("2017-07-15T05:00:53Z"),
+        "visibility": "students",
+        "labels": ["featured"],
+    }
 ]
 
 sample_labels = [
@@ -126,8 +92,12 @@ sample_labels = [
     },
     {
         "name": "potluck",
+    },
+    {
+        "name": "featured",
     }
 ]
+
 
 def load_data(db, event_data=sample_events, label_data=sample_labels):
     import logging
@@ -138,6 +108,7 @@ def load_data(db, event_data=sample_events, label_data=sample_labels):
     logging.info("Inserting sample label data")
     for label in label_data:
         db.Label(**label).save()
+
 
 if __name__ == '__main__':  # import data
     import database as db
