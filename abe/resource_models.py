@@ -120,6 +120,7 @@ class EventApi(Resource):
                         result = create_sub_event(received_data, result)
                 else:
                     result.update(**received_data)
+                    result.reload()
 
 
         except ValidationError as error:
@@ -196,6 +197,7 @@ class LabelApi(Resource):
 
         try:
             result.update(**received_data)
+            result.reload()  # load the new document data into the local object
         except ValidationError as error:
             return {'error_type': 'validation',
                     'validation_errors': [str(err) for err in error.errors],
