@@ -111,5 +111,5 @@ def load_data(db, event_data=sample_events, label_data=sample_labels):
 
 
 if __name__ == '__main__':  # import data
-    import database as db
+    from . import database as db
     load_data(db)
