@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from dateutil.rrule import rrule, MONTHLY, WEEKLY, DAILY, YEARLY
 from .helpers import (
     mongo_to_dict, request_to_dict, mongo_to_ics, event_query, get_to_event_search,
-    recurring_to_full, update_sub_event
+    recurring_to_full, update_sub_event, ics_to_mongo
     )
 from icalendar import Calendar
 import isodate
