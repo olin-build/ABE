@@ -30,6 +30,13 @@ class RecurringEventExc(EmbeddedDocument):  # TODO: get a better name
     rec_id = DateTimeField()
     deleted = BooleanField(required=True, default=False)
     _id = ObjectIdField(default=ObjectId)
+    meta = {
+        'indexes': [
+            'sid',
+            'rec_id',
+            '_id'
+        ]
+    }
 
 
 class Event(Document):
@@ -51,7 +58,13 @@ class Event(Document):
     recurrence = EmbeddedDocumentField(RecurringEventDefinition)
     sub_events = EmbeddedDocumentListField(RecurringEventExc)
 
-    meta = {'allow_inheritance': True}  # TODO: set indexes
+    meta = {'allow_inheritance': True,
+        'indexes': [
+            'start',
+            'end',
+            'recurrence_end']
+        } 
+
 
     # TODO: look into clean() function for more advanced data validation
 
