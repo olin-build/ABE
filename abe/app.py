@@ -11,8 +11,9 @@ import logging
 FORMAT = "%(levelname)s:ABE: _||_ %(message)s"
 logging.basicConfig(level=logging.DEBUG, format=FORMAT)
 
-from .resource_models.event_resources import EventApi, ICSFeed
+from .resource_models.event_resources import EventApi
 from .resource_models.label_resources import LabelApi
+from .resource_models.ics_resources import ICSApi
 
 app = Flask(__name__)
 CORS(app)
@@ -35,8 +36,8 @@ api.add_resource(EventApi, '/events/<string:event_id>/<string:rec_id>', methods=
 api.add_resource(LabelApi, '/labels/', methods=['GET', 'POST'], endpoint='label')
 api.add_resource(LabelApi, '/labels/<string:label_name>', methods=['GET', 'PUT', 'PATCH', 'DELETE'], endpoint='label_name')
 
-api.add_resource(ICSFeed, '/ics/', methods=['GET', 'POST'], endpoint='ics')
-api.add_resource(ICSFeed, '/ics/<string:ics_name>', methods=['GET', 'PUT', 'PATCH', 'DELETE'], endpoint='ics_name')
+api.add_resource(ICSApi, '/ics/', methods=['GET', 'POST'], endpoint='ics')
+api.add_resource(ICSApi, '/ics/<string:ics_name>', methods=['GET', 'PUT', 'PATCH', 'DELETE'], endpoint='ics_name')
 
 
 @app.route('/')

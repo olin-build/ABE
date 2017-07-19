@@ -1,5 +1,5 @@
 from celery import Celery
-from abe.helpers import update_ics_feed
+from abe.helper_functions.ics_helpers import update_ics_feed
 from abe import database as db
 import time 
 import logging
