@@ -11,7 +11,8 @@ import logging
 FORMAT = "%(levelname)s:ABE: _||_ %(message)s"
 logging.basicConfig(level=logging.DEBUG, format=FORMAT)
 
-from .resource_models import EventApi, LabelApi, ICSFeed
+from .resource_models.event_resources import EventApi, ICSFeed
+from .resource_models.label_resources import LabelApi
 
 app = Flask(__name__)
 CORS(app)
