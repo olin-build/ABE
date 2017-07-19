@@ -57,12 +57,3 @@ class Event(Document):
     meta = {'allow_inheritance': True}  # TODO: set indexes
 
     # TODO: look into clean() function for more advanced data validation
-
-class Label(Document):
-    """Model for labels of events"""
-    name = StringField(required=True, unique=True)  # TODO: set to primary key?
-    description = StringField()
-    url = URLField()
-
-class ICS(Document):
-    url = StringField()
