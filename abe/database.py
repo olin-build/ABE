@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Connect to mongodb"""
 from mongoengine import *
-from .document_models import Event, Label, RecurringEventExc
+from .document_models import Event, Label, RecurringEventExc, ICS
 import os
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -31,3 +31,6 @@ else:
     location = 'localhost'
 
 logging.info('Using db "{}" with {}'.format(mongo_db_name, location))
+
+def return_uri():
+	return mongo_uri
