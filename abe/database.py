@@ -3,6 +3,7 @@
 from mongoengine import *
 from .document_models.event_documents import Event, RecurringEventExc
 from .document_models.label_documents import Label
+from .document_models.ics_documents import ICS
 import os
 import logging
 logging.basicConfig(level=logging.DEBUG)

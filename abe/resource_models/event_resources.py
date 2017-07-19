@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Resource models for flask"""
+"""Event Resource models for flask"""
 
 from flask import jsonify, request, abort, Response, make_response
 from flask_restful import Resource
@@ -12,14 +12,16 @@ from dateutil.rrule import rrule, MONTHLY, WEEKLY, DAILY, YEARLY
 from icalendar import Calendar
 import isodate
 
-from abe.helpers import *
-
 import pdb
 import requests
 
 import logging
 
 from abe import database as db
+from abe.helper_functions.converting_helpers import request_to_dict, mongo_to_dict
+from abe.helper_functions.recurring_helpers import recurring_to_full, placeholder_recurring_creation
+from abe.helper_functions.sub_event_helpers import create_sub_event, update_sub_event, sub_event_to_full, access_sub_event, find_recurrence_end
+from abe.helper_functions.query_helpers import get_to_event_search, event_query
 
 
 class EventApi(Resource):
@@ -150,40 +152,3 @@ class EventApi(Resource):
             logging.debug("Received DELETE data: {}".format(received_data))
             result.delete()
             return mongo_to_dict(result)
-
-
-class ICSFeed(Resource):
-    """API for interacting with ics feeds"""
-    def get(self, ics_name=None):
-        # configure ics specs from fullcalendar to be mongoengine searchable
-        query = event_query(get_to_event_search(request))
-        results = db.Event.objects(__raw__=query)
-        response = mongo_to_ics(results)
-        logging.debug("ics feed created")
-        cd = "attachment;filename=abe.ics"
-        return Response(response,
-                   mimetype="text/calendar",
-                   headers={"Content-Disposition": cd})
-
-    def post(self):
-        #reads outside ics feed
-        url = request_to_dict(request)
-        data = requests.get(url['url'].strip()).content.decode('utf-8')
-        print(url['url'])
-        cal = Calendar.from_ical(data)
-        if 'labels' in url:
-            labels = url['labels']
-        else:
-            labels = ['unlabeled']
-
-        extract_ics(cal, url['url'], labels)
-
-
-    def put(self, ics_name):
-        pass
-
-    def patch(self, ics_name):
-        pass
-
-    def delete(self, ics_name):
-        pass

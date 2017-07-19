@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Resource models for flask"""
+"""Label Resource models for flask"""
 
 from flask import jsonify, request, abort, Response, make_response
 from flask_restful import Resource
@@ -12,14 +12,14 @@ from dateutil.rrule import rrule, MONTHLY, WEEKLY, DAILY, YEARLY
 from icalendar import Calendar
 import isodate
 
-from abe.helpers import *
-
 import pdb
 import requests
 
 import logging
 
 from abe import database as db
+from abe.helper_functions.converting_helpers import mongo_to_dict, request_to_dict
+from abe.helper_functions.query_helpers import multi_search
 
 
 class LabelApi(Resource):
