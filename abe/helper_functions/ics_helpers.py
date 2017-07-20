@@ -12,7 +12,7 @@ import logging
 import pdb
 import pytz
 
-from icalendar import Calendar, Event, vCalAddress, vText, vDatetime
+from icalendar import Calendar, Event, vCalAddress, vText, vDatetime, Timezone
 from dateutil.rrule import rrule, MONTHLY, WEEKLY, DAILY, YEARLY
 from datetime import datetime, timedelta, timezone
 from bson import objectid
@@ -31,13 +31,30 @@ from abe.helper_functions.sub_event_helpers import create_sub_event, update_sub_
 def create_ics_event(event,recurrence=False):
     """creates ICS event definition
     """
+    date_to_ics = lambda a: a[:-9].replace('-','')
+
     new_event = Event()
     new_event.add('summary', event['title'])
     new_event.add('location', event['location'])
     new_event.add('description', event['description'])
-    new_event.add('dtstart', event['start'])
+    if event['allDay'] == True:
+        start_string = 'dtstart;VALUE=DATE'
+        end_string = 'dtend;VALUE=DATE'
+        event_start = date_to_ics(event['start'].isoformat())
+        event_end = date_to_ics(event['end'].isoformat())
+        if (event['end'] - event['start']) < timedelta(days=1):
+            event_end = str(int(event_end) + 1)
+    else:
+        start_string = 'dtstart'
+        end_string = 'dtend'
+        
+        utc = pytz.utc
+        event_start = utc.localize(event['start'])
+        event_end = utc.localize(event['end'])
+
+    new_event.add(start_string, event_start)
     if 'end' in event:
-        new_event.add('dtend', event['end'])
+        new_event.add(end_string, event_end)
     new_event.add('TRANSP', 'OPAQUE')
 
     if recurrence == False:
@@ -73,9 +90,14 @@ def create_ics_recurrence(new_event, recurrence):
         elif recurrence['by_month_day']:
             rec_ics_string['bymonthday'] = recurrence['by_month_day']
 
+    elif frequency == 'YEARLY':
+        if recurrence['by_month']:
+            rec_ics_string['bymonth'] = recurrence['by_month']
+        elif recurrence['by_year_day']:
+            rec_ics_string['byyearday'] = recurrence['by_year_day']
+
     new_event.add('RRULE', rec_ics_string)
     return(new_event)
-
 
 def mongo_to_ics(events):
     """creates the iCal based on the MongoDb database
@@ -84,6 +106,8 @@ def mongo_to_ics(events):
 
     #initialize calendar object
     cal = Calendar()
+    cal.add('PRODID', 'ABE')
+    cal.add('VERSION', '2.0')
     for event in events:
         new_event = create_ics_event(event)
 
@@ -101,8 +125,6 @@ def mongo_to_ics(events):
         #vevent.add('attendee', 'MAILTO:emily.lepert@gmail.com')
 
         cal.add_component(new_event)
-
-
     response = cal.to_ical()
     return response
 
