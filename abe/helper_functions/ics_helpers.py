@@ -131,15 +131,17 @@ def mongo_to_ics(events):
 
 def ics_to_dict(component, labels, ics_id=None):
     event_def = {}
+    utc = pytz.utc
+    convert_timezone = lambda a: a.astimezone(utc)
     event_def['title'] = str(component.get('summary'))
     event_def['description'] = str(component.get('description'))
     event_def['location'] = str(component.get('location'))
-    event_def['start'] = component.get('dtstart').dt
-    event_def['end'] = component.get('dtend').dt
+    event_def['start'] = convert_timezone(component.get('dtstart').dt)
+    event_def['end'] = convert_timezone(component.get('dtend').dt)
     event_def['labels'] = labels
     
     if component.get('recurrence-id'):
-        event_def['rec_id'] = component.get('recurrence-id').dt
+        event_def['rec_id'] = convert_timezone(component.get('recurrence-id').dt)
     else:
         event_def['ics_id'] = ics_id
     event_def['UID'] = str(component.get('uid'))
@@ -148,7 +150,7 @@ def ics_to_dict(component, labels, ics_id=None):
         rec_def = {}
         rec_def['frequency'] = str(rrule.get('freq')[0])
         if 'until' in rrule:
-            rec_def['until'] = rrule.get('until')[0]
+            rec_def['until'] = convert_timezone(rrule.get('until')[0])
         if 'count' in rrule:
             rec_def['count'] = str(rrule.get('count')[0])
         if 'BYDAY' in rrule:
@@ -178,6 +180,7 @@ def extract_ics(cal, ics_url, labels=None):
     else:
         ics_object = db.ICS(**{'url':ics_url}).save()
         temporary_dict = []
+        timezone_info = ''
         for component in cal.walk():
             if component.name == "VEVENT":
                 com_dict = ics_to_dict(component, labels, ics_object.id)
