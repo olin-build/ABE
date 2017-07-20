@@ -9,3 +9,7 @@ class Label(Document):
     name = StringField(required=True, unique=True)  # TODO: set to primary key?
     description = StringField()
     url = URLField()
+    default = BooleanField(default=False)  # suggested to display by default
+    parent_labels = ListField(StringField())  # rudimentary hierarchy of labels
+    color = StringField()  # suggested color for label
+    visibility = StringField()  # suggested visibility
