@@ -4,6 +4,9 @@ from flask import Flask, render_template, jsonify
 from flask_restful import Api
 from flask_cors import CORS
 from flask_sslify import SSLify  # redirect to https
+from flask.json import JSONEncoder
+
+from datetime import datetime
 
 import os
 
@@ -19,6 +22,18 @@ app = Flask(__name__)
 CORS(app)
 SSLify(app)
 api = Api(app)
+
+
+class CustomJSONEncoder(JSONEncoder):
+
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        else:
+            return JSONEncoder.default(self, obj)
+
+
+app.json_encoder = CustomJSONEncoder
 
 # add return representations
 @api.representation('application/json')
