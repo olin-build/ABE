@@ -255,5 +255,4 @@ def load_data(
 
 if __name__ == '__main__':  # import data
     from . import database as db
-    
     load_data(db)
