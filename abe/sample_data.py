@@ -202,6 +202,10 @@ sample_labels = [
     {
         "name": "testing",
         "description": "Sample events for testing"
+    },
+    {
+        "name": "unlabeled",
+        "description": "Events with the unlabeled label."
     }
 ]
 

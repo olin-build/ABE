@@ -35,7 +35,7 @@ def mongo_to_dict(obj):
 
     for field_name in obj._fields:
 
-        if obj[field_name]:  # check if field is populated
+        if field_name in obj:  # check if field is populated
             if field_name in ("id",):
                 continue
 
@@ -47,7 +47,7 @@ def mongo_to_dict(obj):
             elif isinstance(obj._fields[field_name], DictField):
                 return_data.append((field_name, data))
             else:
-                return_data.append((field_name, mongo_to_python_type(obj._fields[field_name],data)))
+                return_data.append((field_name, mongo_to_python_type(obj._fields[field_name], data)))
 
     return dict(return_data)
 
@@ -66,10 +66,12 @@ def list_field_to_dict(list_field):
     return return_data
 
 
-def mongo_to_python_type(field,data):
+def mongo_to_python_type(field, data):
     if isinstance(field, ObjectIdField):
         return str(data)
     elif isinstance(field, DecimalField):
+        return data
+    elif isinstance(field, BooleanField):
         return data
     else:
         return str(data)
