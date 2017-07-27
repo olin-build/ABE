@@ -10,7 +10,7 @@ import pytz
 
 from icalendar import Calendar, Event, vCalAddress, vText, vDatetime
 from dateutil.rrule import rrule, MONTHLY, WEEKLY, DAILY, YEARLY
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone, date
 from bson import objectid
 from mongoengine import *
 from icalendar import Calendar
@@ -55,6 +55,7 @@ def update_sub_event(received_data, parent_event, sub_event_id, ics=False):
                         if the update is coming from an ics feed:
                             - will be a rec_id (datetime object)
     """
+    convert_timezone = lambda a: a.replace(tzinfo=pytz.UTC) if isinstance(a, datetime) else a
     for sub_event in parent_event.sub_events:
         if ics == False: # if this update is not coming from an ics feed
             # if the sub_event to be updated's id matches the id of the received_data
@@ -69,7 +70,7 @@ def update_sub_event(received_data, parent_event, sub_event_id, ics=False):
                 parent_event.reload()
                 return(updated_sub_event)
         elif ics == True: # if this update is coming from an ics feed
-            sub_event_compare = sub_event["rec_id"].replace(tzinfo=pytz.UTC)
+            sub_event_compare = convert_timezone(sub_event["rec_id"])
             if sub_event_compare == sub_event_id:
                 updated_sub_event_dict = create_new_sub_event_defintion(mongo_to_dict(sub_event), received_data, parent_event)
                 updated_sub_event = db.RecurringEventExc(**updated_sub_event_dict)
@@ -128,17 +129,22 @@ def instance_creation(event, end=None):
     day_list = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']
 
     recurrence = event.recurrence
-    ensure_date_time = lambda a: dateutil.parser.parse(a) if not isinstance(a, datetime) else a
+    ensure_date_time = lambda a: dateutil.parser.parse(a) if not isinstance(a, datetime) and not isinstance(a, date) else a
+    convert_timezone = lambda a: a.replace(tzinfo=None) if isinstance(a, datetime) else a
 
     rFrequency = rec_type_list.index(recurrence['frequency'])
+    rStart = convert_timezone(ensure_date_time(event['start']))
     if recurrence['frequency'] == 'YEARLY': 
         # extracts the month and day from the date 
-        start = ensure_date_time(event['start']).replace(tzinfo=None)
-        rByMonth = int(start.month)
-        rByMonthDay = int(start.day)
+        rByMonth = int(rStart.month)
+        rByMonthDay = int(rStart.day)
         rByDay = None
     else:
-        rByMonthDay = int(recurrence['by_month_day']) if 'by_month_day' in recurrence else None
+        if 'by_month_day' in recurrence:
+            rByMonthDay = [int(x) for x in recurrence['by_month_day']]
+        else:
+            rByMonthDay = None
+        
         if 'by_month' in recurrence:
             rByMonth = [int(x) for x in recurrence['by_month']]
         else:
@@ -152,13 +158,13 @@ def instance_creation(event, end=None):
 
     rInterval = int(recurrence['interval'])
     if recurrence.forever == True:
-        rUntil = ensure_date_time(end).replace(tzinfo=None) if end is not None else None
+        rUntil = convert_timezone(ensure_date_time(end)) if end is not None else None
     else:
-        rUntil = ensure_date_time(recurrence['until']).replace(tzinfo=None) if 'until' in recurrence else None
+        rUntil = convert_timezone(ensure_date_time(recurrence['until'])) if 'until' in recurrence else None
     rCount = int(recurrence['count']) if 'count' in recurrence else None
-    
+
     rule_list = list(rrule(freq=rFrequency, count=rCount, interval=rInterval, until=rUntil, bymonth=rByMonth, \
-        bymonthday=rByMonthDay, byweekday=rByDay, dtstart=ensure_date_time(event['start']).replace(tzinfo=None)))
+        bymonthday=rByMonthDay, byweekday=rByDay, dtstart=rStart))
     return(rule_list)
 
 
