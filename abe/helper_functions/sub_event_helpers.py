@@ -129,11 +129,28 @@ def instance_creation(event, end=None):
     day_list = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']
 
     recurrence = event.recurrence
-    ensure_date_time = lambda a: dateutil.parser.parse(a) if not isinstance(a, datetime) and not isinstance(a, date) else a
-    convert_timezone = lambda a: a.replace(tzinfo=None) if isinstance(a, datetime) else a
+    eastern = pytz.timezone('US/Eastern')
+    utc = pytz.timezone('UTC')
+    ensure_date_time = lambda a: dateutil.parser.parse(a) if not isinstance(a, date) else a
+    #convert_to_utc = lambda a: a. if isinstance(a, datetime) else a
+    convert_to_eastern = lambda a: a.astimezone(utc).astimezone(eastern) if isinstance(a, datetime) else a
+    remove_timezone = lambda a: a.replace(tzinfo=None) if isinstance(a, datetime) else a
+    
+    rStart_eastern = convert_to_eastern(ensure_date_time(event['start']))
+
+    #rStart = convert_to_eastern(rStart)
+
+    #logging.debug("start convert_eastern: {} with day of week: {}".format(rStart, rStart.weekday()))
+
+    rStart = remove_timezone(rStart_eastern)
+    #logging.debug("start convert_eastern: {} with day of week: {}".format(rStart, rStart.weekday()))
+    if recurrence.forever == True:
+        rUntil_eastern = convert_to_eastern(ensure_date_time(end)) if end is not None else None
+    else:
+        rUntil_eastern = convert_to_eastern(ensure_date_time(recurrence['until'])) if 'until' in recurrence else None
+    rUntil = remove_timezone(rUntil_eastern) if rUntil_eastern is not None else None
 
     rFrequency = rec_type_list.index(recurrence['frequency'])
-    rStart = convert_timezone(ensure_date_time(event['start']))
     if recurrence['frequency'] == 'YEARLY': 
         # extracts the month and day from the date 
         rByMonth = int(rStart.month)
@@ -152,20 +169,39 @@ def instance_creation(event, end=None):
         if 'by_day' in recurrence:
             rByDay = []
             for i in recurrence['by_day']:
-                rByDay.append(day_list.index(i))
+                day_recurrence = day_list.index(i)
+
+                #if day_of_week_start != day_of_week_recurrence
+
+                rByDay.append(day_recurrence)
         else:
             rByDay = None
 
     rInterval = int(recurrence['interval'])
-    if recurrence.forever == True:
-        rUntil = convert_timezone(ensure_date_time(end)) if end is not None else None
-    else:
-        rUntil = convert_timezone(ensure_date_time(recurrence['until'])) if 'until' in recurrence else None
+    
     rCount = int(recurrence['count']) if 'count' in recurrence else None
+
+
 
     rule_list = list(rrule(freq=rFrequency, count=rCount, interval=rInterval, until=rUntil, bymonth=rByMonth, \
         bymonthday=rByMonthDay, byweekday=rByDay, dtstart=rStart))
-    return(rule_list)
+
+    logging.debug("rule_list {}".format(rule_list))
+    rule_list_final = []
+    for instance in rule_list:
+        instance = remove_timezone(instance.astimezone(utc)) if isinstance(instance, datetime) else instance
+        rule_list_final.append(instance)
+        '''
+        instance = instance.date() if isinstance(instance, datetime) else instance
+        rStart_eastern_time = rStart_eastern.time() if isinstance(rStart_eastern, datetime) else None
+        if rStart_eastern_time:
+            rule_list_final.append(datetime.combine(instance, rStart_eastern_time))
+        else:
+            rule_list_final.append(instance)
+        '''
+
+    logging.debug("rule_list_final {}".format(rule_list_final))
+    return(rule_list_final)
 
 
 def find_recurrence_end(event):

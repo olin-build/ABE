@@ -29,15 +29,15 @@ sample_events = [
         'title': 'Coffee Break',
         'location': 'Quiet Reading Room',
         'description': 'Fika (Swedish pronunciation: [²fiːka]) is a concept in Swedish (and Finnish) culture with the basic meaning "to have coffee", often accompanied with pastries, cookies or pie.',
-        'start': datetime(2017, 6, 1, 15),
-        'end': datetime(2017, 6, 1, 15, 30),
+        'start': datetime(2017, 7, 7, 22, 15),
+        'end': datetime(2017, 7, 7, 23, 15),
         'recurrence_end': datetime(2017, 7, 31),
         "labels": ["summer", "library"],
         'recurrence': {
             'frequency': 'WEEKLY',
             'interval': '1',
             'until': datetime(2017, 7, 31),
-            'by_day': ["MO", "TU", "WE", "TH", "FR"]
+            'by_day': ["TH","FR"]
         }
     },
     {
