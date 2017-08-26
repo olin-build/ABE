@@ -18,6 +18,7 @@ import requests
 import logging
 
 from abe import database as db
+from abe.auth import edit_auth_required
 from abe.helper_functions.converting_helpers import mongo_to_dict, request_to_dict
 from abe.helper_functions.query_helpers import multi_search
 
@@ -43,6 +44,7 @@ class LabelApi(Resource):
             else:
                 return [mongo_to_dict(result) for result in results]
 
+    @edit_auth_required
     def post(self):
         """Create new label with parameters passed in through args or form"""
         received_data = request_to_dict(request)
@@ -58,6 +60,7 @@ class LabelApi(Resource):
         else:  # return success
             return mongo_to_dict(new_label), 201 
 
+    @edit_auth_required
     def put(self, label_name):
         """Modify individual label"""
         logging.debug('Label requested: ' + label_name)
@@ -76,6 +79,7 @@ class LabelApi(Resource):
         else:  # return success
             return mongo_to_dict(result)
 
+    @edit_auth_required
     def delete(self, label_name):
         """Delete individual label"""
         logging.debug('Label requested: ' + label_name)

@@ -18,6 +18,7 @@ import requests
 import logging
 
 from abe import database as db
+from abe.auth import edit_auth_required
 from abe.helper_functions.converting_helpers import request_to_dict
 from abe.helper_functions.query_helpers import get_to_event_search, event_query
 from abe.helper_functions.ics_helpers import mongo_to_ics, extract_ics
@@ -41,6 +42,7 @@ class ICSApi(Resource):
                    headers={"Content-Disposition": cd})
 
 
+    @edit_auth_required
     def post(self):
         """
         Converts an ICS feed input to mongoDB objects
