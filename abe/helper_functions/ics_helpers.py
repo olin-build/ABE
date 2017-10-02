@@ -10,7 +10,7 @@ import pytz
 
 from icalendar import Calendar, Event, vCalAddress, vText, vDatetime, Timezone
 from dateutil.rrule import rrule, MONTHLY, WEEKLY, DAILY, YEARLY
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone, date, time
 from bson import objectid
 from mongoengine import *
 from icalendar import Calendar
@@ -163,7 +163,7 @@ def ics_to_dict(component, labels, ics_id=None):
     event_def = {}
 
     utc = pytz.utc
-    convert_timezone = lambda a: a.astimezone(utc)
+    convert_timezone = lambda a: a.astimezone(utc) if isinstance(a, datetime) else a
 
     event_def['title'] = str(component.get('summary'))
     event_def['description'] = str(component.get('description'))
@@ -171,6 +171,15 @@ def ics_to_dict(component, labels, ics_id=None):
 
     event_def['start'] = convert_timezone(component.get('dtstart').dt)
     event_def['end'] = convert_timezone(component.get('dtend').dt)
+    if isinstance(event_def['end'], datetime):
+        if event_def['end'].time() == datetime.time(hours=0, minutes=0, seconds=0):
+            event_def['end'] -= timedelta(days=1)
+            event_def['end'].replace(hours=23, minutes=59, seconds=59)
+    elif isinstance(event_def['end'], date):
+        event_def['end'] = event_def['end'] - timedelta(days=1)
+        midnight_time = time(23, 59, 59)
+        event_def['end'] = datetime.combine(event_def['end'], midnight_time)
+        event_def['allDay'] = True
 
     event_def['labels'] = labels
     
@@ -190,11 +199,11 @@ def ics_to_dict(component, labels, ics_id=None):
         elif 'count' in rrule:
             rec_def['count'] = str(rrule.get('count')[0])
         else:
-            event_def['forever'] = True
+            rec_def['forever'] = True
         if 'BYDAY' in rrule:
             rec_def['by_day'] = rrule.get('BYDAY')
         if 'BYMONTHDAY' in rrule:
-            rec_def['by_month_day'] = rrule.get('BYMONTHDAY')
+            rec_def['by_month_day'] = [str(x) for x in rrule.get('BYMONTHDAY')]
         if 'INTERVAL' in rrule:
             rec_def['interval'] = str(rrule.get('INTERVAL')[0])
         else:
@@ -246,7 +255,10 @@ def extract_ics(cal, ics_url, labels=None):
                         temporary_dict.append(com_dict)
                         logging.debug("temporarily saved recurring event as dict")
                 else: # if this is a regular event
-                    new_event = db.Event(**com_dict).save()
+                    try:
+                        new_event = db.Event(**com_dict).save()
+                    except:
+                        logging.debug("com_dict: {}".format(com_dict))
                     if new_event.labels == []: # if the event has no labels
                         new_event.labels = ['unlabeled']
                     if 'recurrence' in new_event: # if the event has no recurrence_end

@@ -10,7 +10,7 @@ import pytz
 
 from icalendar import Calendar, Event, vCalAddress, vText, vDatetime
 from dateutil.rrule import rrule, MONTHLY, WEEKLY, DAILY, YEARLY
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone, date
 from bson import objectid
 from mongoengine import *
 from icalendar import Calendar
@@ -45,7 +45,8 @@ def recurring_to_full(event, events_list, start, end):
 
     # for each instance create a full event definition based on its parent event
     for instance in rule_list:
-        if instance >= start and instance < end:
+        convert_timezone = lambda a: a.replace(tzinfo=pytz.UTC) if isinstance(a, datetime) else a
+        if convert_timezone(instance) >= convert_timezone(start) and convert_timezone(instance) < convert_timezone(end):
             events_list = placeholder_recurring_creation(instance, events_list, event)
 
     return(events_list)
