@@ -26,11 +26,13 @@ source ./venv/bin/activate
 pip3 install -r requirements.txt
 ```
 
-#### (Optional) Configure MongoDB connection
+### (Optional) Configure MongoDB connection
 
 In order to connect to a mongodb instance other than your localhost, you can create a copy of [`mongo_config_sample.py`](mongo_config_sample.py) called `mongo_config.py`. This configuration file is gitignored and can specify a uri for mongodb to connect to.
 
-## Running the API server
+## Development
+
+### Running the API server
 
 `run honcho start -f ProcfileHoncho`
 
@@ -38,6 +40,21 @@ Visit <http://127.0.0.1:5000>. You should see a top hat.
 
 Visit <http://127.0.0.1:5000/events/>. You should see `[]`. (This is an empty
 JSON list of events.)
+
+### Testing
+
+`python -m unittest`
+
+This is noisy, but should print `OK` at the end:
+
+```bash
+$ python -m unittest
+…
+----------------------------------------------------------------------
+Ran 4 tests in 1.124s
+
+OK
+```
 
 ## API Documentation
 
