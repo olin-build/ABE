@@ -80,8 +80,9 @@ target/
 # pyenv
 .python-version
 
-# celery beat schedule file
+# celery beat
 celerybeat-schedule
+celerybeat.pid
 
 # SageMath parsed files
 *.sage.py
