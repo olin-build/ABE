@@ -34,11 +34,11 @@ In order to connect to a mongodb instance other than your localhost, you can cre
 
 ### Running the API server
 
-`run honcho start -f ProcfileHoncho`
+Run `python run.py`
 
-Visit <http://127.0.0.1:5000>. You should see a top hat.
+Visit <http://127.0.0.1:3000>. You should see a top hat.
 
-Visit <http://127.0.0.1:5000/events/>. You should see `[]`. (This is an empty
+Visit <http://127.0.0.1:3000/events/>. You should see `[]`. (This is an empty
 JSON list of events.)
 
 ### Testing
