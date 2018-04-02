@@ -44,7 +44,7 @@ def create_ics_event(event, recurrence=False):
     new_event.add('location', event['location'])
     new_event.add('description', event['description'])
 
-    if event['allDay'] == True:
+    if event['allDay']:
         start_string = 'dtstart;VALUE=DATE'
         end_string = 'dtend;VALUE=DATE'
         event_start = date_to_ics(ensure_date_time(event['start']).isoformat())
@@ -64,14 +64,14 @@ def create_ics_event(event, recurrence=False):
         new_event.add(end_string, event_end)
     new_event.add('TRANSP', 'OPAQUE')
 
-    if recurrence == False:
+    if not recurrence:
         uid = str(event['id'])
     else:
         uid = str(event['sid'])
         new_event.add('RECURRENCE-ID', ensure_date_time(event['rec_id']))
 
     new_event.add('UID', uid)
-    return (new_event)
+    return new_event
 
 
 def create_ics_recurrence(new_event, recurrence):
@@ -110,7 +110,7 @@ def create_ics_recurrence(new_event, recurrence):
             rec_ics_string['byyearday'] = recurrence['by_year_day']
 
     new_event.add('RRULE', rec_ics_string)
-    return (new_event)
+    return new_event
 
 
 def mongo_to_ics(events):
@@ -167,7 +167,7 @@ def ics_to_dict(component, labels, ics_id=None):
     event_def['start'] = convert_timezone(component.get('dtstart').dt)
     event_def['end'] = convert_timezone(component.get('dtend').dt)
     if isinstance(event_def['end'], datetime):
-        if event_def['end'].time() == datetime.time(hours=0, minutes=0, seconds=0):
+        if event_def['end'].time() == time(hour=0, minute=0, second=0):
             event_def['end'] -= timedelta(days=1)
             event_def['end'].replace(hours=23, minutes=59, seconds=59)
     elif isinstance(event_def['end'], date):
@@ -187,7 +187,8 @@ def ics_to_dict(component, labels, ics_id=None):
 
     if component.get('rrule'):  # if this is an event that defines a recurrence
         rrule = component.get('rrule')
-        rec_def = {}
+
+        rec_def = dict()
         rec_def['frequency'] = str(rrule.get('freq')[0])
         if 'until' in rrule:
             rec_def['until'] = convert_timezone(rrule.get('until')[0])
@@ -205,7 +206,7 @@ def ics_to_dict(component, labels, ics_id=None):
             rec_def['interval'] = '1'
 
         event_def['recurrence'] = rec_def
-    return (event_def)
+    return event_def
 
 
 def extract_ics(cal, ics_url, labels=None):
@@ -254,10 +255,10 @@ def extract_ics(cal, ics_url, labels=None):
                         new_event = db.Event(**com_dict).save()
                     except:
                         logging.debug("com_dict: {}".format(com_dict))
-                    if new_event.labels == []:  # if the event has no labels
+                    if not new_event.labels:  # if the event has no labels
                         new_event.labels = ['unlabeled']
                     if 'recurrence' in new_event:  # if the event has no recurrence_end
-                        if new_event.recurrence.forever == False:
+                        if not new_event.recurrence.forever:
                             new_event.recurrence_end = find_recurrence_end(new_event)
                             logging.debug("made end_recurrence: {}".format(new_event.recurrence_end))
                     new_event.save()
