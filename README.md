@@ -27,6 +27,13 @@ pip install -r requirements.txt
 
 In order to connect to a mongodb instance other than your localhost, you can create a copy of [`mongo_config_sample.py`](mongo_config_sample.py) called `mongo_config.py`. This configuration file is gitignored and can specify a uri for mongodb to connect to.
 
+### Run ABE
+
+In order to run a local version of ABE, activate the virtual environment and run run.py
+
+    source venv/bin/activate
+    python run.py
+
 ## API
 
 ### abe.olin.build/events/
