@@ -9,18 +9,21 @@ Amorphous Blob of Events
 
 ### Python
 
-#### Setup Virtual Environment
+#### Pipenv
 
+[Install pipenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/#installing-pipenv), most commonly:
 ```shell
-sudo pip3 install virtualenv
-virtualenv -p python3 venv
-source ./venv/bin/activate
+$ pip install --user pipenv
 ```
 
-#### Install Requirements
-
+To resolve dependencies:
 ```shell
-pip install -r requirements.txt
+$ pipenv install
+```
+
+To enter a virtual environment:
+```shell
+pipenv shell
 ```
 
 #### mongo_config.py
