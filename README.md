@@ -1,11 +1,14 @@
 # ABE
+
 Amorphous Blob of Events
 
 ## Getting Started
 
 ### MongoDB
 
-- [installation instructions](https://docs.mongodb.com/getting-started/shell/installation/)
+Install MongoDB. Use [these
+instructions](https://docs.mongodb.com/getting-started/shell/installation/). On
+macOS with [Homebrew](https://brew.sh/) installed, you can instead run `brew install mongodb`.
 
 ### Setup Python Virtual Environment
 
@@ -56,42 +59,68 @@ To load [sample data](abe/sample_data.py) into the database, run
 python -m abe.sample_data
 ```
 
-## API
+## Development
+
+### Running the API server
+
+Run `python run.py`
+
+Visit <http://127.0.0.1:3000>. You should see a top hat.
+
+Visit <http://127.0.0.1:3000/events/>. You should see `[]`. (This is an empty
+JSON list of events.)
+
+### Testing
+
+`python -m unittest`
+
+This is noisy, but should print `OK` at the end:
+
+```bash
+$ python -m unittest
+…
+----------------------------------------------------------------------
+Ran 4 tests in 1.124s
+
+OK
+```
+
+## API Documentation
 
 ### abe.olin.build/events/
 
-| HTTP Method | Action |
-| ------------- | ------------- |
-| GET | retrieve all events |
-| POST | create new event |
+| HTTP Method | Action              |
+| ----------- | ------------------- |
+| GET         | retrieve all events |
+| POST        | create new event    |
 
 ### abe.olin.build/events/24
 
-| HTTP Method | Action |
-| ------------- | ------------- |
-| GET | retrieve event with id 24 |
-| PUT | update event with id 24 |
-| DELETE | delete event with id 24 |
+| HTTP Method | Action                    |
+| ----------- | ------------------------- |
+| GET         | retrieve event with id 24 |
+| PUT         | update event with id 24   |
+| DELETE      | delete event with id 24   |
 
 ### abe.olin.build/events/ShortScarletFrog
 
-| HTTP Method | Action |
-| ------------- | ------------- |
-| GET | retrieve event with id "ShortScarletFrog" |
-| PUT | update event with id "ShortScarletFrog" |
-| DELETE | delete event with id "ShortScarletFrog" |
+| HTTP Method | Action                                    |
+| ----------- | ----------------------------------------- |
+| GET         | retrieve event with id "ShortScarletFrog" |
+| PUT         | update event with id "ShortScarletFrog"   |
+| DELETE      | delete event with id "ShortScarletFrog"   |
 
 ### abe.olin.build/labels/
 
-| HTTP Method | Action |
-| ------------- | ------------- |
-| GET | retrieve all labels |
-| PUT | create new label |
+| HTTP Method | Action              |
+| ----------- | ------------------- |
+| GET         | retrieve all labels |
+| PUT         | create new label    |
 
 ### abe.olin.build/labels/clubs
 
-| HTTP Method | Action |
-| ------------- | ------------- |
-| GET | retrieve label with name "clubs" |
-| PUT | update label with name "clubs" |
-| DELETE | delete label with name "clubs" |
+| HTTP Method | Action                           |
+| ----------- | -------------------------------- |
+| GET         | retrieve label with name "clubs" |
+| PUT         | update label with name "clubs"   |
+| DELETE      | delete label with name "clubs"   |
