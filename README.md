@@ -28,7 +28,15 @@ pipenv shell
 
 #### mongo_config.py
 
-In order to connect to a mongodb instance other than your localhost, you can create a copy of [`mongo_config_sample.py`](mongo_config_sample.py) called `mongo_config.py`. This configuration file is gitignored and can specify a uri for mongodb to connect to.
+In order to connect to a mongodb instance other than your localhost, you can create a copy of [`mongo_config_sample.py`](abe/mongo_config_sample.py) called `mongo_config.py`. This configuration file is gitignored and can specify a uri for mongodb to connect to.
+
+### Running Locally
+
+In order to launch a local copy of ABE from inside the pipenv shell, run the slightly verbose:
+
+```shell
+$ gunicorn -c guniconf.py abe.app:app
+```
 
 ## API
 
