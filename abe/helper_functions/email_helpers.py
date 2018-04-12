@@ -7,6 +7,8 @@ from io import StringIO
 from datetime import datetime
 import base64
 import icalendar as ic
+# from . import database as db
+# from .helper_functions.ics_helpers import ics_to_dict, extract_ics
 
 from email import parser
 
@@ -42,9 +44,9 @@ def get_attachments(message):
     return None
 
 def email_test():
-	""" TO DO: determine best way to test. Currently, file does
-	not exist in this framework.
-	"""
+    """ TO DO: determine best way to test. Currently, file does
+    not exist in this framework.
+    """
     with open('test_email.txt', 'r') as myfile:
         data = myfile.read()
 
@@ -67,23 +69,32 @@ def email_test():
                 calendars.append(cal)
     return calendars
 
-def get_calendars_from_email():
-	""" Fetches unread emails from email specified by
-	environment variable ABE_EMAIL (password given by
-	variable ABE_PASS). Reads the emails and returns
-	any icals found as Calendar objects from the icalendar
-	library.
+def get_messages_from_email():
+    """ Fetches unread emails from the email address
+    specified by the environmental variable ABE_EMAIL
+    (password given by env var ABE_PASS). Returns a 
+    list of messages.
 
-	:return:	List of Calendar instances
-	"""
+    :return: List of email message objects
+    """
     pop_conn = poplib.POP3_SSL('pop.gmail.com')
-    pop_conn.user(os.environ['ABE_EMAIL']) # should be abe.at.olin@gmail.com
-    pop_conn.pass_(os.environ['ABE_PASS']) # should be abe@olin
+    pop_conn.user(os.environ['ABE_EMAIL']) # should be 'abe.at.olin@gmail.com'
+    pop_conn.pass_(os.environ['ABE_PASS']) # should be 'abe@olin'
     pop3info = pop_conn.stat() #access mailbox status
     resp, items, octets = pop_conn.list()
 
     messages = get_msg_list(items, pop_conn)
     pop_conn.quit()
+    return messages
+
+def get_calendars_from_messages(messages):
+    """ Returns any icals found as Calendar
+    objects from the icalendar library.
+    
+    :inputs:
+        messages:   List of email Message instances
+    :return:        List of Calendar instances
+    """
     calendars = []
 
     for message in messages:
@@ -101,16 +112,10 @@ def get_calendars_from_email():
 
                         print(date)
                         print(summary)
-
-                # print(part.get_content_type())
-                cdispo = str(part.get('Content-Disposition'))
-                # skip any text/plain (txt) attachments
-                if ctype == 'text/plain' and 'attachment' not in cdispo:
-                    msg_dict['body'] = part.get_payload(decode=True).decode().strip()  # decode
-                    break
     return calendars
 
 if __name__ == '__main__':
-	calendars = get_calendars_from_email()
-	for calendar in calendars:
-		print(calendar)
+    messages = get_messages_from_email()
+    calendars = get_calendars_from_messages(messages)
+    for calendar in calendars:
+        print(calendar)
