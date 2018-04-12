@@ -4,6 +4,15 @@ Amorphous Blob of Events
 
 ## Getting Started
 
+### Environment Variables
+There's an [environment variable template](.env.template), which needs to be copied and may need to be changed accordingly:
+
+```shell
+$ cp .env.template .env
+```
+
+It will be automagically picked up by...
+
 ### Pipenv
 ABE uses Pipenv for python management. 
 

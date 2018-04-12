@@ -18,10 +18,15 @@
 #       range.
 #
 
-# Maintains port setting behavior from previous config, not sure if necissary
+# A little bit ugly, but restricts local server to localhost.
 import os
 _PORT = str(os.environ.get('PORT', 3000))
-bind = '0.0.0.0:' + _PORT
+_FLASK_ENV = str(os.environ.get('FLASK_ENV', "DEV"))
+
+if _FLASK_ENV == "PROD":
+    bind = '0.0.0.0:' + _PORT
+else:
+    bind = '127.0.0.1:' + _PORT
 
 backlog = 2048
 
