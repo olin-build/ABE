@@ -18,7 +18,7 @@ from abe.helper_functions.sub_event_helpers import create_sub_event, update_sub_
     find_recurrence_end
 
 
-def create_ics_event(event, recurrence=False):
+def create_ics_event(event: db.Event, recurrence=False) -> Event:
     """
     This function creates a base ICS event definition. It uses the Event() class of the
     iCalendar library.
@@ -35,8 +35,11 @@ def create_ics_event(event, recurrence=False):
     """
 
     # helper function to truncate all day events to ignore times
-    date_to_ics = lambda a: a[:-9].replace('-', '')
-    ensure_date_time = lambda a: dateutil.parser.parse(a) if not isinstance(a, datetime) else a
+    def date_to_ics(a: str) -> str:
+        return a[:-9].replace('-', '')
+
+    def ensure_date_time(a) -> datetime:
+        return dateutil.parser.parse(a) if not isinstance(a, datetime) else a
 
     # creates the Event
     new_event = Event()
@@ -49,6 +52,7 @@ def create_ics_event(event, recurrence=False):
         end_string = 'dtend;VALUE=DATE'
         event_start = date_to_ics(ensure_date_time(event['start']).isoformat())
         event_end = date_to_ics(ensure_date_time(event['end']).isoformat())
+
         event_end = str(int(event_end) + 1)
     else:
         start_string = 'dtstart'
