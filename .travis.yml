@@ -2,6 +2,7 @@ language: python
 python:
   - "3.6"
 install:
+  - cp .env.template .env
   - pip install pipenv
   - pipenv install --ignore-pipfile
 script: pipenv run python -m unittest
