@@ -10,7 +10,8 @@ import pytz
 
 from icalendar import Calendar, Event, vCalAddress, vText, vDatetime, Timezone
 from dateutil.rrule import rrule, MONTHLY, WEEKLY, DAILY, YEARLY
-from datetime import datetime, timedelta, timezone, date, time
+import datetime #import datetime, timedelta, timezone, date, time
+from datetime import timedelta, timezone, date
 from bson import objectid
 from mongoengine import *
 from icalendar import Calendar
@@ -42,7 +43,7 @@ def create_ics_event(event,recurrence=False):
 
     # helper function to truncate all day events to ignore times
     date_to_ics = lambda a: a[:-9].replace('-','')
-    ensure_date_time = lambda a: dateutil.parser.parse(a) if not isinstance(a, datetime) else a
+    ensure_date_time = lambda a: dateutil.parser.parse(a) if not isinstance(a, datetime.datetime) else a
 
     # creates the Event
     new_event = Event()
@@ -163,7 +164,7 @@ def ics_to_dict(component, labels, ics_id=None):
     event_def = {}
 
     utc = pytz.utc
-    convert_timezone = lambda a: a.astimezone(utc) if isinstance(a, datetime) else a
+    convert_timezone = lambda a: a.astimezone(utc) if isinstance(a, datetime.datetime) else a
 
     event_def['title'] = str(component.get('summary'))
     event_def['description'] = str(component.get('description'))
@@ -171,11 +172,11 @@ def ics_to_dict(component, labels, ics_id=None):
 
     event_def['start'] = convert_timezone(component.get('dtstart').dt)
     event_def['end'] = convert_timezone(component.get('dtend').dt)
-    if isinstance(event_def['end'], datetime):
+    if isinstance(event_def['end'], datetime.datetime):
         if event_def['end'].time() == datetime.time(hour=0,minute=0,second=0):
             event_def['end'] -= timedelta(days=1)
             event_def['end'].replace(hour=23, minute=59, second=59)
-    elif isinstance(event_def['end'], date):
+    elif isinstance(event_def['end'], datetime.date):
         event_def['end'] = event_def['end'] - timedelta(day=1)
         midnight_time = time(23, 59, 59)
         event_def['end'] = datetime.combine(event_def['end'], midnight_time)
