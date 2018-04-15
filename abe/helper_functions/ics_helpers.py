@@ -172,11 +172,11 @@ def ics_to_dict(component, labels, ics_id=None):
     event_def['start'] = convert_timezone(component.get('dtstart').dt)
     event_def['end'] = convert_timezone(component.get('dtend').dt)
     if isinstance(event_def['end'], datetime):
-        if event_def['end'].time() == datetime.time(hours=0, minutes=0, seconds=0):
+        if event_def['end'].time() == datetime.time(hour=0,minute=0,second=0):
             event_def['end'] -= timedelta(days=1)
-            event_def['end'].replace(hours=23, minutes=59, seconds=59)
+            event_def['end'].replace(hour=23, minute=59, second=59)
     elif isinstance(event_def['end'], date):
-        event_def['end'] = event_def['end'] - timedelta(days=1)
+        event_def['end'] = event_def['end'] - timedelta(day=1)
         midnight_time = time(23, 59, 59)
         event_def['end'] = datetime.combine(event_def['end'], midnight_time)
         event_def['allDay'] = True

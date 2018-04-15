@@ -8,7 +8,7 @@ from datetime import datetime
 import base64
 import icalendar as ic
 # from . import database as db
-# from .helper_functions.ics_helpers import ics_to_dict, extract_ics
+from abe.helper_functions.ics_helpers import ics_to_dict
 
 from email import parser
 
@@ -43,11 +43,11 @@ def get_attachments(message):
         return attachment
     return None
 
-def email_test():
+def email_test(filename):
     """ TO DO: determine best way to test. Currently, file does
     not exist in this framework.
     """
-    with open('test_email.txt', 'r') as myfile:
+    with open(filename, 'r') as myfile:
         data = myfile.read()
 
     message = email.message_from_string(data)
@@ -68,6 +68,76 @@ def email_test():
                 print(decoded)
                 calendars.append(cal)
     return calendars
+
+def ical_to_dict(cal):
+    """ Given a calendar, creates a dictionary as
+    specified in ics_to_dict.
+    :input: calendar object
+    :return: a list of event dictionaries
+    """
+    # event_def = {}
+    # utc = pytz.utc
+    # convert_timezone = lambda a: a.astimezone(utc) if isinstance(a, datetime) else a
+    event = cal.walk('vevent')[0]
+    event_def = ics_to_dict(event, None)
+    return event_def
+
+    # event_def['title'] = str(event.get('summary'))
+    # event_def['description'] = str(component.get('description'))
+    # event_def['location'] = str(component.get('location'))
+    # event_def['start'] = convert_timezone(component.get('dtstart').dt)
+    # event_def['end'] = convert_timezone(component.get('dtend').dt)
+
+    # if isinstance(event_def['end'], datetime):
+    #     if event_def['end'].time() == datetime.time(hours=0, minutes=0, seconds=0):
+    #         event_def['end'] -= timedelta(days=1)
+    #         event_def['end'].replace(hours=23, minutes=59, seconds=59)
+    # elif isinstance(event_def['end'], date):
+    #     event_def['end'] = event_def['end'] - timedelta(days=1)
+    #     midnight_time = time(23, 59, 59)
+    #     event_def['end'] = datetime.combine(event_def['end'], midnight_time)
+    #     event_def['allDay'] = True
+
+    # if component.get('recurrence-id'): # if this is the ics equivalent of a sub_event
+    #     event_def['rec_id'] = convert_timezone(component.get('recurrence-id').dt)
+    # else: # if this is a normal event or a parent event
+    #     event_def['ics_id'] = ics_id
+
+    # event_def['UID'] = str(component.get('uid'))
+
+    # standard = cal.walk('standard')[0]
+    """
+
+    event_def['labels'] = labels
+    
+    if component.get('recurrence-id'): # if this is the ics equivalent of a sub_event
+        event_def['rec_id'] = convert_timezone(component.get('recurrence-id').dt)
+    else: # if this is a normal event or a parent event
+        event_def['ics_id'] = ics_id
+
+    event_def['UID'] = str(component.get('uid'))
+
+    if component.get('rrule'): # if this is an event that defines a recurrence
+        rrule = component.get('rrule')
+        rec_def = {}
+        rec_def['frequency'] = str(rrule.get('freq')[0])
+        if 'until' in rrule:
+            rec_def['until'] = convert_timezone(rrule.get('until')[0])
+        elif 'count' in rrule:
+            rec_def['count'] = str(rrule.get('count')[0])
+        else:
+            rec_def['forever'] = True
+        if 'BYDAY' in rrule:
+            rec_def['by_day'] = rrule.get('BYDAY')
+        if 'BYMONTHDAY' in rrule:
+            rec_def['by_month_day'] = [str(x) for x in rrule.get('BYMONTHDAY')]
+        if 'INTERVAL' in rrule:
+            rec_def['interval'] = str(rrule.get('INTERVAL')[0])
+        else:
+            rec_def['interval'] = '1'
+
+        event_def['recurrence'] = rec_def
+    return(event_def)"""
 
 def get_messages_from_email():
     """ Fetches unread emails from the email address
@@ -104,18 +174,15 @@ def get_calendars_from_messages(messages):
                 if part.get_content_type() == 'text/calendar':
                     decoded = base64.b64decode(part.get_payload())
                     # print(base64.b64decode(part.get_payload()))
-                    cal = ic.Calendar.from_ical(decoded)
+                    cal = ic.Calendar(decoded)
                     calendars.append(cal)
-                    for event in cal.walk('vevent'):
-                        date = event.decoded('dtstart')
-                        summary = event.decoded('summary')
-
-                        print(date)
-                        print(summary)
     return calendars
 
 if __name__ == '__main__':
-    messages = get_messages_from_email()
-    calendars = get_calendars_from_messages(messages)
-    for calendar in calendars:
-        print(calendar)
+    cals = email_test('test_email.txt')
+    for cal in cals:
+        ical_to_dict(cal)
+    # messages = get_messages_from_email()
+    # calendars = get_calendars_from_messages(messages)
+    # for calendar in calendars:
+    #     print(calendar)
