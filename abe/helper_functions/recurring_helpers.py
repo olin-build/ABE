@@ -31,17 +31,15 @@ def recurring_to_full(event, events_list, start, end):
 
     start, end      start and end indicating the query date range
     """
-
     if 'sub_events' in event: # if there are sub_events in event
         for sub_event in event['sub_events']:
             if 'start' in sub_event:
                 # if the sub_event fits into the date range and is not deleted
                 if sub_event['start'] <= end and sub_event['start'] >= start \
-                    and sub_event['deleted']==False: 
+                    and sub_event['deleted']==False:
                     events_list.append(sub_event_to_full(mongo_to_dict(sub_event), event))
-
-    # generate a list of all datetimes a recurring event would occur 
-    rule_list = instance_creation(event, end)
+    # generate a list of all datetimes a recurring event would occur
+    rule_list = instance_creation(event, start, end)
 
     # for each instance create a full event definition based on its parent event
     for instance in rule_list:
@@ -64,15 +62,16 @@ def placeholder_recurring_creation(instance, events_list, event, edit_recurrence
     event_end = dateutil.parser.parse(str(event['end']))
     event_start = dateutil.parser.parse(str(event['start']))
 
+
     fields = ['title', 'location', 'description', 'labels']
 
     repeat = False
     if 'sub_events' in event:
         for individual in event['sub_events']:
             indiv = dateutil.parser.parse(str(individual['rec_id']))
-            # checks to see if the instance actually occurs at the time a sub_event 
+            # checks to see if the instance actually occurs at the time a sub_event
             # would have occurred
-            if instance == indiv: 
+            if instance == indiv:
                 repeat = True
 
     if repeat == False: # if the instance is not a repeat of a sub_event
@@ -91,6 +90,3 @@ def placeholder_recurring_creation(instance, events_list, event, edit_recurrence
             fake_object['rec_id'] = isodate.parse_datetime(instance.isoformat())
             return(fake_object)
     return(events_list)
-
-
-

@@ -118,7 +118,7 @@ def create_new_sub_event_defintion(sub_event, updates, parent_event):
     return(sub_event)
 
 
-def instance_creation(event, end=None):
+def instance_creation(event, start=None, end=None):
     """
     Generates list of datetime objects of when recurring events should occur
     Uses rrule from dateutils
@@ -134,6 +134,8 @@ def instance_creation(event, end=None):
 
     rFrequency = rec_type_list.index(recurrence['frequency'])
     rStart = convert_timezone(ensure_date_time(event['start']))
+    if start > rStart: # if we're searching starting after the beginning of the recurring event, start there to speed up rrule
+        rStart = start
     if recurrence['frequency'] == 'YEARLY':
         # extracts the month and day from the date
         rByMonth = int(rStart.month)
@@ -163,8 +165,12 @@ def instance_creation(event, end=None):
         rUntil = convert_timezone(ensure_date_time(recurrence['until'])) if 'until' in recurrence else end
     rCount = int(recurrence['count']) if 'count' in recurrence else None
 
-    rule_list = list(rrule(freq=rFrequency, count=rCount, interval=rInterval, until=rUntil, bymonth=rByMonth, \
-        bymonthday=rByMonthDay, byweekday=rByDay, dtstart=rStart))
+    if rUntil == end:
+        rule_list = list(rrule(freq=rFrequency, count=rCount, interval=rInterval, until=rUntil, bymonth=rByMonth, \
+            bymonthday=rByMonthDay, byweekday=rByDay, dtstart=rStart))
+    else:
+        rule_list = list(rrule(freq=rFrequency, count=rCount, interval=rInterval, until=rUntil, bymonth=rByMonth, \
+            bymonthday=rByMonthDay, byweekday=rByDay, dtstart=rStart))
     return(rule_list)
 
 
