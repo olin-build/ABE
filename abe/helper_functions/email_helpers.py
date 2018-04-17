@@ -9,6 +9,9 @@ import base64
 import icalendar as ic
 # from . import database as db
 from abe.helper_functions.ics_helpers import ics_to_dict
+from abe.helper_functions.converting_helpers import mongo_to_dict
+from abe import database as db
+from mongoengine import ValidationError
 
 from email import parser
 
@@ -56,7 +59,6 @@ def email_test(filename):
         for part in message.walk():
             if part.get_content_type() == 'text/calendar':
                 decoded = base64.b64decode(part.get_payload()).decode('utf-8')
-                # print(base64.b64decode(part.get_payload()))
                 cal = ic.Calendar.from_ical(decoded)
                 for event in cal.walk('vevent'):
                     date = event.decoded('dtstart')
@@ -82,9 +84,16 @@ def ical_to_dict(cal):
     # Get the labels off of the description. Assumes description is in format
     # [tags][go][here]\n
     # "rest of description"
-    label_str = str(event.get('description')).strip().lower().split('\n')[0]
-    labels = label_str.replace('[', ' ').replace(']', '').strip().split()
+    labels_and_desc = str(event.get('description')).strip().split('\n')
+    if '[' == labels_and_desc[0][0]: # if the bracket is in the first line of the description, there are labels
+        label_str = labels_and_desc[0].lower()
+        labels = label_str.replace('[', ' ').replace(']', '').strip().split()
+        desc = '\n'.join(labels_and_desc[1:]).strip()
+    else:
+        desc = '\n'.join(labels_and_desc).strip()
+        labels = None
     event_def = ics_to_dict(event, labels)
+    event_def['description'] = desc
     return event_def
 
 def get_messages_from_email():
@@ -118,14 +127,40 @@ def get_calendars_from_messages(messages):
     for message in messages:
         if message.is_multipart():
             for part in message.walk():
-                # print(part.get_content_type(), part)
                 if part.get_content_type() == 'text/calendar':
                     decoded = base64.b64decode(part.get_payload()).decode('utf-8')
-                    print(decoded)
-                    # print(base64.b64decode(part.get_payload()))
                     cal = ic.Calendar.from_ical(decoded)
                     calendars.append(cal)
     return calendars
+
+def cal_to_event(cal):
+    """ Creates an event from a calendar object """
+    received_data = ical_to_dict(cal)
+    try:
+        new_event = db.Event(**received_data)
+        if new_event.labels == []: # if no labels were given
+            new_event.labels = ['unlabeled']
+        if 'recurrence' in new_event: # if this is a recurring event
+            if new_event.recurrence.forever == False: # if it doesn't recurr forever
+                # find the end of the recurrence
+                new_event.recurrence_end = find_recurrence_end(new_event)
+        new_event.save()
+    except ValidationError as error:
+        return {'error_type': 'validation',
+                'validation_errors': [str(err) for err in error.errors],
+                'error_message': error.message}, 400
+    else:  # return success
+        return mongo_to_dict(new_event), 201
+
+def scrape():
+    """ Scrapes emails and parses them into events """
+    msgs = get_messages_from_email()
+    cals = get_calendars_from_messages(msgs)
+    print("Scraped", len(cals), "from abe.at.olin@gmail.com")
+    completed = []
+    for cal in cals:
+        completed.append(cal_to_event(cal))
+    return completed
 
 if __name__ == '__main__':
     cals = email_test('test_email.txt')

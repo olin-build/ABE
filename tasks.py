@@ -1,5 +1,6 @@
 from celery import Celery
 from abe.helper_functions.ics_helpers import update_ics_feed
+from abe.helper_functions.email_helpers import scrape
 from abe import database as db
 import time 
 import logging
@@ -16,3 +17,8 @@ celery.config_from_object('celeryconfig')
 def refresh_calendar():
 	update_ics_feed()
 	return("did the stuff")
+
+@celery.task
+def parse_email_icals():
+	completed_events = scrape()
+	return("scraped the emails")
