@@ -59,6 +59,14 @@ To load [sample data](abe/sample_data.py) into the database, run
 python -m abe.sample_data
 ```
 
+Load additional sample data via the following. Look at the files in
+ `./tests/data` to see the format of the event and label JSON files.
+
+```shell
+python -m abe.sample_data --events event-data.json
+python -m abe.sample_data --labels label-data.json
+```
+
 ## Development
 
 ### Running the API server
@@ -90,14 +98,14 @@ OK
 ### abe.olin.build/events/
 
 | HTTP Method | Action              |
-| ----------- | ------------------- |
+|-------------|---------------------|
 | GET         | retrieve all events |
 | POST        | create new event    |
 
 ### abe.olin.build/events/24
 
 | HTTP Method | Action                    |
-| ----------- | ------------------------- |
+|-------------|---------------------------|
 | GET         | retrieve event with id 24 |
 | PUT         | update event with id 24   |
 | DELETE      | delete event with id 24   |
@@ -105,7 +113,7 @@ OK
 ### abe.olin.build/events/ShortScarletFrog
 
 | HTTP Method | Action                                    |
-| ----------- | ----------------------------------------- |
+|-------------|-------------------------------------------|
 | GET         | retrieve event with id "ShortScarletFrog" |
 | PUT         | update event with id "ShortScarletFrog"   |
 | DELETE      | delete event with id "ShortScarletFrog"   |
@@ -113,14 +121,14 @@ OK
 ### abe.olin.build/labels/
 
 | HTTP Method | Action              |
-| ----------- | ------------------- |
+|-------------|---------------------|
 | GET         | retrieve all labels |
 | PUT         | create new label    |
 
 ### abe.olin.build/labels/clubs
 
 | HTTP Method | Action                           |
-| ----------- | -------------------------------- |
+|-------------|----------------------------------|
 | GET         | retrieve label with name "clubs" |
 | PUT         | update label with name "clubs"   |
 | DELETE      | delete label with name "clubs"   |
