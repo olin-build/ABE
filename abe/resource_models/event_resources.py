@@ -74,7 +74,7 @@ class EventApi(Resource):
 
             query_time_period = query_dict['end']-query_dict['start']
             if query_time_period > timedelta(days=365):
-                return "Too wide of date range in query. Max date range of 1 year allowed.", 400
+                return "Too wide of date range in query. Max date range of 1 year allowed.", 404
 
             query = event_query(query_dict)
             results = db.Event.objects(__raw__ = query) #{'start': new Date('2017-06-14')})
