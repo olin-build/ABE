@@ -51,7 +51,7 @@ def update_sub_event(received_data, parent_event, sub_event_id, ics=False):
     """edits a sub_event that has already been created
 
     sub_event_id        if the update is not coming from an ics feed:
-                            - will be an objectid 
+                            - will be an objectid
                         if the update is coming from an ics feed:
                             - will be a rec_id (datetime object)
     """
@@ -123,7 +123,7 @@ def instance_creation(event, end=None):
     Generates list of datetime objects of when recurring events should occur
     Uses rrule from dateutils
     """
-    
+
     rec_type_list = ['YEARLY', 'MONTHLY', 'WEEKLY', 'DAILY']
 
     day_list = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']
@@ -134,8 +134,8 @@ def instance_creation(event, end=None):
 
     rFrequency = rec_type_list.index(recurrence['frequency'])
     rStart = convert_timezone(ensure_date_time(event['start']))
-    if recurrence['frequency'] == 'YEARLY': 
-        # extracts the month and day from the date 
+    if recurrence['frequency'] == 'YEARLY':
+        # extracts the month and day from the date
         rByMonth = int(rStart.month)
         rByMonthDay = int(rStart.day)
         rByDay = None
@@ -144,7 +144,7 @@ def instance_creation(event, end=None):
             rByMonthDay = [int(x) for x in recurrence['by_month_day']]
         else:
             rByMonthDay = None
-        
+
         if 'by_month' in recurrence:
             rByMonth = [int(x) for x in recurrence['by_month']]
         else:
@@ -160,7 +160,7 @@ def instance_creation(event, end=None):
     if recurrence.forever == True:
         rUntil = convert_timezone(ensure_date_time(end)) if end is not None else None
     else:
-        rUntil = convert_timezone(ensure_date_time(recurrence['until'])) if 'until' in recurrence else None
+        rUntil = convert_timezone(ensure_date_time(recurrence['until'])) if 'until' in recurrence else end
     rCount = int(recurrence['count']) if 'count' in recurrence else None
 
     rule_list = list(rrule(freq=rFrequency, count=rCount, interval=rInterval, until=rUntil, bymonth=rByMonth, \
@@ -170,7 +170,7 @@ def instance_creation(event, end=None):
 
 def find_recurrence_end(event):
     """
-    Finds the last occurence of an event and returns the day after 
+    Finds the last occurence of an event and returns the day after
     """
     rule_list = instance_creation(event)
     event_end = rule_list[-1] + timedelta(hours=24)
