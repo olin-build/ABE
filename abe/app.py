@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Main flask app"""
 from flask import Flask, render_template, jsonify
-from flask_restful import Api
+from flask_restplus import Api
 from flask_cors import CORS
 from flask_sslify import SSLify  # redirect to https
 from flask.json import JSONEncoder
@@ -20,8 +20,13 @@ from .resource_models.ics_resources import ICSApi
 
 app = Flask(__name__)
 CORS(app)
-SSLify(app)
-api = Api(app)
+#SSLify(app)
+
+@app.route('/') #For the splash to work, needs to be declared before API
+def splash():
+    return render_template('splash.html')
+
+api = Api(app, doc="/swagger/")
 
 
 class CustomJSONEncoder(JSONEncoder):
@@ -54,11 +59,6 @@ api.add_resource(LabelApi, '/labels/<string:label_name>', methods=['GET', 'PUT',
 api.add_resource(ICSApi, '/ics/', methods=['GET', 'POST'], endpoint='ics')
 
 
-@app.route('/')
-def splash():
-    return render_template('splash.html')
-
-
 @app.route('/add_event')
 def add_event():
     return render_template('add_event.html')
@@ -67,11 +67,6 @@ def add_event():
 @app.route('/add_label')
 def add_label():
     return render_template('add_label.html')
-
-
-
-
-
 
 
 

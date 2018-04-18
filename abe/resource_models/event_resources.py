@@ -2,7 +2,7 @@
 """Event Resource models for flask"""
 
 from flask import jsonify, request, abort, Response, make_response
-from flask_restful import Resource
+from flask_restplus import Resource
 from mongoengine import ValidationError
 from bson.objectid import ObjectId
 from pprint import pprint, pformat
