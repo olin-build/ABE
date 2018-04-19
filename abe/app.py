@@ -55,7 +55,9 @@ api.add_resource(LabelApi, '/labels/', methods=['GET', 'POST'], endpoint='label'
 api.add_resource(LabelApi, '/labels/<string:label_name>', methods=['GET', 'PUT', 'PATCH', 'DELETE'], endpoint='label_name')
 
 api.add_resource(ICSApi, '/ics/', methods=['GET', 'POST'], endpoint='ics')
-api.add_resource(SubscriptionAPI, '/subscriptions/', methods=['POST', 'GET'])
+
+api.add_resource(SubscriptionAPI, '/subscriptions/', methods=['POST'], endpoint='subscription')
+api.add_resource(SubscriptionAPI, '/subscriptions/<string:subscription_id>', methods=['GET'], endpoint='subscription_id')
 
 
 @app.route('/')

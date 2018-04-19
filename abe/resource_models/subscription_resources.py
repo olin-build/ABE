@@ -24,10 +24,10 @@ from abe.helper_functions.query_helpers import get_to_event_search, event_query
 from abe.helper_functions.ics_helpers import mongo_to_ics, extract_ics
 
 
-def subscription_to_dict(s: Subscription):
+def subscription_to_dict(s: Subscription, api_root='https://abe.olin.build'):
     return {'subscription_id': s.id,
             'labels': s.labels,
-            'ics_url': 'example.com/ics/{}'.format(s.id)}
+            'ics_url': '{}/ics/{}'.format(api_root, s.id)}
 
 
 class SubscriptionAPI(Resource):
@@ -60,6 +60,8 @@ class SubscriptionAPI(Resource):
                 subscription.labels = d['labels'].split(',')
             else:
                 raise ValueError('labels must be a list or comma-separated string')
+
+            # TODO: save to database
 
             return subscription_to_dict(subscription)
 

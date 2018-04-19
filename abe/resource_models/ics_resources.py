@@ -60,4 +60,3 @@ class ICSApi(Resource):
             return {'error_type': 'validation',
                     'validation_errors': [str(err) for err in error.errors],
                     'error_message': error.message}, 400
-        
