@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""ICS Resource models for flask"""
+"""Subscription Resource models for flask"""
 
-from flask import jsonify, request, abort, Response, make_response
+from flask import jsonify, request, abort, Response, make_response, Request
 from flask_restful import Resource
 from mongoengine import ValidationError
 from bson.objectid import ObjectId
@@ -40,13 +40,12 @@ class SubscriptionAPI(Resource):
 
         logging.debug("Subscription information requested: " + subscription_id)
 
-        subscription = Subscription()  # TODO: get from database instead of making something up
+        subscription = Subscription.get_sample()  # TODO: get from database instead of making something up
         subscription.id = subscription_id
-        subscription.labels = 'hello world carpe'.split()
 
         return subscription_to_dict(subscription)
 
-    def post(self):
+    def post(self, subscription_id: str=''):
         """
         Creates a subscription object with a list of labels, returning it with an ID
         """
@@ -54,6 +53,9 @@ class SubscriptionAPI(Resource):
             d = request_to_dict(request)
 
             subscription = Subscription()  # Creates a subscription with a random ID
+            if subscription_id:
+                subscription.id = subscription_id
+
             if isinstance(d['labels'], list):
                 subscription.labels = d['labels']
             elif isinstance(d['labels'], str):
@@ -62,6 +64,7 @@ class SubscriptionAPI(Resource):
                 raise ValueError('labels must be a list or comma-separated string')
 
             # TODO: save to database
+            logging.debug("Imagine that we saved the Subscription {} to the database".format(subscription))
 
             return subscription_to_dict(subscription)
 
@@ -69,3 +72,26 @@ class SubscriptionAPI(Resource):
             return {'error_type': 'validation',
                     'validation_errors': [str(err) for err in error.errors],
                     'error_message': error.message}, 400
+
+    def put(self, subscription_id: str):
+        """Modify an existing subscription"""
+
+        received_data = request_to_dict(request)
+        logging.debug("Received Subscription PUT data: {}".format(received_data))
+
+        try:
+            # sub = db.Event.objects(id=subscription_id).first()
+            sub = Subscription.get_sample()  # TODO: get from database instead of making something up
+            if not sub:  # if no subscription was found
+                abort(404)
+            else:  # if subscription was found
+                sub.update(**received_data)
+                sub.reload()
+
+        except ValidationError as error:
+            return {'error_type': 'validation',
+                    'validation_errors': [str(err) for err in error.errors],
+                    'error_message': error.message}, 400
+
+        else:  # return success
+            return subscription_to_dict(sub)

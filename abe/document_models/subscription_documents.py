@@ -17,3 +17,9 @@ class Subscription(Document):
     def __init__(self):
         super(Subscription, self).__init__()
         self.id = '{:030x}'.format(random.randrange(16 ** 30))
+
+    @staticmethod
+    def get_sample():
+        subscription = Subscription()
+        subscription.labels = 'hello world carpe'.split()
+        return subscription
