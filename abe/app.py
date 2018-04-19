@@ -14,10 +14,6 @@ import logging
 FORMAT = "%(levelname)s:ABE: _||_ %(message)s"
 logging.basicConfig(level=logging.DEBUG, format=FORMAT)
 
-from .resource_models.event_resources import EventApi
-from .resource_models.label_resources import LabelApi
-from .resource_models.ics_resources import ICSApi
-
 app = Flask(__name__)
 CORS(app)
 #SSLify(app)
@@ -27,6 +23,10 @@ def splash():
     return render_template('splash.html')
 
 api = Api(app, doc="/swagger/")
+
+from .resource_models.event_resources import EventApi
+from .resource_models.label_resources import LabelApi
+from .resource_models.ics_resources import ICSApi
 
 
 class CustomJSONEncoder(JSONEncoder):
