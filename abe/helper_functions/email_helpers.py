@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import poplib
+import smtplib
 import email
 from io import StringIO
 from datetime import datetime
@@ -75,12 +76,15 @@ def ical_to_dict(cal):
     """ Given a calendar, creates a dictionary as
     specified in ics_to_dict.
     :input: calendar object
-    :return: a list of event dictionaries
+    :return: tuple of event dictionary and sender email as string
     """
     # event_def = {}
     # utc = pytz.utc
     # convert_timezone = lambda a: a.astimezone(utc) if isinstance(a, datetime) else a
     event = cal.walk('vevent')[0]
+
+    # sender can be found in the form of 'ORGANIZER': vCalAddress('b'MAILTO:<email>)
+    sender = str(event.get('organizer')).strip().split(':')[1]
     # Get the labels off of the description. Assumes description is in format
     # [tags][go][here]\n
     # "rest of description"
@@ -94,7 +98,7 @@ def ical_to_dict(cal):
         labels = None
     event_def = ics_to_dict(event, labels)
     event_def['description'] = desc
-    return event_def
+    return event_def, sender
 
 def get_messages_from_email():
     """ Fetches unread emails from the email address
@@ -139,7 +143,7 @@ def get_calendars_from_messages(messages):
 
 def cal_to_event(cal):
     """ Creates an event from a calendar object """
-    received_data = ical_to_dict(cal)
+    received_data, sender = ical_to_dict(cal)
     try:
         new_event = db.Event(**received_data)
         if new_event.labels == []: # if no labels were given
@@ -150,11 +154,76 @@ def cal_to_event(cal):
                 new_event.recurrence_end = find_recurrence_end(new_event)
         new_event.save()
     except ValidationError as error:
+        error_reply(sender, error)
         return {'error_type': 'validation',
                 'validation_errors': [str(err) for err in error.errors],
                 'error_message': error.message}, 400
     else:  # return success
-        return mongo_to_dict(new_event), 201
+        new_event_dict = mongo_to_dict(new_event)
+        reply_email(sender, new_event_dict)
+        return new_event_dict, 201
+
+def smtp_connect():
+    """ Connects to the smtp server
+    :return: server instance, gmail to send
+    """
+    try:
+        gmail = os.environ['ABE_EMAIL'] # should be 'abe.at.olin@gmail.com'
+        gpass = os.environ['ABE_PASS'] # should be 'abe@olin'
+    except:
+        gmail = 'abe.at.olin@gmail.com'
+        gpass = 'abe@olin'
+    try:
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        server.ehlo()
+        server.login(gmail, gpass)
+    except:
+        print('Connecting to gmail failed...')
+        return
+    return server, gmail
+
+def error_reply(to, error):
+    """ Given the erros, sends an email with the errors that
+    occured to the original sender. """
+    server, sent_from = smtp_connect()
+    subject = 'Event Failed to Add'
+    body = "ABE didn't manage to add the event, sorry. Here's what went wrong: \n"
+    for err in error.errors:
+        body = body + str(err) + '\n'
+    body = body + "Final error message: " + error.message
+
+    email_text = """
+    From: {}
+    To: {}
+    Subject: {}
+
+    {}
+    """.format(sent_from, to, subject, body)
+
+    send_email(server, email_text, sent_from, to)
+
+def reply_email(to, event_dict):
+    """ Responds after a successful posting with
+    the tags under which the event was saved. """
+    server, sent_from = smtp_connect()
+    subject = '{} added to ABE!'.format(event_dict['title'])
+    tags = ', '.join(event_dict['labels']).strip()
+    body = "Your event was added to ABE! Here's the details: "
+
+    email_text = """
+    From: {}
+    To: {}
+    Subject: {}
+
+    {}
+    Description: {}
+    Tags: {}
+    """.format(sent_from, to, subject, body, event_dict['description'], tags)
+    send_email(server, email_text, sent_from, to)
+
+def send_email(server, email_text, sent_from, sent_to):
+    server.sendmail(sent_from, sent_to, email_text)
+    server.close()
 
 def scrape():
     """ Scrapes emails and parses them into events """
