@@ -24,9 +24,9 @@ from abe import database as db
 from abe.helper_functions.converting_helpers import request_to_dict
 
 
-def get_to_event_search(request):
+def get_to_event_search(req_dict):
     """Build search dictionary based on get parameters"""
-    req_dict = request_to_dict(request)
+
     visibilities = {
         'public': ['public'],
         'olin': ['public', 'olin'],

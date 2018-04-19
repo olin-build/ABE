@@ -70,7 +70,7 @@ class EventApi(Resource):
 
         else:  # search database based on parameters
             # make a query to the database
-            query_dict = get_to_event_search(request)
+            query_dict = get_to_event_search(request_to_dict(request))
             query = event_query(query_dict)
             results = db.Event.objects(__raw__ = query) #{'start': new Date('2017-06-14')})
             logging.debug('found {} events for query'.format(len(results)))

@@ -45,7 +45,7 @@ class SubscriptionAPI(Resource):
 
         return subscription_to_dict(subscription)
 
-    def post(self, subscription_id: str=''):
+    def post(self, subscription_id: str = ''):
         """
         Creates a subscription object with a list of labels, returning it with an ID
         """
@@ -95,3 +95,36 @@ class SubscriptionAPI(Resource):
 
         else:  # return success
             return subscription_to_dict(sub)
+
+
+class SubscriptionICS(Resource):
+    """Retrieves data from the given subscription as an ICS feed"""
+
+    def get(self, subscription_id: str):
+        """
+        Returns an ICS feed when requested.
+        Takes all search parameters that are accepted
+        """
+        req_dict = request_to_dict(request)
+
+        sub = Subscription.get_sample()
+        if not sub:
+            abort(404)
+
+        if 'labels' in req_dict:
+            logging.warning('ICS feed requested with manually-specified labels {}. '
+                            'They have been ignored in favor of the stored labels {}'.format(req_dict['labels'],
+                                                                                             sub.labels))
+
+        req_dict['labels'] = sub.labels
+
+        query = event_query(get_to_event_search(req_dict))
+        results = db.Event.objects(__raw__=query)
+
+        # converts mongoDB objects to an ICS format
+        response = mongo_to_ics(results)
+        logging.debug("ics feed created for Subscription {}".format(sub.id))
+        cd = "attachment;filename=abe.ics"
+        return Response(response,
+                        mimetype="text/calendar",
+                        headers={"Content-Disposition": cd})

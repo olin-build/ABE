@@ -21,5 +21,6 @@ class Subscription(Document):
     @staticmethod
     def get_sample():
         subscription = Subscription()
-        subscription.labels = 'hello world carpe'.split()
+        subscription.labels = 'hello featured carpe'.split()
+        subscription.id = 'deadbeef'+subscription.id[8:]
         return subscription
