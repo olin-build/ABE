@@ -4,8 +4,18 @@ helpful inspiration: https://gist.github.com/jason-w/4969476
 """
 
 import logging
-from datetime import datetime, timedelta, timezone, date, time
+import pdb
+import pytz
 
+from icalendar import Calendar, Event, vCalAddress, vText, vDatetime, Timezone
+from dateutil.rrule import rrule, MONTHLY, WEEKLY, DAILY, YEARLY
+import datetime #import datetime, timedelta, timezone, date, time
+from datetime import timedelta, timezone, date
+from bson import objectid
+from mongoengine import *
+from icalendar import Calendar
+
+import isodate
 import dateutil.parser
 import pytz
 import requests
@@ -35,11 +45,8 @@ def create_ics_event(event: db.Event, recurrence=False) -> Event:
     """
 
     # helper function to truncate all day events to ignore times
-    def date_to_ics(a: str) -> str:
-        return a[:-9].replace('-', '')
-
-    def ensure_date_time(a) -> datetime:
-        return dateutil.parser.parse(a) if not isinstance(a, datetime) else a
+    date_to_ics = lambda a: a[:-9].replace('-','')
+    ensure_date_time = lambda a: dateutil.parser.parse(a) if not isinstance(a, datetime.datetime) else a
 
     # creates the Event
     new_event = Event()
@@ -162,7 +169,7 @@ def ics_to_dict(component, labels, ics_id=None):
     event_def = {}
 
     utc = pytz.utc
-    convert_timezone = lambda a: a.astimezone(utc) if isinstance(a, datetime) else a
+    convert_timezone = lambda a: a.astimezone(utc) if isinstance(a, datetime.datetime) else a
 
     event_def['title'] = str(component.get('summary'))
     event_def['description'] = str(component.get('description'))
@@ -170,12 +177,12 @@ def ics_to_dict(component, labels, ics_id=None):
 
     event_def['start'] = convert_timezone(component.get('dtstart').dt)
     event_def['end'] = convert_timezone(component.get('dtend').dt)
-    if isinstance(event_def['end'], datetime):
-        if event_def['end'].time() == time(hour=0, minute=0, second=0):
+    if isinstance(event_def['end'], datetime.datetime):
+        if event_def['end'].time() == datetime.time(hour=0,minute=0,second=0):
             event_def['end'] -= timedelta(days=1)
-            event_def['end'].replace(hours=23, minutes=59, seconds=59)
-    elif isinstance(event_def['end'], date):
-        event_def['end'] = event_def['end'] - timedelta(days=1)
+            event_def['end'].replace(hour=23, minute=59, second=59)
+    elif isinstance(event_def['end'], datetime.date):
+        event_def['end'] = event_def['end'] - timedelta(day=1)
         midnight_time = time(23, 59, 59)
         event_def['end'] = datetime.combine(event_def['end'], midnight_time)
         event_def['allDay'] = True

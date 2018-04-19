@@ -16,4 +16,8 @@ CELERYBEAT_SCHEDULE = {
         'task': 'tasks.refresh_calendar',
         'schedule': timedelta(seconds=7200),
     },
+    'refresh-every-hour': {
+    	'task':'tasks.parse_email_icals',
+    	'schedule': timedelta(seconds=3600),
+    }
 }
