@@ -25,7 +25,7 @@ from abe.helper_functions.ics_helpers import mongo_to_ics, extract_ics
 
 
 def subscription_to_dict(s: Subscription):
-    return {'subscription_id': s.id,
+    return {'id': s.id,
             'labels': s.labels,
             'ics_url': '/subscriptions/{}/ics'.format(s.id)}
 
@@ -85,7 +85,7 @@ class SubscriptionAPI(Resource):
             if not sub:  # if no subscription was found
                 abort(404)
             else:  # if subscription was found
-                sub.update(**received_data)
+                sub.update(labels=received_data['labels'])
                 # sub.reload() # TODO: Put it back in the database
 
         except ValidationError as error:
