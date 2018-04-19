@@ -11,6 +11,9 @@ from datetime import datetime
 import os
 
 import logging
+
+from abe.resource_models.subscription_resources import SubscriptionAPI
+
 FORMAT = "%(levelname)s:ABE: _||_ %(message)s"
 logging.basicConfig(level=logging.DEBUG, format=FORMAT)
 
@@ -52,6 +55,7 @@ api.add_resource(LabelApi, '/labels/', methods=['GET', 'POST'], endpoint='label'
 api.add_resource(LabelApi, '/labels/<string:label_name>', methods=['GET', 'PUT', 'PATCH', 'DELETE'], endpoint='label_name')
 
 api.add_resource(ICSApi, '/ics/', methods=['GET', 'POST'], endpoint='ics')
+api.add_resource(SubscriptionAPI, '/subscriptions/', methods=['POST', 'GET'])
 
 
 @app.route('/')
