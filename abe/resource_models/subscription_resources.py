@@ -81,12 +81,12 @@ class SubscriptionAPI(Resource):
 
         try:
             # sub = db.Event.objects(id=subscription_id).first()
-            sub = Subscription.get_sample()  # TODO: get from database instead of making something up
+            sub = Subscription.get_sample()  # TODO: get from database instead of making data up
             if not sub:  # if no subscription was found
                 abort(404)
             else:  # if subscription was found
                 sub.update(**received_data)
-                sub.reload()
+                # sub.reload() # TODO: Put it back in the database
 
         except ValidationError as error:
             return {'error_type': 'validation',
