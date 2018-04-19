@@ -20,7 +20,22 @@ from .resource_models.ics_resources import ICSApi
 
 app = Flask(__name__)
 CORS(app)
-SSLify(app)
+
+# Redirect HTTP to HTTPS.
+#
+# For operational flexibility, set the HSTS max-age to a few seconds, instead of
+# the on-year default. The threats mitigated by HSTS policy caching are in any
+# case mostly not relevant to API services.
+#
+# TODO: Maybe the app should 404 non-HTTPS requests, rather than redirect them.
+#
+# The value of `skips` is the fixed prefix from the ACME HTTP Challenge spec
+# https://ietf-wg-acme.github.io/acme/draft-ietf-acme-acme.html#rfc.section.8.3,
+# used by LetsEncrypt.
+#
+# Use tests/tests_https_redirection.sh to test changes to this code.
+SSLify(app, age=10, permanent=True, skips=['.well-known/acme-challenge/'])
+
 api = Api(app)
 
 
@@ -36,6 +51,8 @@ class CustomJSONEncoder(JSONEncoder):
 app.json_encoder = CustomJSONEncoder
 
 # add return representations
+
+
 @api.representation('application/json')
 def output_json(data, code, headers=None):
     resp = jsonify(data)
@@ -45,11 +62,14 @@ def output_json(data, code, headers=None):
 
 # Route resources
 api.add_resource(EventApi, '/events/', methods=['GET', 'POST'], endpoint='event')
-api.add_resource(EventApi, '/events/<string:event_id>', methods=['GET', 'PUT', 'PATCH', 'DELETE'], endpoint='event_id')  # TODO: add route for string/gphycat links
-api.add_resource(EventApi, '/events/<string:event_id>/<string:rec_id>', methods=['GET', 'PUT', 'PATCH', 'DELETE'], endpoint='rec_id')  # TODO: add route for string/gphycat links
+# TODO: add route for string/gphycat links
+api.add_resource(EventApi, '/events/<string:event_id>', methods=['GET', 'PUT', 'PATCH', 'DELETE'], endpoint='event_id')
+api.add_resource(EventApi, '/events/<string:event_id>/<string:rec_id>',
+                 methods=['GET', 'PUT', 'PATCH', 'DELETE'], endpoint='rec_id')  # TODO: add route for string/gphycat links
 
 api.add_resource(LabelApi, '/labels/', methods=['GET', 'POST'], endpoint='label')
-api.add_resource(LabelApi, '/labels/<string:label_name>', methods=['GET', 'PUT', 'PATCH', 'DELETE'], endpoint='label_name')
+api.add_resource(LabelApi, '/labels/<string:label_name>',
+                 methods=['GET', 'PUT', 'PATCH', 'DELETE'], endpoint='label_name')
 
 api.add_resource(ICSApi, '/ics/', methods=['GET', 'POST'], endpoint='ics')
 
@@ -67,12 +87,6 @@ def add_event():
 @app.route('/add_label')
 def add_label():
     return render_template('add_label.html')
-
-
-
-
-
-
 
 
 if __name__ == '__main__':
