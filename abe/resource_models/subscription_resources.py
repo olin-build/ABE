@@ -24,10 +24,10 @@ from abe.helper_functions.query_helpers import get_to_event_search, event_query
 from abe.helper_functions.ics_helpers import mongo_to_ics, extract_ics
 
 
-def subscription_to_dict(s: Subscription, api_root='https://abe.olin.build'):
+def subscription_to_dict(s: Subscription):
     return {'subscription_id': s.id,
             'labels': s.labels,
-            'ics_url': '{}/ics/{}'.format(api_root, s.id)}
+            'ics_url': '/subscriptions/{}/ics'.format(s.id)}
 
 
 class SubscriptionAPI(Resource):
