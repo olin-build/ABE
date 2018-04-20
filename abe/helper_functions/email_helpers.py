@@ -114,7 +114,7 @@ def get_messages_from_email():
         pop_conn.pass_(os.environ['ABE_PASS']) # should be 'abe@olin'
     except:
         pop_conn.user('abe.at.olin@gmail.com')
-        pop_con.pass_('abe@olin')
+        pop_conn.pass_('abe@olin')
     pop3info = pop_conn.stat() #access mailbox status
     resp, items, octets = pop_conn.list()
 
