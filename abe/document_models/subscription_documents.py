@@ -11,16 +11,19 @@ class Subscription(Document):
     Model for subscriptions
 
     """
-    id = StringField(required=True, unique=True, primary_key=True)
+    sid = StringField(required=True, unique=True)
     labels = ListField(StringField())
 
-    def __init__(self):
-        super(Subscription, self).__init__()
-        self.id = '{:030x}'.format(random.randrange(16 ** 30))
+    def __init__(self, **data):
+        super(Subscription, self).__init__(**data)
+
+    @staticmethod
+    def new():
+        return Subscription(sid='{:030x}'.format(random.randrange(16 ** 30)))
 
     @staticmethod
     def get_sample():
-        subscription = Subscription()
+        subscription = Subscription.new()
         subscription.labels = 'hello featured carpe'.split()
-        subscription.id = 'deadbeef'+subscription.id[8:]
+        subscription.sid = 'deadbeef' + subscription.sid[8:]
         return subscription

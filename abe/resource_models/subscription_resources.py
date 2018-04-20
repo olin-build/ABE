@@ -22,12 +22,13 @@ from abe.document_models.subscription_documents import Subscription
 from abe.helper_functions.converting_helpers import request_to_dict
 from abe.helper_functions.query_helpers import get_to_event_search, event_query
 from abe.helper_functions.ics_helpers import mongo_to_ics, extract_ics
+from abe.helper_functions.query_helpers import multi_search
 
 
 def subscription_to_dict(s: Subscription):
-    return {'id': s.id,
+    return {'id': s.sid,
             'labels': s.labels,
-            'ics_url': '/subscriptions/{}/ics'.format(s.id)}
+            'ics_url': '/subscriptions/{}/ics'.format(s.sid)}
 
 
 class SubscriptionAPI(Resource):
@@ -40,8 +41,10 @@ class SubscriptionAPI(Resource):
 
         logging.debug("Subscription information requested: " + subscription_id)
 
-        subscription = Subscription.get_sample()  # TODO: get from database instead of making something up
-        subscription.id = subscription_id
+        subscription = db.Subscription.objects(sid=subscription_id).first()
+
+        if not subscription:
+            return "Subscription not found with identifier '{}'".format(subscription_id), 404
 
         return subscription_to_dict(subscription)
 
@@ -52,9 +55,9 @@ class SubscriptionAPI(Resource):
         try:
             d = request_to_dict(request)
 
-            subscription = Subscription()  # Creates a subscription with a random ID
+            subscription = Subscription.new()  # Creates a subscription with a random ID
             if subscription_id:
-                subscription.id = subscription_id
+                subscription.sid = subscription_id
 
             if isinstance(d['labels'], list):
                 subscription.labels = d['labels']
@@ -63,8 +66,8 @@ class SubscriptionAPI(Resource):
             else:
                 raise ValueError('labels must be a list or comma-separated string')
 
-            # TODO: save to database
-            logging.debug("Imagine that we saved the Subscription {} to the database".format(subscription))
+            subscription.save()
+            logging.debug("Subscription {} saved to the database".format(subscription.sid))
 
             return subscription_to_dict(subscription)
 
@@ -76,17 +79,21 @@ class SubscriptionAPI(Resource):
     def put(self, subscription_id: str):
         """Modify an existing subscription"""
 
-        received_data = request_to_dict(request)
-        logging.debug("Received Subscription PUT data: {}".format(received_data))
+        data = request_to_dict(request)
+        logging.debug("Received Subscription PUT data: {}".format(data))
 
         try:
-            # sub = db.Event.objects(id=subscription_id).first()
-            sub = Subscription.get_sample()  # TODO: get from database instead of making data up
-            if not sub:  # if no subscription was found
-                abort(404)
-            else:  # if subscription was found
-                sub.update(labels=received_data['labels'])
-                # sub.reload() # TODO: Put it back in the database
+            subscription = db.Subscription.objects(sid=subscription_id).first()
+
+            if not subscription:
+                return "Subscription not found with identifier '{}'".format(subscription_id), 404
+
+            if isinstance(data['labels'], list):
+                subscription.labels = data['labels']
+            elif isinstance(data['labels'], str):
+                subscription.labels = data['labels'].split(',')
+
+            subscription.save()
 
         except ValidationError as error:
             return {'error_type': 'validation',
@@ -94,7 +101,7 @@ class SubscriptionAPI(Resource):
                     'error_message': error.message}, 400
 
         else:  # return success
-            return subscription_to_dict(sub)
+            return subscription_to_dict(subscription)
 
 
 class SubscriptionICS(Resource):
@@ -107,9 +114,10 @@ class SubscriptionICS(Resource):
         """
         req_dict = request_to_dict(request)
 
-        sub = Subscription.get_sample()
+        sub = db.Subscription.objects(sid=subscription_id).first()
+
         if not sub:
-            abort(404)
+            return "Subscription not found with identifier '{}'".format(subscription_id), 404
 
         if 'labels' in req_dict:
             logging.warning('ICS feed requested with manually-specified labels {}. '
