@@ -6,23 +6,51 @@ from bson import ObjectId
 VISIBILITY = ['public', 'olin', 'students']
 
 
-def Document__repr__(doc, as_dict=False, skip_empty_values=True):
-    """Return a readable representation of a MongoDB Document.
+def Document__repr__(doc, nested=False, skip_empty_values=True):
+    """Return a string containing a printable representation of a MongoDB
+    Document.
 
-    For example, <DocumentSubclass a=1 b="str">.
+    This function makes a string that would return an object of the same
+    value when passed to `eval()`, if the suitable constructors are in scope.
+
+    For example, DocumentSubclass(a=1, b="str").
     """
     def value_repr(v):
         if isinstance(v, EmbeddedDocument):
-            return Document__repr__(v, as_dict=True, skip_empty_values=skip_empty_values)
+            return Document__repr__(v, nested=True, skip_empty_values=skip_empty_values)
         else:
             return repr(v)
-    data_iter = doc._data.items()
+    data_iter = ((k, v) for
+                 k, v in doc._data.items()
+                 if k != '_cls')
     if skip_empty_values:
         data_iter = ((k, v) for k, v in data_iter if v)
-    sep = ': ' if as_dict else '='
-    data_repr = ' '.join("{}{}{}".format(k, sep, value_repr(v))
+    sep = ': ' if nested else '='
+    data_repr = ', '.join("{}{}{}".format(k, sep, value_repr(v))
+                          for k, v in data_iter)
+    return '{' + data_repr + '}' if nested else f"{doc.__class__.__name__}({data_repr})"
+
+
+def Document__str__(doc, skip_empty_values=True):
+    """Return a nicely-printable string representation of a MongoDB Document.
+
+    For example, <DocumentSubclass a=1 b="str">.
+    """
+    def value_str(v):
+        if isinstance(v, EmbeddedDocument):
+            return Document__str__(v, skip_empty_values=skip_empty_values)
+        elif isinstance(v, str):
+            return repr(v)
+        else:
+            return str(v)
+    data_iter = ((k, v) for
+                 k, v in doc._data.items()
+                 if k != '_cls')
+    if skip_empty_values:
+        data_iter = ((k, v) for k, v in data_iter if v)
+    data_repr = ' '.join("{}={}".format(k, value_str(v))
                          for k, v in data_iter)
-    return '{' + data_repr + '}' if as_dict else f"{doc.__class__.__name__} {data_repr} >"
+    return f"<{doc.__class__.__name__} {data_repr}>"
 
 
 class RecurringEventDefinition(EmbeddedDocument):
@@ -82,6 +110,7 @@ class RecurringEventDefinition(EmbeddedDocument):
     forever = BooleanField(default=False)
 
     __repr__ = Document__repr__
+    __str__ = Document__str__
 
 
 class RecurringEventExc(EmbeddedDocument):  # TODO: get a better name
@@ -180,6 +209,7 @@ class RecurringEventExc(EmbeddedDocument):  # TODO: get a better name
     }
 
     __repr__ = Document__repr__
+    __str__ = Document__str__
 
 
 class Event(Document):
@@ -276,3 +306,4 @@ class Event(Document):
     # TODO: look into clean() function for more advanced data validation
 
     __repr__ = Document__repr__
+    __str__ = Document__str__
