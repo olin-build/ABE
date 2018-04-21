@@ -31,7 +31,7 @@ class ICSApi(Resource):
         Returns an ICS feed when requested
         """
         # configure ics specs from fullcalendar to be mongoengine searchable
-        query = event_query(get_to_event_search(request_to_dict(request)))
+        query = event_query(get_to_event_search(request))
         results = db.Event.objects(__raw__=query)
         # converts mongoDB objects to an ICS format
         response = mongo_to_ics(results)
