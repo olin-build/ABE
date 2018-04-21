@@ -5,6 +5,26 @@ from bson import ObjectId
 
 VISIBILITY = ['public', 'olin', 'students']
 
+
+def Document__repr__(doc, as_dict=False, skip_empty_values=True):
+    """Return a readable representation of a MongoDB Document.
+
+    For example, <DocumentSubclass a=1 b="str">.
+    """
+    def value_repr(v):
+        if isinstance(v, EmbeddedDocument):
+            return Document__repr__(v, as_dict=True, skip_empty_values=skip_empty_values)
+        else:
+            return repr(v)
+    data_iter = doc._data.items()
+    if skip_empty_values:
+        data_iter = ((k, v) for k, v in data_iter if v)
+    sep = ': ' if as_dict else '='
+    data_repr = ' '.join("{}{}{}".format(k, sep, value_repr(v))
+                         for k, v in data_iter)
+    return '{' + data_repr + '}' if as_dict else f"{doc.__class__.__name__} {data_repr} >"
+
+
 class RecurringEventDefinition(EmbeddedDocument):
     """
     Represents the definition of a recurring event. Is stored as an embedded document of Event with the field 'recurrence'
@@ -18,7 +38,7 @@ class RecurringEventDefinition(EmbeddedDocument):
                     Example: 'WEEKLY' (event occurs every week)
 
     interval        The interval between events. Required.
-                    Takes a string of an integer. 
+                    Takes a string of an integer.
                     Example: '2' (would be every 2 days, 2 weeks, 2 months, or 2 years depending on frequency)
 
     count           How many events should occur. Optional.
@@ -61,6 +81,8 @@ class RecurringEventDefinition(EmbeddedDocument):
 
     forever = BooleanField(default=False)
 
+    __repr__ = Document__repr__
+
 
 class RecurringEventExc(EmbeddedDocument):  # TODO: get a better name
     """
@@ -79,7 +101,7 @@ class RecurringEventExc(EmbeddedDocument):  # TODO: get a better name
 
     rec_id          The start datetime of the event had it not been edited. Required
                     Takes a datetime
-                    Example: If the recurring event was supposed to occur on July 5th at 5pm, but has 
+                    Example: If the recurring event was supposed to occur on July 5th at 5pm, but has
                     since been edited to occur on July 5th at 6pm, rec_id will be datetime(2017, 7, 5, 5)
 
     _id             The id of the sub_event. Required
@@ -146,9 +168,9 @@ class RecurringEventExc(EmbeddedDocument):  # TODO: get a better name
     start = DateTimeField()
     end = DateTimeField()
     allDay = BooleanField(default=False)
-    
+
     deleted = BooleanField(required=True, default=False)
-    
+
     meta = {
         'indexes': [
             'sid',
@@ -156,6 +178,8 @@ class RecurringEventExc(EmbeddedDocument):  # TODO: get a better name
             '_id'
         ]
     }
+
+    __repr__ = Document__repr__
 
 
 class Event(Document):
@@ -239,14 +263,16 @@ class Event(Document):
 
     recurrence = EmbeddedDocumentField(RecurringEventDefinition)
     recurrence_end = DateTimeField()
-    
+
     sub_events = EmbeddedDocumentListField(RecurringEventExc)
- 
+
     meta = {'allow_inheritance': True,
-        'indexes': [
-            'start',
-            'end',
-            'recurrence_end']
-        }
+            'indexes': [
+                'start',
+                'end',
+                'recurrence_end']
+            }
 
     # TODO: look into clean() function for more advanced data validation
+
+    __repr__ = Document__repr__
