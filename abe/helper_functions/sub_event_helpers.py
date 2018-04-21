@@ -22,6 +22,7 @@ import requests
 from abe import database as db
 from abe.helper_functions.converting_helpers import mongo_to_dict
 
+
 def duplicate_query_check(sub_event_dict, parent_event):
     """checks whether a dictionary has the same field-value pair as a parent event
     used to check for duplicate information in sub_events and their parent events
@@ -31,11 +32,12 @@ def duplicate_query_check(sub_event_dict, parent_event):
     for field in sub_event_dict:
         if field in parent_event_dict:
             if sub_event_dict[field] == parent_event_dict[field]:
-               fields_to_pop.append(field)
+                fields_to_pop.append(field)
     for field in fields_to_pop:
         sub_event_dict.pop(field)
 
     return(sub_event_dict)
+
 
 def create_sub_event(received_data, parent_event):
     """creates an edited sub event in a recurring series for the first time
@@ -47,6 +49,7 @@ def create_sub_event(received_data, parent_event):
 
     return(rec_event)
 
+
 def update_sub_event(received_data, parent_event, sub_event_id, ics=False):
     """edits a sub_event that has already been created
 
@@ -57,10 +60,11 @@ def update_sub_event(received_data, parent_event, sub_event_id, ics=False):
     """
     convert_timezone = lambda a: a.replace(tzinfo=pytz.UTC) if isinstance(a, datetime) else a
     for sub_event in parent_event.sub_events:
-        if ics == False: # if this update is not coming from an ics feed
+        if ics == False:  # if this update is not coming from an ics feed
             # if the sub_event to be updated's id matches the id of the received_data
-            if sub_event['_id']== sub_event_id:
-                updated_sub_event_dict = create_new_sub_event_defintion(mongo_to_dict(sub_event), received_data, parent_event)
+            if sub_event['_id'] == sub_event_id:
+                updated_sub_event_dict = create_new_sub_event_defintion(
+                    mongo_to_dict(sub_event), received_data, parent_event)
                 updated_sub_event = db.RecurringEventExc(**updated_sub_event_dict)
                 parent_event.update(pull__sub_events___id=sub_event_id)
                 parent_event.update(add_to_set__sub_events=updated_sub_event_dict)
@@ -69,10 +73,11 @@ def update_sub_event(received_data, parent_event, sub_event_id, ics=False):
                 parent_event.save()
                 parent_event.reload()
                 return(updated_sub_event)
-        elif ics == True: # if this update is coming from an ics feed
+        elif ics == True:  # if this update is coming from an ics feed
             sub_event_compare = convert_timezone(sub_event["rec_id"])
             if sub_event_compare == sub_event_id:
-                updated_sub_event_dict = create_new_sub_event_defintion(mongo_to_dict(sub_event), received_data, parent_event)
+                updated_sub_event_dict = create_new_sub_event_defintion(
+                    mongo_to_dict(sub_event), received_data, parent_event)
                 updated_sub_event = db.RecurringEventExc(**updated_sub_event_dict)
                 parent_event.update(pull__sub_events__rec_id=sub_event_id)
                 parent_event.update(add_to_set__sub_events=updated_sub_event_dict)
@@ -81,6 +86,7 @@ def update_sub_event(received_data, parent_event, sub_event_id, ics=False):
                 parent_event.save()
                 parent_event.reload()
                 return(updated_sub_event)
+
 
 def sub_event_to_full(sub_event_dict, event):
     """expands a sub_event definition to have all fields full_Calendar requires
@@ -102,12 +108,14 @@ def sub_event_to_full(sub_event_dict, event):
     sub_event_dict["id"] = sub_event_dict.pop("_id")
     return(sub_event_dict)
 
+
 def access_sub_event(parent_event, sub_event_id):
     """gets the sub_event from a parent_event and returns it
     """
     for sub_event in parent_event['sub_events']:
         if sub_event['_id'] == str(sub_event_id):
             return(sub_event)
+
 
 def create_new_sub_event_defintion(sub_event, updates, parent_event):
     """based on the old sub_event definition and updates submitted
@@ -120,8 +128,9 @@ def create_new_sub_event_defintion(sub_event, updates, parent_event):
 
 def instance_creation(event, start=None, end=None):
     """
-    Generates list of datetime objects of when recurring events should occur
-    Uses rrule from dateutils
+    Generate a list of datetime objects of when recurring events should occur.
+    Uses rrule from dateutils.
+    Only recurrences between start and end, if supplied, are created.
     """
 
     rec_type_list = ['YEARLY', 'MONTHLY', 'WEEKLY', 'DAILY']
@@ -129,12 +138,17 @@ def instance_creation(event, start=None, end=None):
     day_list = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']
 
     recurrence = event.recurrence
-    ensure_date_time = lambda a: dateutil.parser.parse(a) if not isinstance(a, datetime) and not isinstance(a, date) else a
-    convert_timezone = lambda a: a.replace(tzinfo=None) if isinstance(a, datetime) else a
+
+    def ensure_date_time(d):
+        return dateutil.parser.parse(d) if not isinstance(d, datetime) and not isinstance(d, date) else d
+
+    def convert_timezone(d):
+        return d.replace(tzinfo=None) if isinstance(d, datetime) else d
 
     rFrequency = rec_type_list.index(recurrence['frequency'])
     rStart = convert_timezone(ensure_date_time(event['start']))
-    if start > rStart: # if we're searching starting after the beginning of the recurring event, start there to speed up rrule
+    logging.debug('help')
+    if start and start > rStart:  # if we're searching starting after the beginning of the recurring event, start there to speed up rrule
         rStart = start
     if recurrence['frequency'] == 'YEARLY':
         # extracts the month and day from the date
@@ -166,18 +180,18 @@ def instance_creation(event, start=None, end=None):
     rCount = int(recurrence['count']) if 'count' in recurrence else None
 
     if rUntil == end:
-        rule_list = list(rrule(freq=rFrequency, count=rCount, interval=rInterval, until=rUntil, bymonth=rByMonth, \
-            bymonthday=rByMonthDay, byweekday=rByDay, dtstart=rStart))
+        rule_list = list(rrule(freq=rFrequency, count=rCount, interval=rInterval, until=rUntil, bymonth=rByMonth,
+                               bymonthday=rByMonthDay, byweekday=rByDay, dtstart=rStart))
     else:
-        rule_list = list(rrule(freq=rFrequency, count=rCount, interval=rInterval, until=rUntil, bymonth=rByMonth, \
-            bymonthday=rByMonthDay, byweekday=rByDay, dtstart=rStart))
-    return(rule_list)
+        rule_list = list(rrule(freq=rFrequency, count=rCount, interval=rInterval, until=rUntil, bymonth=rByMonth,
+                               bymonthday=rByMonthDay, byweekday=rByDay, dtstart=rStart))
+    return rule_list
 
 
 def find_recurrence_end(event):
     """
-    Finds the last occurence of an event and returns the day after
+    Finds the last occurrence of an event and returns the day after.
     """
     rule_list = instance_creation(event)
     event_end = rule_list[-1] + timedelta(hours=24)
-    return(event_end)
+    return event_end
