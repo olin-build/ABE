@@ -128,7 +128,7 @@ in a separate terminal. These will run the "beat" and "worker" servers alongside
 
 `python -m unittest`
 
-This is noisy, but should print `OK` at the end:
+This should print `OK` at the end:
 
 ```shell
 $ python -m unittest

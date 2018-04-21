@@ -84,7 +84,7 @@ def insert_data(db, event_data=None, label_data=None, ics_data=None):
     from .helper_functions.sub_event_helpers import find_recurrence_end
     logging.basicConfig(level=logging.DEBUG)
     if event_data:
-        logging.info("Inserting sample event data")
+        logging.debug("Inserting sample event data")
         for event in event_data:
             for key, value in event.items():
                 if type(value) is datetime:  # convert to UTC from EST
@@ -96,16 +96,16 @@ def insert_data(db, event_data=None, label_data=None, ics_data=None):
             if 'recurrence' in new_event:
                 if new_event.recurrence.forever == False:
                     new_event.recurrence_end = find_recurrence_end(new_event)
-                    logging.info("made some end recurrences: {}".format(new_event.recurrence_end))
+                    logging.debug("made some end recurrences: {}".format(new_event.recurrence_end))
             new_event.save()
     if label_data:
-        logging.info("Inserting sample label data")
+        logging.debug("Inserting sample label data")
         for index, label in enumerate(label_data):
             if 'color' not in label:
                 label['color'] = olin_colors[index]
             db.Label(**label).save()
     if ics_data:
-        logging.info("Inserting sample ics data")
+        logging.debug("Inserting sample ics data")
         for ics in ics_data:
             db.ICS(**ics).save()
 

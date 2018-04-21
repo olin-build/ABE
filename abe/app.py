@@ -13,7 +13,7 @@ import os
 import logging
 
 FORMAT = "%(levelname)s:ABE: _||_ %(message)s"
-logging.basicConfig(level=logging.DEBUG, format=FORMAT)
+logging.basicConfig(level=logging.INFO, format=FORMAT)
 
 from .resource_models.event_resources import EventApi
 from .resource_models.label_resources import LabelApi
