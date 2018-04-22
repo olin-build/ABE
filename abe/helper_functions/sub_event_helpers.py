@@ -147,7 +147,6 @@ def instance_creation(event, start=None, end=None):
 
     rFrequency = rec_type_list.index(recurrence['frequency'])
     rStart = convert_timezone(ensure_date_time(event['start']))
-    logging.debug('help')
     if start and start > rStart:  # if we're searching starting after the beginning of the recurring event, start there to speed up rrule
         rStart = start
     if recurrence['frequency'] == 'YEARLY':
