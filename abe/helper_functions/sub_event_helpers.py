@@ -179,22 +179,9 @@ def instance_creation(event, start=None, end=None):
         rUntil = convert_timezone(ensure_date_time(recurrence['until'])) if 'until' in recurrence else end
     rCount = int(recurrence['count']) if 'count' in recurrence else None
 
-    if rUntil == end:
-<<<<<<< HEAD
-        rule_list = list(rrule(freq=rFrequency, count=rCount, interval=rInterval, until=rUntil, bymonth=rByMonth,
-                               bymonthday=rByMonthDay, byweekday=rByDay, dtstart=rStart))
-    else:
-        rule_list = list(rrule(freq=rFrequency, count=rCount, interval=rInterval, until=rUntil, bymonth=rByMonth,
-                               bymonthday=rByMonthDay, byweekday=rByDay, dtstart=rStart))
-    return rule_list
-=======
-        rule_list = list(rrule(freq=rFrequency, count=rCount, interval=rInterval, until=rUntil, bymonth=rByMonth, \
-            bymonthday=rByMonthDay, byweekday=rByDay, dtstart=rStart))
-    else:
-        rule_list = list(rrule(freq=rFrequency, count=rCount, interval=rInterval, until=rUntil, bymonth=rByMonth, \
-            bymonthday=rByMonthDay, byweekday=rByDay, dtstart=rStart))
+    rule_list = list(rrule(freq=rFrequency, count=rCount, interval=rInterval, until=rUntil, bymonth=rByMonth, \
+        bymonthday=rByMonthDay, byweekday=rByDay, dtstart=rStart))
     return(rule_list)
->>>>>>> Adding limit of one year date range to get requests and making rrule start datetime be query start if after event start.
 
 
 def find_recurrence_end(event):

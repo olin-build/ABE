@@ -16,7 +16,7 @@ recurringEvents = dict(
         'title': 'Weekly Test Event',
         'location': 'Quiet Reading Room',
         'description': '',
-        'start': datetime(2017, 6, 1, 15),
+        'start': datetime(2017, 6, 1, 15, 0),
         'end': datetime(2017, 6, 1, 15, 30),
         'recurrence_end': datetime(2017, 7, 31),
         "labels": [],
@@ -31,7 +31,7 @@ recurringEvents = dict(
 )
 
 
-class SampleDataTestCase(unittest.TestCase):
+class RecurrenceTestCase(unittest.TestCase):
 
     def setUp(self):
         os.environ["DB_NAME"] = testDbName
@@ -59,22 +59,22 @@ class SampleDataTestCase(unittest.TestCase):
 
         with self.subTest("no start or end date"):
             instances = sub_event_helpers.instance_creation(event)
-            # FIXME: what number should this return?
-            self.assertEqual(len(instances), -1)
+            # With neither of the optional params specified, it should enumerate all instances of the recurring event
+            self.assertEqual(len(instances), 10)
 
         with self.subTest("start and date outside recurrence"):
             instances = sub_event_helpers.instance_creation(
                 event,
                 start=datetime(2017, 1, 1),
                 end=datetime(2018, 1, 1))
-            # FIXME: what number should this return?
-            self.assertEqual(len(instances), -1)
+            # Should return every instance of the recurring event.
+            self.assertEqual(len(instances), 10)
 
         with self.subTest("start and date inside recurrence"):
-            # FIXME: use a date that is actually inside the recurrence
             instances = sub_event_helpers.instance_creation(
                 event,
-                start=datetime(2017, 1, 1),
-                end=datetime(2018, 1, 1))
-            # FIXME: what number should this return?
-            self.assertEqual(len(instances), -1)
+                start=datetime(2017, 7, 20),
+                end=datetime(2027, 7, 31))
+            print(instances)
+            # Should return all instances of the recurring event that happen within the query range
+            self.assertEqual(len(instances), 8)
