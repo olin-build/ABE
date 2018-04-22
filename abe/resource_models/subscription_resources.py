@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Subscription Resource models for flask"""
 
 from flask import jsonify, request, abort, Response, make_response, Request

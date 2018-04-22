@@ -27,7 +27,7 @@ class ICSApi(Resource):
 
     def get(self):
         """
-        Depreciated, use SubscriptionICSFeed.get instead.
+        Deprecated, use SubscriptionICSFeed.get instead.
         Returns an ICS feed when requested
         """
         # configure ics specs from fullcalendar to be mongoengine searchable
