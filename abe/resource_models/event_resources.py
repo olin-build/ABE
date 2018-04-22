@@ -71,6 +71,11 @@ class EventApi(Resource):
         else:  # search database based on parameters
             # make a query to the database
             query_dict = get_to_event_search(request)
+
+            query_time_period = query_dict['end']-query_dict['start']
+            if query_time_period > timedelta(days=365):
+                return "Too wide of date range in query. Max date range of 1 year allowed.", 400
+
             query = event_query(query_dict)
             results = db.Event.objects(__raw__ = query) #{'start': new Date('2017-06-14')})
             logging.debug('found {} events for query'.format(len(results)))
@@ -84,7 +89,7 @@ class EventApi(Resource):
 
             events_list = []
             for event in results:
-                
+
                 if 'recurrence' in event: # checks for recurrent events
                     # expands a recurring event defintion into a json response with individual events
                     events_list = recurring_to_full(event, events_list, start, end)
