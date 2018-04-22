@@ -37,7 +37,7 @@ class AbeTestCase(unittest.TestCase):
 
     def test_add_sample_events(self):
         """Adds the sample events to the database"""
-        for event in sample_data.sample_events:
+        for event in sample_data.load_sample_data().events:
             response = self.app.post(
                 '/events/',
                 data=flask.json.dumps(event),  # use flask.json for datetimes
@@ -47,7 +47,7 @@ class AbeTestCase(unittest.TestCase):
 
     def test_add_sample_labels(self):
         """Adds the sample labels to the database"""
-        for event in sample_data.sample_labels:
+        for event in sample_data.load_sample_data().labels:
             response = self.app.post(
                 '/labels/',
                 data=flask.json.dumps(event),
