@@ -36,7 +36,7 @@ def create_ics_event(event: db.Event, recurrence=False) -> Event:
 
     recurrence      A boolean value indicating the event is part of a recurring event series.
                     If True then the UID of the ICS event will correspond to the sub_event id
-                    (sid) of the event. A 'RECURRENCE-ID' field will be created with the event 
+                    (sid) of the event. A 'RECURRENCE-ID' field will be created with the event
                     rec_id as its value.
                     If False then the UID of the ICS event will correspond to the event id (id)
                     of the event.
@@ -58,10 +58,13 @@ def create_ics_event(event: db.Event, recurrence=False) -> Event:
     if event['allDay']:
         start_string = 'dtstart;VALUE=DATE'
         end_string = 'dtend;VALUE=DATE'
-        event_start = date_to_ics(ensure_date_time(event['start']).isoformat())
-        event_end = date_to_ics(ensure_date_time(event['end']).isoformat())
-
-        event_end = str(int(event_end) + 1)
+        event_start_datetime = ensure_date_time(event['start'])
+        event_end_datetime = ensure_date_time(event['end'])
+        if event_end_datetime-event_start_datetime < timedelta(days=1):  # If it's a single-day event, we can just drop the event end
+            event_end = None
+        else:
+            event_end = date_to_ics(event_end_datetime.isoformat())
+        event_start = date_to_ics(event_start_datetime.isoformat())
     else:
         start_string = 'dtstart'
         end_string = 'dtend'
@@ -72,7 +75,7 @@ def create_ics_event(event: db.Event, recurrence=False) -> Event:
         event_end = utc.localize(ensure_date_time(event['end']))
 
     new_event.add(start_string, event_start)
-    if 'end' in event:
+    if 'end' in event and event_end is not None:
         new_event.add(end_string, event_end)
     new_event.add('TRANSP', 'OPAQUE')
 
@@ -90,7 +93,7 @@ def create_ics_recurrence(new_event, recurrence):
     """
     creates the ICS rrule definition
 
-    new_event           The current ics event that the recurrence 
+    new_event           The current ics event that the recurrence
                         definition will be added to
 
     recurrence          The recurrence defintion as stored in mongoDB
@@ -157,15 +160,15 @@ def mongo_to_ics(events):
 
 def ics_to_dict(component, labels, ics_id=None):
     """
-    Converts an ics component to a dictionary that 
+    Converts an ics component to a dictionary that
     can be used to create or update a mongoDB object
 
     component       The ics component representing a singular event
 
     labels          labels given
 
-    ics_id          the objectId corresponding to the ICS object that 
-                    this component comes from 
+    ics_id          the objectId corresponding to the ICS object that
+                    this component comes from
     """
     event_def = {}
 
@@ -180,10 +183,10 @@ def ics_to_dict(component, labels, ics_id=None):
     event_def['end'] = convert_timezone(component.get('dtend').dt)
 
     if isinstance(event_def['end'], datetime.datetime):
-        if event_def['end'].time() == datetime.time(hour=0,minute=0,second=0):
+        if event_def['end'].time() == datetime.time(hour=0, minute=0, second=0):
             event_def['end'] -= timedelta(days=1)
             event_def['end'].replace(hour=23, minute=59, second=59)
-            
+
     elif isinstance(event_def['end'], datetime.date):
         event_def['end'] = event_def['end'] - timedelta(day=1)
         midnight_time = time(23, 59, 59)
@@ -225,7 +228,7 @@ def ics_to_dict(component, labels, ics_id=None):
 
 def extract_ics(cal, ics_url, labels=None):
     """
-    Extracts the ics components and stores them 
+    Extracts the ics components and stores them
 
     cal         the ics calendar
 
