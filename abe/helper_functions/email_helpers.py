@@ -109,12 +109,8 @@ def get_messages_from_email():
     :return: List of email message objects
     """
     pop_conn = poplib.POP3_SSL('pop.gmail.com')
-    try:
-        pop_conn.user(os.environ['ABE_EMAIL']) # should be 'abe.at.olin@gmail.com'
-        pop_conn.pass_(os.environ['ABE_PASS']) # should be 'abe@olin'
-    except:
-        pop_conn.user('abe.at.olin@gmail.com')
-        pop_conn.pass_('abe@olin')
+    pop_conn.user(os.environ['ABE_EMAIL'])
+    pop_conn.pass_(os.environ['ABE_PASS'])
     pop3info = pop_conn.stat() #access mailbox status
     resp, items, octets = pop_conn.list()
 

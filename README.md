@@ -33,6 +33,8 @@ pipenv shell
 
 You can either develop within this virtual environment, or execute individual commands from outside with `pipenv run <COMMAND>`.
 
+You will also need to export `ABE_PASS` and `ABE_EMAIL`, as [found here](https://docs.google.com/document/d/1CZ45xYT33sTi5xpFJF8BkEeniCRszaxcfwiBmvMdmbk/edit).
+
 ### RabbitMQ
 
 Install rabbitmq and any dependencies. Use [these instructions](http://www.rabbitmq.com/download.html). It will likely require a download of [Erlang](https://packages.erlang-solutions.com/erlang/), which must be installed separately.
