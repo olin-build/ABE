@@ -11,12 +11,14 @@ from datetime import datetime
 import os
 
 import logging
+
 FORMAT = "%(levelname)s:ABE: _||_ %(message)s"
 logging.basicConfig(level=logging.DEBUG, format=FORMAT)
 
 from .resource_models.event_resources import EventApi
 from .resource_models.label_resources import LabelApi
 from .resource_models.ics_resources import ICSApi
+from .resource_models.subscription_resources import SubscriptionAPI, SubscriptionICS
 
 app = Flask(__name__)
 CORS(app)
@@ -73,6 +75,10 @@ api.add_resource(LabelApi, '/labels/<string:label_name>',
 
 api.add_resource(ICSApi, '/ics/', methods=['GET', 'POST'], endpoint='ics')
 
+api.add_resource(SubscriptionAPI, '/subscriptions/', methods=['POST'], endpoint='subscription')
+api.add_resource(SubscriptionAPI, '/subscriptions/<string:subscription_id>', methods=['GET', 'PUT', 'POST'], endpoint='subscription_id')
+
+api.add_resource(SubscriptionICS, '/subscriptions/<string:subscription_id>/ics', methods=['GET'], endpoint='subscription_ics')
 
 @app.route('/')
 def splash():
