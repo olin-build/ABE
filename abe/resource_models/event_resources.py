@@ -73,7 +73,7 @@ class EventApi(Resource):
             query_dict = get_to_event_search(request)
 
             query_time_period = query_dict['end']-query_dict['start']
-            if query_time_period > timedelta(days=365):
+            if query_time_period > timedelta(days=366):
                 return "Too wide of date range in query. Max date range of 1 year allowed.", 400
 
             query = event_query(query_dict)
