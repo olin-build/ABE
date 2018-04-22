@@ -1,0 +1,71 @@
+[
+    {
+        "url": "http://library.olin.edu/",
+        "name": "library",
+        "description": "Events hosted in or relating to the Olin Library",
+        "color": "#26AAA5"
+    },
+    {
+        "name": "food",
+        "description": "Anything you can eat.",
+        "default": true
+    },
+    {
+        "name": "clubs",
+        "description":
+            "Events hosted by or relating to Olin/BOW clubs and orgs",
+        "default": true
+    },
+    {
+        "name": "classes",
+        "default": true
+    },
+    {
+        "name": "academic",
+        "description": "Events from the academic calendar",
+        "default": true
+    },
+    {
+        "name": "STAR",
+        "description": "Anything you can eat.",
+        "default": true
+    },
+    {
+        "name": "administration",
+        "description": "Anything you can eat.",
+        "default": true
+    },
+    {
+        "name": "aquaponics",
+        "parent_labels": ["clubs"]
+    },
+    {
+        "name": "OWL",
+        "description": "Olin Workshop in the Library"
+    },
+    {
+        "name": "potluck",
+        "description": "Events from Olin's hottest new library hackathon"
+    },
+    {
+        "name": "summer",
+        "description": "Events happening over the summer."
+    },
+    {
+        "name": "featured",
+        "default": true
+    },
+    {
+        "name": "burstthebubble",
+        "description": "Events outside of the Olin bubble.",
+        "default": true
+    },
+    {
+        "name": "testing",
+        "description": "Sample events for testing"
+    },
+    {
+        "name": "unlabeled",
+        "description": "Events with the unlabeled label."
+    }
+]
