@@ -18,12 +18,22 @@
 #       range.
 #
 
-# A little bit ugly, but restricts local server to localhost.
 import os
 _PORT = str(os.environ.get('PORT', 3000))
 _FLASK_ENV = str(os.environ.get('FLASK_ENV', "DEV"))
 
-if _FLASK_ENV == "PROD":
+# Restricts local server to localhost.
+#
+# Heroku dev and review apps don't have FLASK_ENV set, so it's not suffient to
+# test just for that. Instead, recognize a Heroku app by the presence of PORT.
+#
+# TODO: It would be cleaner to conditionalize this on a variable set in
+# `app.json`, or just use a `HOST` that's set in that file. I'm not using the
+# existing required `HEROKU_APP_NAME`, because these aren't set on the Heroku
+# dev and prod apps, and, because of their use in `pr-predestroy.py`, I don't
+# want to change that without review. The PORT check is the most similar to what
+# we've been running with until now.
+if _FLASK_ENV == 'PROD' or 'PORT' in os.environ:
     bind = '0.0.0.0:' + _PORT
 else:
     bind = '127.0.0.1:' + _PORT
