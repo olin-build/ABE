@@ -10,6 +10,10 @@ Install MongoDB. Use [these
 instructions](https://docs.mongodb.com/getting-started/shell/installation/). On
 macOS with [Homebrew](https://brew.sh/) installed, you can instead run `brew install mongodb`.
 
+### RabbitMQ
+
+Install rabbitmq and any dependencies. Use [these instructions](http://www.rabbitmq.com/download.html). It will likely require a download of [Erlang](https://packages.erlang-solutions.com/erlang/), which must be installed separately.
+
 ### Setup Python Virtual Environment
 
 ```shell
@@ -51,6 +55,8 @@ To start a local version of ABE, run
 python run.py
 ```
 
+Be sure that your local MongoDB is running when you run the python script.
+
 ### Load Sample Data
 
 To load [sample data](abe/sample_data.py) into the database, run
@@ -58,6 +64,22 @@ To load [sample data](abe/sample_data.py) into the database, run
 ```shell
 python -m abe.sample_data
 ```
+
+### Running the celery tasks
+
+To run the celery tasks concurrently with a local version of ABE, run
+
+```shell
+honcho start -f ProcfileHoncho
+```
+
+or
+
+```shell
+celery -A tasks worker --beat -l info
+```
+
+in a separate terminal. These will run the "beat" and "worker" servers alongside the web server.
 
 ## Development
 
