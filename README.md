@@ -33,6 +33,12 @@ pipenv shell
 
 You can either develop within this virtual environment, or execute individual commands from outside with `pipenv run <COMMAND>`.
 
+You will also need to export `ABE_PASS` and `ABE_EMAIL`, as [found here](https://docs.google.com/document/d/1CZ45xYT33sTi5xpFJF8BkEeniCRszaxcfwiBmvMdmbk/edit).
+
+### RabbitMQ
+
+Install rabbitmq and any dependencies. Use [these instructions](http://www.rabbitmq.com/download.html). It will likely require a download of [Erlang](https://packages.erlang-solutions.com/erlang/), which must be installed separately.
+
 ### MongoDB
 
 Install MongoDB. Use [these
@@ -72,6 +78,22 @@ Visit <http://127.0.0.1:3000>. You should see a top hat.
 
 Visit <http://127.0.0.1:3000/events/>. You should see `[]`. (This is an empty
 JSON list of events.)
+
+### Running the celery tasks
+
+To run the celery tasks concurrently with a local version of ABE, run
+
+```shell
+honcho start -f ProcfileHoncho
+```
+
+or
+
+```shell
+celery -A tasks worker --beat -l info
+```
+
+in a separate terminal. These will run the "beat" and "worker" servers alongside the web server.
 
 ### Testing
 
