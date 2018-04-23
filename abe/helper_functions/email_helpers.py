@@ -1,20 +1,20 @@
+import base64
+import email
 import os
-import sys
-import time
 import poplib
 import smtplib
-import email
 from io import StringIO
-from datetime import datetime
-import base64
+
 import icalendar as ic
-# from . import database as db
-from abe.helper_functions.ics_helpers import ics_to_dict
-from abe.helper_functions.converting_helpers import mongo_to_dict
-from abe import database as db
 from mongoengine import ValidationError
 
-from email import parser
+from abe import database as db
+from abe.helper_functions.converting_helpers import mongo_to_dict
+from abe.helper_functions.ics_helpers import ics_to_dict
+
+ABE_EMAIL = os.environ['ABE_EMAIL']
+ABE_PASS = os.environ['ABE_PASS']
+
 
 def get_msg_list(pop_items, pop_conn):
     """ Takes a list of items and the pop3 connection
@@ -35,6 +35,7 @@ def get_msg_list(pop_items, pop_conn):
         messages.append(orig_email)
     return messages
 
+
 def get_attachments(message):
     """ Given a message object,
     checks for an attachment
@@ -46,6 +47,7 @@ def get_attachments(message):
         print(attachment.get_content_type())
         return attachment
     return None
+
 
 def email_test(filename):
     """ TO DO: determine best way to test. Currently, file does
@@ -72,6 +74,7 @@ def email_test(filename):
                 calendars.append(cal)
     return calendars
 
+
 def ical_to_dict(cal):
     """ Given a calendar, creates a dictionary as
     specified in ics_to_dict.
@@ -89,7 +92,7 @@ def ical_to_dict(cal):
     # [tags][go][here]\n
     # "rest of description"
     labels_and_desc = str(event.get('description')).strip().split('\n')
-    if '[' == labels_and_desc[0][0]: # if the bracket is in the first line of the description, there are labels
+    if '[' == labels_and_desc[0][0]:  # if the bracket is in the first line of the description, there are labels
         label_str = labels_and_desc[0].lower()
         labels = label_str.replace('[', ' ').replace(']', '').strip().split()
         desc = '\n'.join(labels_and_desc[1:]).strip()
@@ -100,28 +103,30 @@ def ical_to_dict(cal):
     event_def['description'] = desc
     return event_def, sender
 
+
 def get_messages_from_email():
     """ Fetches unread emails from the email address
     specified by the environmental variable ABE_EMAIL
-    (password given by env var ABE_PASS). Returns a 
+    (password given by env var ABE_PASS). Returns a
     list of messages.
 
     :return: List of email message objects
     """
     pop_conn = poplib.POP3_SSL('pop.gmail.com')
-    pop_conn.user(os.environ['ABE_EMAIL'])
-    pop_conn.pass_(os.environ['ABE_PASS'])
-    pop3info = pop_conn.stat() #access mailbox status
+    pop_conn.user(ABE_EMAIL)
+    pop_conn.pass_(ABE_PASS)
+    pop3info = pop_conn.stat()  # access mailbox status
     resp, items, octets = pop_conn.list()
 
     messages = get_msg_list(items, pop_conn)
     pop_conn.quit()
     return messages
 
+
 def get_calendars_from_messages(messages):
     """ Returns any icals found as Calendar
     objects from the icalendar library.
-    
+
     :inputs:
         messages:   List of email Message instances
     :return:        List of Calendar instances
@@ -137,15 +142,16 @@ def get_calendars_from_messages(messages):
                     calendars.append(cal)
     return calendars
 
+
 def cal_to_event(cal):
     """ Creates an event from a calendar object """
     received_data, sender = ical_to_dict(cal)
     try:
         new_event = db.Event(**received_data)
-        if new_event.labels == []: # if no labels were given
+        if new_event.labels == []:  # if no labels were given
             new_event.labels = ['unlabeled']
-        if 'recurrence' in new_event: # if this is a recurring event
-            if new_event.recurrence.forever == False: # if it doesn't recurr forever
+        if 'recurrence' in new_event:  # if this is a recurring event
+            if not new_event.recurrence.forever:  # if it doesn't recurr forever
                 # find the end of the recurrence
                 new_event.recurrence_end = find_recurrence_end(new_event)
         new_event.save()
@@ -159,16 +165,13 @@ def cal_to_event(cal):
         reply_email(sender, new_event_dict)
         return new_event_dict, 201
 
+
 def smtp_connect():
     """ Connects to the smtp server
     :return: server instance, gmail to send
     """
-    try:
-        gmail = os.environ['ABE_EMAIL'] # should be 'abe.at.olin@gmail.com'
-        gpass = os.environ['ABE_PASS'] # should be 'abe@olin'
-    except:
-        gmail = 'abe.at.olin@gmail.com'
-        gpass = 'abe@olin'
+    gmail = ABE_EMAIL
+    gpass = ABE_PASS
     try:
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
         server.ehlo()
@@ -177,6 +180,7 @@ def smtp_connect():
         print('Connecting to gmail failed...')
         return
     return server, gmail
+
 
 def error_reply(to, error):
     """ Given the erros, sends an email with the errors that
@@ -198,6 +202,7 @@ def error_reply(to, error):
 
     send_email(server, email_text, sent_from, to)
 
+
 def reply_email(to, event_dict):
     """ Responds after a successful posting with
     the tags under which the event was saved. """
@@ -217,15 +222,17 @@ def reply_email(to, event_dict):
     """.format(sent_from, to, subject, body, event_dict['description'], tags)
     send_email(server, email_text, sent_from, to)
 
+
 def send_email(server, email_text, sent_from, sent_to):
     server.sendmail(sent_from, sent_to, email_text)
     server.close()
+
 
 def scrape():
     """ Scrapes emails and parses them into events """
     msgs = get_messages_from_email()
     cals = get_calendars_from_messages(msgs)
-    print("Scraped", len(cals), "from abe.at.olin@gmail.com")
+    print(f"Scraped {len(cals)} from {ABE_EMAIL}")
     completed = []
     for cal in cals:
         completed.append(cal_to_event(cal))
