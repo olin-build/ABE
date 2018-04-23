@@ -1,10 +1,30 @@
 # ABE
 
-Amorphous Blob of Events
+Dev: [![Build Status](https://travis-ci.org/olinlibrary/ABE.svg?branch=dev)](https://travis-ci.org/olinlibrary/ABE/branches)
+Master: [![Build Status](https://travis-ci.org/olinlibrary/ABE.svg?branch=master)](https://travis-ci.org/olinlibrary/ABE/branches)
+
+**ABE** (Amorphous Blob of Events) is Olin's student-built store of information
+about Olin events. It enables the creation of digital experiences that share
+information about past, present, and upcoming events.
+
+## Built With ABE
+
+ABE is a platform. Some online experiences that use the data in ABE include:
+
+* [Olin Events](https://github.com/olinlibrary/abe-web) is a web view of the
+  Olin calendar. It can also be used to subscribe other calendar programs, such
+  as Google Calendar and desktop and mobile calendar clients, to ABE; and to
+  connect ABE to other calendars.
+* [FUTUREboard](https://github.com/olinlibrary/futureboard)  is a digital
+  signage platform for sharing of media, supplemented by information about
+  events happening on campus.
+* [ABE Event Schedule](https://github.com/osteele/abe-event-schedule) is an
+  experiment in deriving a conference-track-style schedule from ABE events.
 
 ## Getting Started
 
 ### Environment Variables
+
 There's an [environment variable template](.env.template), which needs to be copied and may need to be changed accordingly:
 
 ```shell
@@ -14,19 +34,23 @@ $ cp .env.template .env
 It will be automagically picked up by...
 
 ### Pipenv
+
 ABE uses Pipenv for python management.
 
 First, [install pipenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/#installing-pipenv). Most commonly:
+
 ```shell
 $ pip install --user pipenv
 ```
 
 To resolve python dependencies:
+
 ```shell
 $ pipenv install --dev
 ```
 
 To enter a virtual environment:
+
 ```shell
 pipenv shell
 ```
@@ -51,7 +75,9 @@ In order to connect to a mongodb instance other than your localhost, you can cre
 This configuration file is gitignored and can specify a uri for mongodb to connect to.
 
 #### Load Sample Data
+
 To load [sample data](abe/sample_data.py) into the database, run
+
 ```shell
 python -m abe.sample_data
 ```
