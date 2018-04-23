@@ -36,7 +36,10 @@ CORS(app)
 # used by LetsEncrypt.
 #
 # Use tests/tests_https_redirection.sh to test changes to this code.
-SSLify(app, age=10, permanent=True, skips=['.well-known/acme-challenge/'])
+#
+# Disabled by default for local development. See issue #158.
+if os.environ.get('HSTS_ENABLED'):
+    SSLify(app, age=10, skips=['.well-known/acme-challenge/'])
 
 api = Api(app)
 
@@ -76,9 +79,12 @@ api.add_resource(LabelApi, '/labels/<string:label_name>',
 api.add_resource(ICSApi, '/ics/', methods=['GET', 'POST'], endpoint='ics')
 
 api.add_resource(SubscriptionAPI, '/subscriptions/', methods=['POST'], endpoint='subscription')
-api.add_resource(SubscriptionAPI, '/subscriptions/<string:subscription_id>', methods=['GET', 'PUT', 'POST'], endpoint='subscription_id')
+api.add_resource(SubscriptionAPI, '/subscriptions/<string:subscription_id>',
+                 methods=['GET', 'PUT', 'POST'], endpoint='subscription_id')
 
-api.add_resource(SubscriptionICS, '/subscriptions/<string:subscription_id>/ics', methods=['GET'], endpoint='subscription_ics')
+api.add_resource(SubscriptionICS, '/subscriptions/<string:subscription_id>/ics',
+                 methods=['GET'], endpoint='subscription_ics')
+
 
 @app.route('/')
 def splash():
