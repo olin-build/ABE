@@ -5,6 +5,7 @@ Amorphous Blob of Events
 ## Getting Started
 
 ### Environment Variables
+
 There's an [environment variable template](.env.template), which needs to be copied and may need to be changed accordingly:
 
 ```shell
@@ -14,19 +15,23 @@ $ cp .env.template .env
 It will be automagically picked up by...
 
 ### Pipenv
+
 ABE uses Pipenv for python management.
 
 First, [install pipenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/#installing-pipenv). Most commonly:
+
 ```shell
 $ pip install --user pipenv
 ```
 
 To resolve python dependencies:
+
 ```shell
 $ pipenv install --dev
 ```
 
 To enter a virtual environment:
+
 ```shell
 pipenv shell
 ```
@@ -51,7 +56,9 @@ In order to connect to a mongodb instance other than your localhost, you can cre
 This configuration file is gitignored and can specify a uri for mongodb to connect to.
 
 #### Load Sample Data
+
 To load [sample data](abe/sample_data.py) into the database, run
+
 ```shell
 python -m abe.sample_data
 ```
