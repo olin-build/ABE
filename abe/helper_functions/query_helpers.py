@@ -26,7 +26,12 @@ from abe.helper_functions.converting_helpers import request_to_dict
 
 def get_to_event_search(request):
     """Build search dictionary based on get parameters"""
-    req_dict = request_to_dict(request)
+
+    if isinstance(request, dict):
+        req_dict = request
+    else:
+        req_dict = request_to_dict(request)
+
     visibilities = {
         'public': ['public'],
         'olin': ['public', 'olin'],

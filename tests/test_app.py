@@ -37,7 +37,7 @@ class AbeTestCase(unittest.TestCase):
 
     def test_add_sample_events(self):
         """Adds the sample events to the database"""
-        for event in sample_data.sample_events:
+        for event in sample_data.load_sample_data().events:
             response = self.app.post(
                 '/events/',
                 data=flask.json.dumps(event),  # use flask.json for datetimes
@@ -47,13 +47,37 @@ class AbeTestCase(unittest.TestCase):
 
     def test_add_sample_labels(self):
         """Adds the sample labels to the database"""
-        for event in sample_data.sample_labels:
+        for event in sample_data.load_sample_data().labels:
             response = self.app.post(
                 '/labels/',
                 data=flask.json.dumps(event),
                 content_type='application/json'
             )
             assert response._status_code == 201
+
+    def test_date_range(self):
+        from abe import database as db
+        sample_data.load_data(db)
+
+        with self.subTest("a six-month query returns some events"):
+            response = self.app.get('/events/?start=2017-01-01&end=2017-07-01')
+            self.assertEqual(response._status_code, 200)
+            self.assertEqual(len(flask.json.loads(response.data)), 25)
+
+        with self.subTest("a one-year query returns all events"):
+            response = self.app.get('/events/?start=2017-01-01&end=2018-01-01')
+            assert response._status_code == 200, f"status={response._status_code}"
+            self.assertEqual(len(flask.json.loads(response.data)), 69)
+
+        with self.subTest("a two-year query is too long"):
+            response = self.app.get('/events/?start=2017-01-01&end=2019-01-01')
+            # FIXME:
+            self.assertEqual(response._status_code, 404)
+
+        with self.subTest("a one-year query works for leap years"):
+            response = self.app.get('/events/?start=2020-01-01&end=2021-01-01')
+            # FIXME:
+            self.assertEqual(response._status_code, 200)
 
 
 if __name__ == '__main__':

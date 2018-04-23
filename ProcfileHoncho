@@ -1,4 +1,4 @@
-web: python run.py
+web: gunicorn -c guniconf.py abe.app:app
 worker1: celery -A tasks beat -l info
 worker2: celery -A tasks worker -l info
 
