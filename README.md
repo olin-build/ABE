@@ -1,5 +1,8 @@
 # ABE
 
+Dev: [![Build Status](https://travis-ci.org/olinlibrary/ABE.svg?branch=dev)](https://travis-ci.org/olinlibrary/ABE/branches)
+Master: [![Build Status](https://travis-ci.org/olinlibrary/ABE.svg?branch=master)](https://travis-ci.org/olinlibrary/ABE/branches)
+
 Amorphous Blob of Events
 
 ## Getting Started
