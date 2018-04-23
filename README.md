@@ -3,7 +3,23 @@
 Dev: [![Build Status](https://travis-ci.org/olinlibrary/ABE.svg?branch=dev)](https://travis-ci.org/olinlibrary/ABE/branches)
 Master: [![Build Status](https://travis-ci.org/olinlibrary/ABE.svg?branch=master)](https://travis-ci.org/olinlibrary/ABE/branches)
 
-Amorphous Blob of Events
+**ABE** (Amorphous Blob of Events) is Olin's student-built store of information
+about Olin events. It enables the creation of digital experiences that share
+information about past, present, and upcoming events.
+
+## Built With ABE
+
+ABE is a platform. Some online experiences that use the data in ABE include:
+
+* [Olin Events](https://github.com/olinlibrary/abe-web) is a web view of the
+  Olin calendar. It can also be used to subscribe other calendar programs, such
+  as Google Calendar and desktop and mobile calendar clients, to ABE; and to
+  connect ABE to other calendars.
+* [FUTUREboard](https://github.com/olinlibrary/futureboard)  is a digital
+  signage platform for sharing of media, supplemented by information about
+  events happening on campus.
+* [ABE Event Schedule](https://github.com/osteele/abe-event-schedule) is an
+  experiment in deriving a conference-track-style schedule from ABE events.
 
 ## Getting Started
 
