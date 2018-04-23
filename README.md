@@ -14,7 +14,7 @@ $ cp .env.template .env
 It will be automagically picked up by...
 
 ### Pipenv
-ABE uses Pipenv for python management. 
+ABE uses Pipenv for python management.
 
 First, [install pipenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/#installing-pipenv). Most commonly:
 ```shell
@@ -23,7 +23,7 @@ $ pip install --user pipenv
 
 To resolve python dependencies:
 ```shell
-$ pipenv install
+$ pipenv install --dev
 ```
 
 To enter a virtual environment:
@@ -47,7 +47,7 @@ macOS with [Homebrew](https://brew.sh/) installed, you can instead run `brew ins
 
 #### Setup mongo_config.py
 
-In order to connect to a mongodb instance other than your localhost, you can create a copy of [`mongo_config_sample.py`](abe/mongo_config_sample.py) called `mongo_config.py`. 
+In order to connect to a mongodb instance other than your localhost, you can create a copy of [`mongo_config_sample.py`](abe/mongo_config_sample.py) called `mongo_config.py`.
 This configuration file is gitignored and can specify a uri for mongodb to connect to.
 
 #### Load Sample Data
