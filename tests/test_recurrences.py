@@ -3,6 +3,9 @@ from datetime import datetime
 from . import abe_unittest
 from .context import abe  # noqa: F401
 
+# This import has to happen after .context sets the environment variables
+from abe.helper_functions import sub_event_helpers  # isort:skip
+
 # TODO: add test cases for YEARLY frequency (are there others)?
 # TODO: add test cases for by_month, by_month_day
 # TODO: add test cases for count, interval
@@ -36,8 +39,6 @@ class RecurrenceTestCase(abe_unittest.TestCase):
         return db.Event(**event)
 
     def test_instance_creation(self):
-        # This import has to happen after setUp sets the environment variables
-        from abe.helper_functions import sub_event_helpers
         event = self.get_test_event('weekly')
 
         with self.subTest("no start or end date"):

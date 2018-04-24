@@ -3,11 +3,7 @@ import unittest
 
 from pymongo import MongoClient
 
-MONGODB_TEST_DB_NAME = "abe-unittest"
-os.environ["DB_NAME"] = MONGODB_TEST_DB_NAME
-os.environ["MONGO_URI"] = ""
-
-from abe import database as db  # isort:skip # noqa: E402
+from .context import MONGODB_TEST_DB_NAME, db
 
 
 class TestCase(unittest.TestCase):
@@ -21,6 +17,7 @@ class TestCase(unittest.TestCase):
     """
 
     def setUp(self):
+        super().setUp()
         # This import needs to happen after setting the environment variables
         # above
         self.db = db
@@ -28,6 +25,7 @@ class TestCase(unittest.TestCase):
             f"{__name__} must be imported before abe.database"
 
     def tearDown(self):
+        super().tearDown()
         client = MongoClient()
         client.drop_database(MONGODB_TEST_DB_NAME)
         client.close()

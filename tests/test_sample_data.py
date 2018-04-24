@@ -5,10 +5,11 @@ database named "abe-unittest" for testing.
 """
 import unittest
 
-from abe import sample_data
-
 from . import abe_unittest
 from .context import abe  # noqa: F401
+
+# This import has to happen after .context sets the environment variables
+from abe import sample_data  # isort:skip
 
 
 class SampleDataTestCase(abe_unittest.TestCase):
