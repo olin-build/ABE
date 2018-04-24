@@ -1,5 +1,6 @@
 import base64
 import email
+import logging
 import os
 import poplib
 import smtplib
@@ -11,9 +12,12 @@ from mongoengine import ValidationError
 from abe import database as db
 from abe.helper_functions.converting_helpers import mongo_to_dict
 from abe.helper_functions.ics_helpers import ics_to_dict
+from abe.helper_functions.sub_event_helpers import find_recurrence_end
 
-ABE_EMAIL = os.environ['ABE_EMAIL']
-ABE_PASS = os.environ['ABE_PASS']
+ABE_EMAIL_USERNAME = os.environ['ABE_EMAIL_USERNAME', None]
+ABE_EMAIL_PASSWORD = os.environ['ABE_EMAIL_PASSWORD', None]
+ABE_EMAIL_HOST = os.environ.get('ABE_EMAIL_HOST', 'pop.gmail.com')
+ABE_EMAIL_PORT = int(os.environ.get('ABE_EMAIL_PORT', 465))
 
 
 def get_msg_list(pop_items, pop_conn):
@@ -106,16 +110,18 @@ def ical_to_dict(cal):
 
 def get_messages_from_email():
     """ Fetches unread emails from the email address
-    specified by the environmental variable ABE_EMAIL
-    (password given by env var ABE_PASS). Returns a
+    specified by the environmental variable ABE_EMAIL_USERNAME
+    (password given by env var ABE_EMAIL_PASSWORD). Returns a
     list of messages.
 
     :return: List of email message objects
     """
-    pop_conn = poplib.POP3_SSL('pop.gmail.com')
-    pop_conn.user(ABE_EMAIL)
-    pop_conn.pass_(ABE_PASS)
-    pop3info = pop_conn.stat()  # access mailbox status
+    if not ABE_EMAIL_USERNAME:
+        logger.info("ABE_EMAIL_USERNAME is not defined. Not fetching messages.")
+        return []
+    pop_conn = poplib.POP3_SSL(ABE_EMAIL_HOST)
+    pop_conn.user(ABE_EMAIL_USERNAME)
+    pop_conn.pass_(ABE_EMAIL_PASSWORD)
     resp, items, octets = pop_conn.list()
 
     messages = get_msg_list(items, pop_conn)
@@ -170,20 +176,25 @@ def smtp_connect():
     """ Connects to the smtp server
     :return: server instance, gmail to send
     """
-    gmail = ABE_EMAIL
-    gpass = ABE_PASS
-    try:
-        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        server.ehlo()
-        server.login(gmail, gpass)
-    except:
-        print('Connecting to gmail failed...')
+    username = ABE_EMAIL_USERNAME
+    if not username:
+        logger.info("ABE_EMAIL_USERNAME is not defined. Not fetching messages.")
         return
-    return server, gmail
+    try:
+        server = smtplib.SMTP_SSL(ABE_EMAIL_HOST, ABE_EMAIL_PORT)
+        server.ehlo()
+        server.login(ABE_EMAIL_USERNAME, ABE_EMAIL_PASSWORD)
+    # FIXME: catch the specific exception type
+    except:
+        logging.error(f'Connecting to {ABE_EMAIL_HOST} failed...')
+        # FIXME: callers do not handle a `None` return, and will error
+        # on upacking this.
+        return
+    return server, username
 
 
 def error_reply(to, error):
-    """ Given the erros, sends an email with the errors that
+    """ Given the error, sends an email with the errors that
     occured to the original sender. """
     server, sent_from = smtp_connect()
     subject = 'Event Failed to Add'
@@ -230,13 +241,18 @@ def send_email(server, email_text, sent_from, sent_to):
 
 def scrape():
     """ Scrapes emails and parses them into events """
-    msgs = get_messages_from_email()
+    try:
+        msgs = get_messages_from_email()
+    except poplib.error_proto as err:
+        logging.error(f"Couldn't connect to {ABE_EMAIL_HOST} as {ABE_EMAIL_USERNAME}. Error: {err}")
+        return []
     cals = get_calendars_from_messages(msgs)
-    print(f"Scraped {len(cals)} from {ABE_EMAIL}")
+    logger.info(f"Scraped {len(cals)} from {ABE_EMAIL_USERNAME}")
     completed = []
     for cal in cals:
         completed.append(cal_to_event(cal))
     return completed
+
 
 if __name__ == '__main__':
     cals = email_test('test_email.txt')

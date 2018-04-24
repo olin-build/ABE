@@ -107,7 +107,10 @@ JSON list of events.)
 
 ### Running the celery tasks
 
-To run the celery tasks concurrently with a local version of ABE, run
+To run the celery tasks concurrently with a local version of ABE, set
+`ABE_EMAIL_USERNAME` and `ABE_EMAIL_PASSWORD` to credentials for a GMail
+account. (Or, additionally set `ABE_EMAIL_HOST` and `ABE_EMAIL_PORT` to use
+a non-GMail POP3 SSL account.)
 
 ```shell
 honcho start -f ProcfileHoncho
@@ -141,14 +144,14 @@ OK
 ### abe.olin.build/events/
 
 | HTTP Method | Action              |
-|-------------|---------------------|
+| ----------- | ------------------- |
 | GET         | retrieve all events |
 | POST        | create new event    |
 
 ### abe.olin.build/events/24
 
 | HTTP Method | Action                    |
-|-------------|---------------------------|
+| ----------- | ------------------------- |
 | GET         | retrieve event with id 24 |
 | PUT         | update event with id 24   |
 | DELETE      | delete event with id 24   |
@@ -156,7 +159,7 @@ OK
 ### abe.olin.build/events/ShortScarletFrog
 
 | HTTP Method | Action                                    |
-|-------------|-------------------------------------------|
+| ----------- | ----------------------------------------- |
 | GET         | retrieve event with id "ShortScarletFrog" |
 | PUT         | update event with id "ShortScarletFrog"   |
 | DELETE      | delete event with id "ShortScarletFrog"   |
@@ -164,14 +167,14 @@ OK
 ### abe.olin.build/labels/
 
 | HTTP Method | Action              |
-|-------------|---------------------|
+| ----------- | ------------------- |
 | GET         | retrieve all labels |
 | PUT         | create new label    |
 
 ### abe.olin.build/labels/clubs
 
 | HTTP Method | Action                           |
-|-------------|----------------------------------|
+| ----------- | -------------------------------- |
 | GET         | retrieve label with name "clubs" |
 | PUT         | update label with name "clubs"   |
 | DELETE      | delete label with name "clubs"   |
