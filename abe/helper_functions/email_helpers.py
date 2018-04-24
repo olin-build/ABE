@@ -117,7 +117,7 @@ def get_messages_from_email():
     :return: List of email message objects
     """
     if not ABE_EMAIL_USERNAME:
-        logger.info("ABE_EMAIL_USERNAME is not defined. Not fetching messages.")
+        logging.warning("ABE_EMAIL_USERNAME is not defined. Not fetching messages.")
         return []
     pop_conn = poplib.POP3_SSL(ABE_EMAIL_HOST)
     pop_conn.user(ABE_EMAIL_USERNAME)
@@ -178,7 +178,7 @@ def smtp_connect():
     """
     username = ABE_EMAIL_USERNAME
     if not username:
-        logger.info("ABE_EMAIL_USERNAME is not defined. Not fetching messages.")
+        logging.warning("ABE_EMAIL_USERNAME is not defined. Not fetching messages.")
         return
     try:
         server = smtplib.SMTP_SSL(ABE_EMAIL_HOST, ABE_EMAIL_PORT)
@@ -247,7 +247,7 @@ def scrape():
         logging.error(f"Couldn't connect to {ABE_EMAIL_HOST} as {ABE_EMAIL_USERNAME}. Error: {err}")
         return []
     cals = get_calendars_from_messages(msgs)
-    logger.info(f"Scraped {len(cals)} from {ABE_EMAIL_USERNAME}")
+    logging.info(f"Scraped {len(cals)} from {ABE_EMAIL_USERNAME}")
     completed = []
     for cal in cals:
         completed.append(cal_to_event(cal))
