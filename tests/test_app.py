@@ -5,15 +5,17 @@ database named "abe-unittest" for testing.
 """
 import os
 import unittest
+
 import flask
 from pymongo import MongoClient
-import logging
-from .context import abe
+
 from abe import sample_data
-import pdb
+
+from . import abe_unittest
+from .context import abe  # noqa: F401
 
 
-class AbeTestCase(unittest.TestCase):
+class AbeTestCase(abe_unittest.TestCase):
 
     def setUp(self):
         """Setup testing environment"""

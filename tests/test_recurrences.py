@@ -1,11 +1,7 @@
-import os
-import unittest
 from datetime import datetime
 
-from pymongo import MongoClient
-
-
-testDbName = "abe-unittest"
+from . import abe_unittest
+from .context import abe  # noqa: F401
 
 # TODO: add test cases for YEARLY frequency (are there others)?
 # TODO: add test cases for by_month, by_month_day
@@ -31,20 +27,7 @@ recurringEvents = dict(
 )
 
 
-class RecurrenceTestCase(unittest.TestCase):
-
-    def setUp(self):
-        os.environ["DB_NAME"] = testDbName
-        os.environ["MONGO_URI"] = ""
-        # These imports need to happen after setting the environment variable
-        # TODO: factor these from the tests to a test helper
-        from abe import database as db
-        self.db = db
-
-    def tearDown(self):
-        client = MongoClient()
-        client.drop_database(testDbName)
-        client.close()
+class RecurrenceTestCase(abe_unittest.TestCase):
 
     def get_test_event(self, key):
         db = self.db
