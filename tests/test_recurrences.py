@@ -75,6 +75,5 @@ class RecurrenceTestCase(unittest.TestCase):
                 event,
                 start=datetime(2017, 7, 20),
                 end=datetime(2027, 7, 31))
-            print(instances)
             # Should return all instances of the recurring event that happen within the query range
             self.assertEqual(len(instances), 8)
