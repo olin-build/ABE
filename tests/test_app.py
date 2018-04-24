@@ -73,7 +73,3 @@ class AbeTestCase(abe_unittest.TestCase):
             response = self.app.get('/events/?start=2020-01-01&end=2021-01-01')
             # FIXME:
             self.assertEqual(response._status_code, 200)
-
-
-if __name__ == '__main__':
-    unittest.main()

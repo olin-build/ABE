@@ -136,19 +136,25 @@ Ran 4 tests in 1.124s
 OK
 ```
 
+Test a specific test:
+
+```shell
+$ python -m unittest tests/test_recurrences.py
+```
+
 ## API Documentation
 
 ### abe.olin.build/events/
 
 | HTTP Method | Action              |
-|-------------|---------------------|
+| ----------- | ------------------- |
 | GET         | retrieve all events |
 | POST        | create new event    |
 
 ### abe.olin.build/events/24
 
 | HTTP Method | Action                    |
-|-------------|---------------------------|
+| ----------- | ------------------------- |
 | GET         | retrieve event with id 24 |
 | PUT         | update event with id 24   |
 | DELETE      | delete event with id 24   |
@@ -156,7 +162,7 @@ OK
 ### abe.olin.build/events/ShortScarletFrog
 
 | HTTP Method | Action                                    |
-|-------------|-------------------------------------------|
+| ----------- | ----------------------------------------- |
 | GET         | retrieve event with id "ShortScarletFrog" |
 | PUT         | update event with id "ShortScarletFrog"   |
 | DELETE      | delete event with id "ShortScarletFrog"   |
@@ -164,14 +170,14 @@ OK
 ### abe.olin.build/labels/
 
 | HTTP Method | Action              |
-|-------------|---------------------|
+| ----------- | ------------------- |
 | GET         | retrieve all labels |
 | PUT         | create new label    |
 
 ### abe.olin.build/labels/clubs
 
 | HTTP Method | Action                           |
-|-------------|----------------------------------|
+| ----------- | -------------------------------- |
 | GET         | retrieve label with name "clubs" |
 | PUT         | update label with name "clubs"   |
 | DELETE      | delete label with name "clubs"   |
