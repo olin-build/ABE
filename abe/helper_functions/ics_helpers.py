@@ -9,7 +9,7 @@ import pytz
 
 from icalendar import Calendar, Event, vCalAddress, vText, vDatetime, Timezone
 from dateutil.rrule import rrule, MONTHLY, WEEKLY, DAILY, YEARLY
-import datetime #import datetime, timedelta, timezone, date, time
+import datetime  # import datetime, timedelta, timezone, date, time
 from datetime import timedelta, timezone, date
 from bson import objectid
 from mongoengine import *
@@ -60,7 +60,8 @@ def create_ics_event(event: db.Event, recurrence=False) -> Event:
         end_string = 'dtend;VALUE=DATE'
         event_start_datetime = ensure_date_time(event['start'])
         event_end_datetime = ensure_date_time(event['end'])
-        if event_end_datetime-event_start_datetime < timedelta(days=1):  # If it's a single-day event, we can just drop the event end
+        # If it's a single-day event, we can just drop the event end
+        if event_end_datetime - event_start_datetime < timedelta(days=1):
             event_end = None
         else:
             event_end = date_to_ics(event_end_datetime.isoformat())
@@ -295,8 +296,7 @@ def update_ics_to_mongo(component, labels):
     normal_event = db.Event.objects(__raw__={'UID': str(component.get('UID'))}).first()
     if component.get('recurrence-id'):  # if this is the ics equivalent of a sub_event
         # check to see if a sub_event with the rec_id and UID already exists
-        parent_sub_event = db.Event.objects(__raw__=
-        {'$and': [
+        parent_sub_event = db.Event.objects(__raw__={'$and': [
             {'sub_events.rec_id': component.get('recurrence-id').dt},
             {'UID': str(component.get('UID'))}]}).first()
         logging.debug("parent event found for reccurrence-id: {}".format(component.get('recurrence-id').dt))

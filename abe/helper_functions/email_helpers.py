@@ -1,20 +1,24 @@
+import base64
+import email
+import logging
 import os
-import sys
-import time
 import poplib
 import smtplib
-import email
 from io import StringIO
-from datetime import datetime
-import base64
+
 import icalendar as ic
-# from . import database as db
-from abe.helper_functions.ics_helpers import ics_to_dict
-from abe.helper_functions.converting_helpers import mongo_to_dict
-from abe import database as db
 from mongoengine import ValidationError
 
-from email import parser
+from abe import database as db
+from abe.helper_functions.converting_helpers import mongo_to_dict
+from abe.helper_functions.ics_helpers import ics_to_dict
+from abe.helper_functions.sub_event_helpers import find_recurrence_end
+
+ABE_EMAIL_USERNAME = os.environ['ABE_EMAIL_USERNAME', None]
+ABE_EMAIL_PASSWORD = os.environ['ABE_EMAIL_PASSWORD', None]
+ABE_EMAIL_HOST = os.environ.get('ABE_EMAIL_HOST', 'pop.gmail.com')
+ABE_EMAIL_PORT = int(os.environ.get('ABE_EMAIL_PORT', 465))
+
 
 def get_msg_list(pop_items, pop_conn):
     """ Takes a list of items and the pop3 connection
@@ -35,6 +39,7 @@ def get_msg_list(pop_items, pop_conn):
         messages.append(orig_email)
     return messages
 
+
 def get_attachments(message):
     """ Given a message object,
     checks for an attachment
@@ -46,6 +51,7 @@ def get_attachments(message):
         print(attachment.get_content_type())
         return attachment
     return None
+
 
 def email_test(filename):
     """ TO DO: determine best way to test. Currently, file does
@@ -72,6 +78,7 @@ def email_test(filename):
                 calendars.append(cal)
     return calendars
 
+
 def ical_to_dict(cal):
     """ Given a calendar, creates a dictionary as
     specified in ics_to_dict.
@@ -89,7 +96,7 @@ def ical_to_dict(cal):
     # [tags][go][here]\n
     # "rest of description"
     labels_and_desc = str(event.get('description')).strip().split('\n')
-    if '[' == labels_and_desc[0][0]: # if the bracket is in the first line of the description, there are labels
+    if '[' == labels_and_desc[0][0]:  # if the bracket is in the first line of the description, there are labels
         label_str = labels_and_desc[0].lower()
         labels = label_str.replace('[', ' ').replace(']', '').strip().split()
         desc = '\n'.join(labels_and_desc[1:]).strip()
@@ -100,28 +107,32 @@ def ical_to_dict(cal):
     event_def['description'] = desc
     return event_def, sender
 
+
 def get_messages_from_email():
     """ Fetches unread emails from the email address
-    specified by the environmental variable ABE_EMAIL
-    (password given by env var ABE_PASS). Returns a 
+    specified by the environmental variable ABE_EMAIL_USERNAME
+    (password given by env var ABE_EMAIL_PASSWORD). Returns a
     list of messages.
 
     :return: List of email message objects
     """
-    pop_conn = poplib.POP3_SSL('pop.gmail.com')
-    pop_conn.user(os.environ['ABE_EMAIL'])
-    pop_conn.pass_(os.environ['ABE_PASS'])
-    pop3info = pop_conn.stat() #access mailbox status
+    if not ABE_EMAIL_USERNAME:
+        logger.info("ABE_EMAIL_USERNAME is not defined. Not fetching messages.")
+        return []
+    pop_conn = poplib.POP3_SSL(ABE_EMAIL_HOST)
+    pop_conn.user(ABE_EMAIL_USERNAME)
+    pop_conn.pass_(ABE_EMAIL_PASSWORD)
     resp, items, octets = pop_conn.list()
 
     messages = get_msg_list(items, pop_conn)
     pop_conn.quit()
     return messages
 
+
 def get_calendars_from_messages(messages):
     """ Returns any icals found as Calendar
     objects from the icalendar library.
-    
+
     :inputs:
         messages:   List of email Message instances
     :return:        List of Calendar instances
@@ -137,15 +148,16 @@ def get_calendars_from_messages(messages):
                     calendars.append(cal)
     return calendars
 
+
 def cal_to_event(cal):
     """ Creates an event from a calendar object """
     received_data, sender = ical_to_dict(cal)
     try:
         new_event = db.Event(**received_data)
-        if new_event.labels == []: # if no labels were given
+        if new_event.labels == []:  # if no labels were given
             new_event.labels = ['unlabeled']
-        if 'recurrence' in new_event: # if this is a recurring event
-            if new_event.recurrence.forever == False: # if it doesn't recurr forever
+        if 'recurrence' in new_event:  # if this is a recurring event
+            if not new_event.recurrence.forever:  # if it doesn't recurr forever
                 # find the end of the recurrence
                 new_event.recurrence_end = find_recurrence_end(new_event)
         new_event.save()
@@ -159,27 +171,30 @@ def cal_to_event(cal):
         reply_email(sender, new_event_dict)
         return new_event_dict, 201
 
+
 def smtp_connect():
     """ Connects to the smtp server
     :return: server instance, gmail to send
     """
-    try:
-        gmail = os.environ['ABE_EMAIL'] # should be 'abe.at.olin@gmail.com'
-        gpass = os.environ['ABE_PASS'] # should be 'abe@olin'
-    except:
-        gmail = 'abe.at.olin@gmail.com'
-        gpass = 'abe@olin'
-    try:
-        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        server.ehlo()
-        server.login(gmail, gpass)
-    except:
-        print('Connecting to gmail failed...')
+    username = ABE_EMAIL_USERNAME
+    if not username:
+        logger.info("ABE_EMAIL_USERNAME is not defined. Not fetching messages.")
         return
-    return server, gmail
+    try:
+        server = smtplib.SMTP_SSL(ABE_EMAIL_HOST, ABE_EMAIL_PORT)
+        server.ehlo()
+        server.login(ABE_EMAIL_USERNAME, ABE_EMAIL_PASSWORD)
+    # FIXME: catch the specific exception type
+    except:
+        logging.error(f'Connecting to {ABE_EMAIL_HOST} failed...')
+        # FIXME: callers do not handle a `None` return, and will error
+        # on upacking this.
+        return
+    return server, username
+
 
 def error_reply(to, error):
-    """ Given the erros, sends an email with the errors that
+    """ Given the error, sends an email with the errors that
     occured to the original sender. """
     server, sent_from = smtp_connect()
     subject = 'Event Failed to Add'
@@ -197,6 +212,7 @@ def error_reply(to, error):
     """.format(sent_from, to, subject, body)
 
     send_email(server, email_text, sent_from, to)
+
 
 def reply_email(to, event_dict):
     """ Responds after a successful posting with
@@ -217,19 +233,26 @@ def reply_email(to, event_dict):
     """.format(sent_from, to, subject, body, event_dict['description'], tags)
     send_email(server, email_text, sent_from, to)
 
+
 def send_email(server, email_text, sent_from, sent_to):
     server.sendmail(sent_from, sent_to, email_text)
     server.close()
 
+
 def scrape():
     """ Scrapes emails and parses them into events """
-    msgs = get_messages_from_email()
+    try:
+        msgs = get_messages_from_email()
+    except poplib.error_proto as err:
+        logging.error(f"Couldn't connect to {ABE_EMAIL_HOST} as {ABE_EMAIL_USERNAME}. Error: {err}")
+        return []
     cals = get_calendars_from_messages(msgs)
-    print("Scraped", len(cals), "from abe.at.olin@gmail.com")
+    logger.info(f"Scraped {len(cals)} from {ABE_EMAIL_USERNAME}")
     completed = []
     for cal in cals:
         completed.append(cal_to_event(cal))
     return completed
+
 
 if __name__ == '__main__':
     cals = email_test('test_email.txt')
