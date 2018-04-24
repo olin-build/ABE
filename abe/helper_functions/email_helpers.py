@@ -14,8 +14,8 @@ from abe.helper_functions.converting_helpers import mongo_to_dict
 from abe.helper_functions.ics_helpers import ics_to_dict
 from abe.helper_functions.sub_event_helpers import find_recurrence_end
 
-ABE_EMAIL_USERNAME = os.environ['ABE_EMAIL_USERNAME', None]
-ABE_EMAIL_PASSWORD = os.environ['ABE_EMAIL_PASSWORD', None]
+ABE_EMAIL_USERNAME = os.environ.get('ABE_EMAIL_USERNAME', None)
+ABE_EMAIL_PASSWORD = os.environ.get('ABE_EMAIL_PASSWORD', None)
 ABE_EMAIL_HOST = os.environ.get('ABE_EMAIL_HOST', 'pop.gmail.com')
 ABE_EMAIL_PORT = int(os.environ.get('ABE_EMAIL_PORT', 465))
 
