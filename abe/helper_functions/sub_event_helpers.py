@@ -176,7 +176,7 @@ def instance_creation(event, start=None, end=None):
         rUntil = convert_timezone(ensure_date_time(end)) if end is not None else None
     else:
         rUntil = convert_timezone(ensure_date_time(recurrence['until'])) if 'until' in recurrence else end
-    rCount = int(recurrence['count']) if 'count' in recurrence else None
+    rCount = int(recurrence['count']) if 'count' in recurrence and not rUntil else None
 
     rule_list = list(rrule(freq=rFrequency, count=rCount, interval=rInterval, until=rUntil, bymonth=rByMonth,
                            bymonthday=rByMonthDay, byweekday=rByDay, dtstart=rStart))

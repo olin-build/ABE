@@ -61,7 +61,7 @@ class RecurrenceTestCase(unittest.TestCase):
         with self.subTest("no start or end date"):
             instances = sub_event_helpers.instance_creation(event)
             # With neither of the optional params specified, it should enumerate all instances of the recurring event
-            self.assertEqual(len(instances), 10)
+            self.assertEqual(len(instances), 42)
 
         with self.subTest("start and date outside recurrence"):
             instances = sub_event_helpers.instance_creation(
@@ -69,7 +69,7 @@ class RecurrenceTestCase(unittest.TestCase):
                 start=datetime(2017, 1, 1),
                 end=datetime(2018, 1, 1))
             # Should return every instance of the recurring event.
-            self.assertEqual(len(instances), 10)
+            self.assertEqual(len(instances), 42)
 
         with self.subTest("start and date inside recurrence"):
             instances = sub_event_helpers.instance_creation(
