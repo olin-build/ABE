@@ -131,6 +131,7 @@ class EventApi(Resource):
         else:  # return success
             return mongo_to_dict(new_event), 201
 
+    @api.expect(event_model)
     def put(self, event_id):
         """
         Modify individual event

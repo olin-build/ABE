@@ -2,7 +2,7 @@
 """Subscription Resource models for flask"""
 
 from flask import jsonify, request, abort, Response, make_response, Request
-from flask_restful import Resource
+from flask_restful import Resource, fields
 from mongoengine import ValidationError
 from bson.objectid import ObjectId
 from pprint import pprint, pformat
@@ -18,12 +18,16 @@ import requests
 import logging
 
 from abe import database as db
+from abe.app import api
 from abe.document_models.subscription_documents import Subscription
 from abe.helper_functions.converting_helpers import request_to_dict
 from abe.helper_functions.query_helpers import get_to_event_search, event_query
 from abe.helper_functions.ics_helpers import mongo_to_ics, extract_ics
 from abe.helper_functions.query_helpers import multi_search
 
+subscription_model = api.model('Subscription_Model', {
+    "labels" : fields.List(fields.String) 
+})
 
 def subscription_to_dict(s: Subscription):
     return {'id': s.sid,
@@ -47,7 +51,8 @@ class SubscriptionAPI(Resource):
             return "Subscription not found with identifier '{}'".format(subscription_id), 404
 
         return subscription_to_dict(subscription)
-
+    
+#    @api.expect(subscription_model)
     def post(self, subscription_id: str = ''):
         """
         Creates a subscription object with a list of labels, returning it with an ID
@@ -76,6 +81,7 @@ class SubscriptionAPI(Resource):
                     'validation_errors': [str(err) for err in error.errors],
                     'error_message': error.message}, 400
 
+    @api.expect(subscription_model)
     def put(self, subscription_id: str):
         """Modify an existing subscription"""
 

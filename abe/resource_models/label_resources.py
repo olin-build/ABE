@@ -2,7 +2,7 @@
 """Label Resource models for flask"""
 
 from flask import jsonify, request, abort, Response, make_response
-from flask_restplus import Resource
+from flask_restplus import Resource, fields
 from mongoengine import ValidationError
 from bson.objectid import ObjectId
 from pprint import pprint, pformat
@@ -18,9 +18,19 @@ import requests
 import logging
 
 from abe import database as db
+from abe.app import api
 from abe.helper_functions.converting_helpers import mongo_to_dict, request_to_dict
 from abe.helper_functions.query_helpers import multi_search
 
+label_model = api.model("Label_Model", {
+    "name" : fields.String(required=True),
+    "description" : fields.String,
+    "url" : fields.Url,
+    "default" : fields.Boolean,
+    "parent_labels" : fields.List(fields.String),
+    "color" : fields.String,
+    "visibility": fields.String(enum=['public','olin','students'])
+})
 
 class LabelApi(Resource):
     """API for interacting with all labels (searching, creating)"""
@@ -42,7 +52,8 @@ class LabelApi(Resource):
                 return []
             else:
                 return [mongo_to_dict(result) for result in results]
-
+    
+    @api.expect(label_model)
     def post(self):
         """Create new label with parameters passed in through args or form"""
         received_data = request_to_dict(request)
@@ -58,6 +69,7 @@ class LabelApi(Resource):
         else:  # return success
             return mongo_to_dict(new_label), 201
 
+    @api.expect(label_model)
     def put(self, label_name):
         """Modify individual label"""
         received_data = request_to_dict(request)
