@@ -12,8 +12,12 @@ import os
 
 import logging
 
+log_level = os.getenv('LOG_LEVEL','INFO')  # change logging level. Default is INFO
+numeric_level = getattr(logging, log_level.upper(), None)  # convert string to log level number
+if not isinstance(numeric_level, int):
+    raise ValueError('Invalid log level: {}'.format(log_level))
 FORMAT = "%(levelname)s:ABE: _||_ %(message)s"
-logging.basicConfig(level=logging.INFO, format=FORMAT)
+logging.basicConfig(level=numeric_level, format=FORMAT)
 
 from .resource_models.event_resources import EventApi
 from .resource_models.label_resources import LabelApi
