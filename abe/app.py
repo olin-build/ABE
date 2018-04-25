@@ -47,7 +47,7 @@ def splash():
     return render_template('splash.html')
 
 
-api = Api(app, doc="/swagger/")
+api = Api(app, doc="/swagger/", version="0.1")
 
 
 class CustomJSONEncoder(JSONEncoder):
