@@ -2,7 +2,7 @@
 """Subscription Resource models for flask"""
 
 from flask import jsonify, request, abort, Response, make_response, Request
-from flask_restful import Resource, fields
+from flask_restplus import Resource, fields, Namespace
 from mongoengine import ValidationError
 from bson.objectid import ObjectId
 from pprint import pprint, pformat
@@ -18,22 +18,24 @@ import requests
 import logging
 
 from abe import database as db
-from abe.app import api
+#from abe.app import api
 from abe.document_models.subscription_documents import Subscription
 from abe.helper_functions.converting_helpers import request_to_dict
 from abe.helper_functions.query_helpers import get_to_event_search, event_query
 from abe.helper_functions.ics_helpers import mongo_to_ics, extract_ics
 from abe.helper_functions.query_helpers import multi_search
 
-subscription_model = api.model('Subscription_Model', {
+api = Namespace('Subscriptions', description='Subscription related operations')
+
+sub_model = api.model('Sub_Model', {
     "labels" : fields.List(fields.String) 
 })
+
 
 def subscription_to_dict(s: Subscription):
     return {'id': s.sid,
             'labels': s.labels,
             'ics_url': '/subscriptions/{}/ics'.format(s.sid)}
-
 
 class SubscriptionAPI(Resource):
     """API for managing subscription feeds"""
@@ -52,7 +54,7 @@ class SubscriptionAPI(Resource):
 
         return subscription_to_dict(subscription)
     
-#    @api.expect(subscription_model)
+    @api.expect(sub_model)
     def post(self, subscription_id: str = ''):
         """
         Creates a subscription object with a list of labels, returning it with an ID
@@ -81,7 +83,7 @@ class SubscriptionAPI(Resource):
                     'validation_errors': [str(err) for err in error.errors],
                     'error_message': error.message}, 400
 
-    @api.expect(subscription_model)
+    @api.expect(sub_model)
     def put(self, subscription_id: str):
         """Modify an existing subscription"""
 
@@ -142,3 +144,11 @@ class SubscriptionICS(Resource):
         return Response(response,
                         mimetype="text/calendar",
                         headers={"Content-Disposition": cd})
+
+api.add_resource(SubscriptionAPI, '/', methods=['POST'], endpoint='subscription')
+api.add_resource(SubscriptionAPI, '/<string:subscription_id>',
+                 methods=['GET', 'PUT', 'POST'], endpoint='subscription_id')
+
+api.add_resource(SubscriptionICS, '/<string:subscription_id>/ics',
+                 methods=['GET'], endpoint='subscription_ics')
+

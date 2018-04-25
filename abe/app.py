@@ -45,7 +45,7 @@ api = Api(app, doc="/swagger/")
 from .resource_models.event_resources import EventApi
 from .resource_models.label_resources import LabelApi
 from .resource_models.ics_resources import ICSApi
-from .resource_models.subscription_resources import SubscriptionAPI, SubscriptionICS
+from .resource_models.subscription_resources import api as subscriptions_api
 
 
 class CustomJSONEncoder(JSONEncoder):
@@ -82,12 +82,14 @@ api.add_resource(LabelApi, '/labels/<string:label_name>',
 
 api.add_resource(ICSApi, '/ics/', methods=['GET', 'POST'], endpoint='ics')
 
-api.add_resource(SubscriptionAPI, '/subscriptions/', methods=['POST'], endpoint='subscription')
-api.add_resource(SubscriptionAPI, '/subscriptions/<string:subscription_id>',
-                 methods=['GET', 'PUT', 'POST'], endpoint='subscription_id')
+api.add_namespace(subscriptions_api)
 
-api.add_resource(SubscriptionICS, '/subscriptions/<string:subscription_id>/ics',
-                 methods=['GET'], endpoint='subscription_ics')
+#api.add_resource(SubscriptionAPI, '/subscriptions/', methods=['POST'], endpoint='subscription')
+#api.add_resource(SubscriptionAPI, '/subscriptions/<string:subscription_id>',
+#                 methods=['GET', 'PUT', 'POST'], endpoint='subscription_id')
+
+#api.add_resource(SubscriptionICS, '/subscription/<string:subscription_id>/ics',
+#                 methods=['GET'], endpoint='subscription_ics')
 
 
 @app.route('/add_event')
@@ -98,9 +100,3 @@ def add_event():
 @app.route('/add_label')
 def add_label():
     return render_template('add_label.html')
-
-if __name__ == '__main__':
-    app.debug = os.getenv('FLASK_DEBUG') != 'False'  # updates the page as the code is saved
-    HOST = '0.0.0.0' if 'PORT' in os.environ else '127.0.0.1'
-    PORT = int(os.environ.get('PORT', 3000))
-    app.run(host='0.0.0.0', port=PORT)
