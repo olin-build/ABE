@@ -12,6 +12,11 @@ import os
 
 import logging
 
+from .resource_models.event_resources import api as event_api
+from .resource_models.label_resources import api as label_api
+from .resource_models.ics_resources import api as ics_api
+from .resource_models.subscription_resources import api as subscription_api
+
 FORMAT = "%(levelname)s:ABE: _||_ %(message)s"
 logging.basicConfig(level=logging.DEBUG, format=FORMAT)
 
@@ -20,9 +25,9 @@ CORS(app)
 
 # Redirect HTTP to HTTPS.
 #
-# For operational flexibility, set the HSTS max-age to a few seconds, instead of
-# the on-year default. The threats mitigated by HSTS policy caching are in any
-# case mostly not relevant to API services.
+# For operational flexibility, set the HSTS max-age to a few seconds, instead
+# of the on-year default. The threats mitigated by HSTS policy caching are in
+# any case mostly not relevant to API services.
 #
 # TODO: Maybe the app should 404 non-HTTPS requests, rather than redirect them.
 #
@@ -36,16 +41,13 @@ CORS(app)
 if os.environ.get('HSTS_ENABLED'):
     SSLify(app, age=10, skips=['.well-known/acme-challenge/'])
 
-@app.route('/') #For the splash to work, needs to be declared before API
+
+@app.route('/')  # For the splash to work, needs to be declared before API
 def splash():
     return render_template('splash.html')
 
-api = Api(app, doc="/swagger/")
 
-from .resource_models.event_resources import api as event_api
-from .resource_models.label_resources import api as label_api
-from .resource_models.ics_resources import api as ics_api
-from .resource_models.subscription_resources import api as subscription_api
+api = Api(app, doc="/swagger/")
 
 
 class CustomJSONEncoder(JSONEncoder):
@@ -69,11 +71,13 @@ def output_json(data, code, headers=None):
     resp.headers.extend(headers or {})
     return resp
 
+
 # Route resources
 api.add_namespace(event_api)
 api.add_namespace(label_api)
 api.add_namespace(ics_api)
 api.add_namespace(subscription_api)
+
 
 @app.route('/add_event')
 def add_event():

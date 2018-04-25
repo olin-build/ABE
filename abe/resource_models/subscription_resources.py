@@ -27,7 +27,7 @@ from abe.helper_functions.query_helpers import multi_search
 api = Namespace('Subscriptions', description='Subscription related operations')
 
 sub_model = api.model('Sub_Model', {
-    "labels" : fields.List(fields.String) 
+    "labels": fields.List(fields.String)
 })
 
 
@@ -35,6 +35,7 @@ def subscription_to_dict(s: Subscription):
     return {'id': s.sid,
             'labels': s.labels,
             'ics_url': '/subscriptions/{}/ics'.format(s.sid)}
+
 
 class SubscriptionAPI(Resource):
     """API for managing subscription feeds"""
@@ -52,7 +53,7 @@ class SubscriptionAPI(Resource):
             return "Subscription not found with identifier '{}'".format(subscription_id), 404
 
         return subscription_to_dict(subscription)
-    
+
     @api.expect(sub_model)
     def post(self, subscription_id: str = ''):
         """
@@ -144,10 +145,11 @@ class SubscriptionICS(Resource):
                         mimetype="text/calendar",
                         headers={"Content-Disposition": cd})
 
-api.add_resource(SubscriptionAPI, '/', methods=['POST'], endpoint='subscription')
+
+api.add_resource(SubscriptionAPI, '/', methods=['POST'],
+                 endpoint='subscription')
 api.add_resource(SubscriptionAPI, '/<string:subscription_id>',
                  methods=['GET', 'PUT', 'POST'], endpoint='subscription_id')
 
 api.add_resource(SubscriptionICS, '/<string:subscription_id>/ics',
                  methods=['GET'], endpoint='subscription_ics')
-

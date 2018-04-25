@@ -24,14 +24,15 @@ from abe.helper_functions.query_helpers import multi_search
 api = Namespace('Labels', description='Label related operations')
 
 label_model = api.model("Label_Model", {
-    "name" : fields.String(required=True),
-    "description" : fields.String,
-    "url" : fields.Url,
-    "default" : fields.Boolean,
-    "parent_labels" : fields.List(fields.String),
-    "color" : fields.String,
-    "visibility": fields.String(enum=['public','olin','students'])
+    "name": fields.String(required=True),
+    "description": fields.String,
+    "url": fields.Url,
+    "default":  fields.Boolean,
+    "parent_labels": fields.List(fields.String),
+    "color": fields.String,
+    "visibility": fields.String(enum=['public', 'olin', 'students'])
 })
+
 
 class LabelApi(Resource):
     """API for interacting with all labels (searching, creating)"""
@@ -53,7 +54,7 @@ class LabelApi(Resource):
                 return []
             else:
                 return [mongo_to_dict(result) for result in results]
-    
+
     @api.expect(label_model)
     def post(self):
         """Create new label with parameters passed in through args or form"""
@@ -103,7 +104,8 @@ class LabelApi(Resource):
         result.delete()
         return mongo_to_dict(result)
 
+
 api.add_resource(LabelApi, '/', methods=['GET', 'POST'], endpoint='label')
 api.add_resource(LabelApi, '/<string:label_name>',
-                 methods=['GET', 'PUT', 'PATCH', 'DELETE'], endpoint='label_name')
-
+                 methods=['GET', 'PUT', 'PATCH', 'DELETE'],
+                 endpoint='label_name')

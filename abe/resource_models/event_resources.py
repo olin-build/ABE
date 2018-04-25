@@ -32,10 +32,11 @@ event_model = api.model('Events_Model', {
     'end': fields.DateTime(dt_format='iso8601'),
     'location': fields.String,
     'description': fields.String,
-    'visibility': fields.String(enum=['public','olin','students']),
+    'visibility': fields.String(enum=['public', 'olin', 'students']),
     'labels': fields.List(fields.String),
     'allDay': fields.Boolean
 })
+
 
 class EventApi(Resource):
     """API for interacting with events"""
@@ -94,6 +95,7 @@ class EventApi(Resource):
 
             if not results: # if no results were found
                 return []
+
 
             # date range for query
             start = query_dict['start']
@@ -196,9 +198,12 @@ class EventApi(Resource):
             result.delete()
             return mongo_to_dict(result)
 
+
 api.add_resource(EventApi, '/', methods=['GET', 'POST'], endpoint='event')
 # TODO: add route for string/gphycat links
-api.add_resource(EventApi, '/<string:event_id>', methods=['GET', 'PUT', 'PATCH', 'DELETE'], endpoint='event_id')
+api.add_resource(EventApi, '/<string:event_id>',
+                 methods=['GET', 'PUT', 'PATCH', 'DELETE'],
+                 endpoint='event_id')
 api.add_resource(EventApi, '/<string:event_id>/<string:rec_id>',
-                 methods=['GET', 'PUT', 'PATCH', 'DELETE'], endpoint='rec_id')  # TODO: add route for string/gphycat links
-
+                 methods=['GET', 'PUT', 'PATCH', 'DELETE'],
+                 endpoint='rec_id')  # TODO: add route for string/gphycat links
