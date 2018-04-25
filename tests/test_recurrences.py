@@ -1,10 +1,11 @@
+import os
+import unittest
 from datetime import datetime
 
-from . import abe_unittest
-from .context import abe  # noqa: F401
+from pymongo import MongoClient
 
-# This import has to happen after .context sets the environment variables
-from abe.helper_functions import sub_event_helpers  # isort:skip
+
+testDbName = "abe-unittest"
 
 # TODO: add test cases for YEARLY frequency (are there others)?
 # TODO: add test cases for by_month, by_month_day
@@ -30,7 +31,20 @@ recurringEvents = dict(
 )
 
 
-class RecurrenceTestCase(abe_unittest.TestCase):
+class RecurrenceTestCase(unittest.TestCase):
+
+    def setUp(self):
+        os.environ["DB_NAME"] = testDbName
+        os.environ["MONGO_URI"] = ""
+        # These imports need to happen after setting the environment variable
+        # TODO: factor these from the tests to a test helper
+        from abe import database as db
+        self.db = db
+
+    def tearDown(self):
+        client = MongoClient()
+        client.drop_database(testDbName)
+        client.close()
 
     # TODO: DRY w/ method in IcsHelpersTestCase
     def get_test_event(self, key):
@@ -40,6 +54,8 @@ class RecurrenceTestCase(abe_unittest.TestCase):
         return db.Event(**event)
 
     def test_instance_creation(self):
+        # This import has to happen after setUp sets the environment variables
+        from abe.helper_functions import sub_event_helpers
         event = self.get_test_event('weekly')
 
         with self.subTest("no start or end date"):
@@ -60,5 +76,6 @@ class RecurrenceTestCase(abe_unittest.TestCase):
                 event,
                 start=datetime(2017, 7, 20),
                 end=datetime(2027, 7, 31))
+            print(instances)
             # Should return all instances of the recurring event that happen within the query range
             self.assertEqual(len(instances), 8)
