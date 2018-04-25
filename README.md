@@ -139,6 +139,12 @@ Ran 4 tests in 1.124s
 OK
 ```
 
+Test a specific test:
+
+```shell
+$ python -m unittest tests/test_recurrences.py
+```
+
 ## API Documentation
 
 ### abe.olin.build/events/
