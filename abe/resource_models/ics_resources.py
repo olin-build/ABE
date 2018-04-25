@@ -22,7 +22,7 @@ from abe.helper_functions.converting_helpers import request_to_dict
 from abe.helper_functions.query_helpers import get_to_event_search, event_query
 from abe.helper_functions.ics_helpers import mongo_to_ics, extract_ics
 
-api = Namespace('ICS', description='ICS feeds')
+api = Namespace('ics', description='ICS feeds')
 
 ics_model = api.model("ICS_Model", {
     "url" : fields.Url(required=True),

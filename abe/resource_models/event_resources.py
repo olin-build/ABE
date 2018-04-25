@@ -24,7 +24,7 @@ from abe.helper_functions.recurring_helpers import recurring_to_full, placeholde
 from abe.helper_functions.sub_event_helpers import create_sub_event, update_sub_event, sub_event_to_full, access_sub_event, find_recurrence_end
 from abe.helper_functions.query_helpers import get_to_event_search, event_query
 
-api = Namespace('Events', description='Events related operations')
+api = Namespace('events', description='Events related operations')
 
 event_model = api.model('Events_Model', {
     'title': fields.String,

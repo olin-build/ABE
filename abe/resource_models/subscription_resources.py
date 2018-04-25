@@ -24,7 +24,7 @@ from abe.helper_functions.query_helpers import get_to_event_search, event_query
 from abe.helper_functions.ics_helpers import mongo_to_ics, extract_ics
 from abe.helper_functions.query_helpers import multi_search
 
-api = Namespace('Subscriptions', description='Subscription related operations')
+api = Namespace('subscriptions', description='Subscription related operations')
 
 sub_model = api.model('Sub_Model', {
     "labels": fields.List(fields.String)

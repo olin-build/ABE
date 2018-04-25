@@ -21,7 +21,7 @@ from abe import database as db
 from abe.helper_functions.converting_helpers import mongo_to_dict, request_to_dict
 from abe.helper_functions.query_helpers import multi_search
 
-api = Namespace('Labels', description='Label related operations')
+api = Namespace('labels', description='Label related operations')
 
 label_model = api.model("Label_Model", {
     "name": fields.String(required=True),
