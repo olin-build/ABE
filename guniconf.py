@@ -18,15 +18,12 @@
 #       range.
 #
 
-# A little bit ugly, but restricts local server to localhost.
-import os
-_PORT = str(os.environ.get('PORT', 3000))
-_FLASK_ENV = str(os.environ.get('FLASK_ENV', "DEV"))
+# In production, HOST should be set to 0.0.0.0
 
-if _FLASK_ENV == "PROD":
-    bind = '0.0.0.0:' + _PORT
-else:
-    bind = '127.0.0.1:' + _PORT
+import os
+_HOST = os.environ.get('HOST', "127.0.0.1")
+_PORT = os.environ.get('PORT', "3000")
+bind = _HOST + ':' + _PORT
 
 backlog = 2048
 

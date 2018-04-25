@@ -11,12 +11,30 @@ from datetime import datetime
 import os
 
 import logging
+
 FORMAT = "%(levelname)s:ABE: _||_ %(message)s"
 logging.basicConfig(level=logging.DEBUG, format=FORMAT)
 
 app = Flask(__name__)
 CORS(app)
-#SSLify(app)
+
+# Redirect HTTP to HTTPS.
+#
+# For operational flexibility, set the HSTS max-age to a few seconds, instead of
+# the on-year default. The threats mitigated by HSTS policy caching are in any
+# case mostly not relevant to API services.
+#
+# TODO: Maybe the app should 404 non-HTTPS requests, rather than redirect them.
+#
+# The value of `skips` is the fixed prefix from the ACME HTTP Challenge spec
+# https://ietf-wg-acme.github.io/acme/draft-ietf-acme-acme.html#rfc.section.8.3,
+# used by LetsEncrypt.
+#
+# Use tests/tests_https_redirection.sh to test changes to this code.
+#
+# Disabled by default for local development. See issue #158.
+if os.environ.get('HSTS_ENABLED'):
+    SSLify(app, age=10, skips=['.well-known/acme-challenge/'])
 
 @app.route('/') #For the splash to work, needs to be declared before API
 def splash():
@@ -27,6 +45,7 @@ api = Api(app, doc="/swagger/")
 from .resource_models.event_resources import EventApi
 from .resource_models.label_resources import LabelApi
 from .resource_models.ics_resources import ICSApi
+from .resource_models.subscription_resources import SubscriptionAPI, SubscriptionICS
 
 
 class CustomJSONEncoder(JSONEncoder):
@@ -41,6 +60,8 @@ class CustomJSONEncoder(JSONEncoder):
 app.json_encoder = CustomJSONEncoder
 
 # add return representations
+
+
 @api.representation('application/json')
 def output_json(data, code, headers=None):
     resp = jsonify(data)
@@ -50,13 +71,23 @@ def output_json(data, code, headers=None):
 
 # Route resources
 api.add_resource(EventApi, '/events/', methods=['GET', 'POST'], endpoint='event')
-api.add_resource(EventApi, '/events/<string:event_id>', methods=['GET', 'PUT', 'PATCH', 'DELETE'], endpoint='event_id')  # TODO: add route for string/gphycat links
-api.add_resource(EventApi, '/events/<string:event_id>/<string:rec_id>', methods=['GET', 'PUT', 'PATCH', 'DELETE'], endpoint='rec_id')  # TODO: add route for string/gphycat links
+# TODO: add route for string/gphycat links
+api.add_resource(EventApi, '/events/<string:event_id>', methods=['GET', 'PUT', 'PATCH', 'DELETE'], endpoint='event_id')
+api.add_resource(EventApi, '/events/<string:event_id>/<string:rec_id>',
+                 methods=['GET', 'PUT', 'PATCH', 'DELETE'], endpoint='rec_id')  # TODO: add route for string/gphycat links
 
 api.add_resource(LabelApi, '/labels/', methods=['GET', 'POST'], endpoint='label')
-api.add_resource(LabelApi, '/labels/<string:label_name>', methods=['GET', 'PUT', 'PATCH', 'DELETE'], endpoint='label_name')
+api.add_resource(LabelApi, '/labels/<string:label_name>',
+                 methods=['GET', 'PUT', 'PATCH', 'DELETE'], endpoint='label_name')
 
 api.add_resource(ICSApi, '/ics/', methods=['GET', 'POST'], endpoint='ics')
+
+api.add_resource(SubscriptionAPI, '/subscriptions/', methods=['POST'], endpoint='subscription')
+api.add_resource(SubscriptionAPI, '/subscriptions/<string:subscription_id>',
+                 methods=['GET', 'PUT', 'POST'], endpoint='subscription_id')
+
+api.add_resource(SubscriptionICS, '/subscriptions/<string:subscription_id>/ics',
+                 methods=['GET'], endpoint='subscription_ics')
 
 
 @app.route('/add_event')
@@ -67,8 +98,6 @@ def add_event():
 @app.route('/add_label')
 def add_label():
     return render_template('add_label.html')
-
-
 
 if __name__ == '__main__':
     app.debug = os.getenv('FLASK_DEBUG') != 'False'  # updates the page as the code is saved

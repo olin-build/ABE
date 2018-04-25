@@ -27,6 +27,7 @@ class ICSApi(Resource):
 
     def get(self):
         """
+        Depreciated, use SubscriptionICSFeed.get instead.
         Returns an ICS feed when requested
         """
         # configure ics specs from fullcalendar to be mongoengine searchable
@@ -60,4 +61,3 @@ class ICSApi(Resource):
             return {'error_type': 'validation',
                     'validation_errors': [str(err) for err in error.errors],
                     'error_message': error.message}, 400
-        

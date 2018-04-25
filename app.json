@@ -16,6 +16,16 @@
     },
     "HEROKU_APP_NAME": {
       "required": true
+    },
+    "HOST": {
+      "description": "The hostname for gunicorn to bind to.",
+      "value": "0.0.0.0",
+      "required": true
+    },
+    "HSTS_ENABLE": {
+      "description": "Enforce SSL via HSTS",
+      "value": "True",
+      "required": true
     }
   },
   "formation": {
