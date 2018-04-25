@@ -8,6 +8,9 @@ install:
   - pipenv install --dev --ignore-pipfile
 script:
   - pipenv run python -m unittest
+  # The disjunction prevents flake8 failures from failing the Travis build.
+  # TODO: fix the files, and make this a build failure
+  - pipenv run flake8 abe || echo 'flake8 failed'
 services: mongodb
 notifications:
   slack:

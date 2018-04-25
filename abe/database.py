@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """Connect to mongodb"""
-from mongoengine import *
-from .document_models.event_documents import Event, RecurringEventExc
-from .document_models.label_documents import Label
-from .document_models.ics_documents import ICS
-from .document_models.subscription_documents import Subscription
-import os
 import logging
+import os
+
+from mongoengine import *
+
+from .document_models.event_documents import Event, RecurringEventExc
+from .document_models.ics_documents import ICS
+from .document_models.label_documents import Label
+from .document_models.subscription_documents import Subscription
+
 logging.basicConfig(level=logging.DEBUG)
 
 config_present = False
@@ -35,5 +38,6 @@ else:
 
 logging.info('Using db "{}" with {}'.format(mongo_db_name, location))
 
+
 def return_uri():
-	return mongo_uri
+    return mongo_uri
