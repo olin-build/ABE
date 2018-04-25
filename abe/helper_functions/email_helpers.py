@@ -33,9 +33,7 @@ def get_msg_list(pop_items, pop_conn):
 
         text = [x.decode() for x in text]
         text = "\n".join(text)
-        file = StringIO(text)
-
-        orig_email = email.message_from_file(file)
+        orig_email = email.message_from_string(text)
         messages.append(orig_email)
     return messages
 
