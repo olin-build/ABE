@@ -2,7 +2,7 @@
 """Label Resource models for flask"""
 
 from flask import jsonify, request, abort, Response, make_response
-from flask_restplus import Resource, fields
+from flask_restplus import Resource, fields, Namespace
 from mongoengine import ValidationError
 from bson.objectid import ObjectId
 from pprint import pprint, pformat
@@ -18,9 +18,10 @@ import requests
 import logging
 
 from abe import database as db
-from abe.app import api
 from abe.helper_functions.converting_helpers import mongo_to_dict, request_to_dict
 from abe.helper_functions.query_helpers import multi_search
+
+api = Namespace('Labels', description='Label related operations')
 
 label_model = api.model("Label_Model", {
     "name" : fields.String(required=True),
@@ -101,3 +102,8 @@ class LabelApi(Resource):
         logging.debug("Received DELETE data: {}".format(received_data))
         result.delete()
         return mongo_to_dict(result)
+
+api.add_resource(LabelApi, '/', methods=['GET', 'POST'], endpoint='label')
+api.add_resource(LabelApi, '/<string:label_name>',
+                 methods=['GET', 'PUT', 'PATCH', 'DELETE'], endpoint='label_name')
+

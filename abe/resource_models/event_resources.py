@@ -2,7 +2,7 @@
 """Event Resource models for flask"""
 
 from flask import jsonify, request, abort, Response, make_response
-from flask_restplus import Resource, fields
+from flask_restplus import Resource, fields, Namespace
 from mongoengine import ValidationError
 from bson.objectid import ObjectId
 from pprint import pprint, pformat
@@ -19,11 +19,12 @@ import dateutil.parser
 import logging
 
 from abe import database as db
-from abe.app import api
 from abe.helper_functions.converting_helpers import request_to_dict, mongo_to_dict
 from abe.helper_functions.recurring_helpers import recurring_to_full, placeholder_recurring_creation
 from abe.helper_functions.sub_event_helpers import create_sub_event, update_sub_event, sub_event_to_full, access_sub_event, find_recurrence_end
 from abe.helper_functions.query_helpers import get_to_event_search, event_query
+
+api = Namespace('Events', description='Events related operations')
 
 event_model = api.model('Events_Model', {
     'title': fields.String,
@@ -194,3 +195,10 @@ class EventApi(Resource):
             logging.debug("Received DELETE data: {}".format(received_data))
             result.delete()
             return mongo_to_dict(result)
+
+api.add_resource(EventApi, '/', methods=['GET', 'POST'], endpoint='event')
+# TODO: add route for string/gphycat links
+api.add_resource(EventApi, '/<string:event_id>', methods=['GET', 'PUT', 'PATCH', 'DELETE'], endpoint='event_id')
+api.add_resource(EventApi, '/<string:event_id>/<string:rec_id>',
+                 methods=['GET', 'PUT', 'PATCH', 'DELETE'], endpoint='rec_id')  # TODO: add route for string/gphycat links
+

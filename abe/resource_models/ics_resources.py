@@ -2,7 +2,7 @@
 """ICS Resource models for flask"""
 
 from flask import jsonify, request, abort, Response, make_response
-from flask_restplus import Resource, fields
+from flask_restplus import Resource, fields, Namespace
 from mongoengine import ValidationError
 from bson.objectid import ObjectId
 from pprint import pprint, pformat
@@ -18,10 +18,11 @@ import requests
 import logging
 
 from abe import database as db
-from abe.app import api
 from abe.helper_functions.converting_helpers import request_to_dict
 from abe.helper_functions.query_helpers import get_to_event_search, event_query
 from abe.helper_functions.ics_helpers import mongo_to_ics, extract_ics
+
+api = Namespace('ICS', description='ICS feeds')
 
 ics_model = api.model("ICS_Model", {
     "url" : fields.Url(required=True),
@@ -68,3 +69,6 @@ class ICSApi(Resource):
             return {'error_type': 'validation',
                     'validation_errors': [str(err) for err in error.errors],
                     'error_message': error.message}, 400
+
+api.add_resource(ICSApi, '/', methods=['GET', 'POST'], endpoint='ics')
+

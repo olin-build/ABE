@@ -18,7 +18,6 @@ import requests
 import logging
 
 from abe import database as db
-#from abe.app import api
 from abe.document_models.subscription_documents import Subscription
 from abe.helper_functions.converting_helpers import request_to_dict
 from abe.helper_functions.query_helpers import get_to_event_search, event_query

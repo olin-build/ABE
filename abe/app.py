@@ -42,10 +42,10 @@ def splash():
 
 api = Api(app, doc="/swagger/")
 
-from .resource_models.event_resources import EventApi
-from .resource_models.label_resources import LabelApi
-from .resource_models.ics_resources import ICSApi
-from .resource_models.subscription_resources import api as subscriptions_api
+from .resource_models.event_resources import api as event_api
+from .resource_models.label_resources import api as label_api
+from .resource_models.ics_resources import api as ics_api
+from .resource_models.subscription_resources import api as subscription_api
 
 
 class CustomJSONEncoder(JSONEncoder):
@@ -70,27 +70,10 @@ def output_json(data, code, headers=None):
     return resp
 
 # Route resources
-api.add_resource(EventApi, '/events/', methods=['GET', 'POST'], endpoint='event')
-# TODO: add route for string/gphycat links
-api.add_resource(EventApi, '/events/<string:event_id>', methods=['GET', 'PUT', 'PATCH', 'DELETE'], endpoint='event_id')
-api.add_resource(EventApi, '/events/<string:event_id>/<string:rec_id>',
-                 methods=['GET', 'PUT', 'PATCH', 'DELETE'], endpoint='rec_id')  # TODO: add route for string/gphycat links
-
-api.add_resource(LabelApi, '/labels/', methods=['GET', 'POST'], endpoint='label')
-api.add_resource(LabelApi, '/labels/<string:label_name>',
-                 methods=['GET', 'PUT', 'PATCH', 'DELETE'], endpoint='label_name')
-
-api.add_resource(ICSApi, '/ics/', methods=['GET', 'POST'], endpoint='ics')
-
-api.add_namespace(subscriptions_api)
-
-#api.add_resource(SubscriptionAPI, '/subscriptions/', methods=['POST'], endpoint='subscription')
-#api.add_resource(SubscriptionAPI, '/subscriptions/<string:subscription_id>',
-#                 methods=['GET', 'PUT', 'POST'], endpoint='subscription_id')
-
-#api.add_resource(SubscriptionICS, '/subscription/<string:subscription_id>/ics',
-#                 methods=['GET'], endpoint='subscription_ics')
-
+api.add_namespace(event_api)
+api.add_namespace(label_api)
+api.add_namespace(ics_api)
+api.add_namespace(subscription_api)
 
 @app.route('/add_event')
 def add_event():
