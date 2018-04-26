@@ -1,30 +1,20 @@
 #!/usr/bin/env python3
 """Label Resource models for flask"""
 
-from flask import jsonify, request, abort, Response, make_response
-from flask_restplus import Resource, fields, Namespace
-from mongoengine import ValidationError
-from bson.objectid import ObjectId
-from pprint import pprint, pformat
-from bson import json_util, objectid
-from datetime import datetime, timedelta
-from dateutil.rrule import rrule, MONTHLY, WEEKLY, DAILY, YEARLY
-from icalendar import Calendar
-import isodate
-
-import pdb
-import requests
-
 import logging
+
+from flask import request
+from mongoengine import ValidationError
 
 from abe import database as db
 from abe.auth import edit_auth_required
 from abe.helper_functions.converting_helpers import mongo_to_dict, request_to_dict
 from abe.helper_functions.query_helpers import multi_search
+from flask_restplus import Namespace, Resource, fields
 
 api = Namespace('labels', description='Label related operations')
 
-#This should be kept in sync with the document model, which drives the format
+# This should be kept in sync with the document model, which drives the format
 label_model = api.model("Label_Model", {
     "name": fields.String(required=True),
     "description": fields.String,

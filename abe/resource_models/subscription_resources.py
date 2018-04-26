@@ -1,28 +1,17 @@
 #!/usr/bin/env python3
 """Subscription Resource models for flask"""
 
-from flask import jsonify, request, abort, Response, make_response, Request
-from flask_restplus import Resource, fields, Namespace
-from mongoengine import ValidationError
-from bson.objectid import ObjectId
-from pprint import pprint, pformat
-from bson import json_util, objectid
-from datetime import datetime, timedelta
-from dateutil.rrule import rrule, MONTHLY, WEEKLY, DAILY, YEARLY
-from icalendar import Calendar
-import isodate
-
-import pdb
-import requests
-
 import logging
+
+from flask import Response, request
+from mongoengine import ValidationError
 
 from abe import database as db
 from abe.document_models.subscription_documents import Subscription
 from abe.helper_functions.converting_helpers import request_to_dict
-from abe.helper_functions.query_helpers import get_to_event_search, event_query
-from abe.helper_functions.ics_helpers import mongo_to_ics, extract_ics
-from abe.helper_functions.query_helpers import multi_search
+from abe.helper_functions.ics_helpers import mongo_to_ics
+from abe.helper_functions.query_helpers import event_query, get_to_event_search
+from flask_restplus import Namespace, Resource, fields
 
 api = Namespace('subscriptions', description='Subscription related operations')
 
