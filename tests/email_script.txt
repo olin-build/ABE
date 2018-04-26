@@ -1,0 +1,117 @@
+Delivered-To: abe.at.olin@gmail.com
+Received: by ##.##.##.## with SMTP id t21csp267496qth;
+        Weekday, DD Mmm YYYY 12:15:48 -0700 (PDT)
+X-Google-Smtp-Source: AIpwx4+YBzFpipxGE9p2rosQfqPebc1E0OyXWZ43/f2gfjoi3Vt56JW68aDaPN4HGZkyQULjRfRE
+X-Received: by ##.##.###.### with SMTP id s187mr8230156qkc.171.1523474148454;
+        Weekday, DD Mmm YYYY 12:15:48 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1523474148; cv=none;
+        d=google.com; s=arc-20160816;
+        b=JWpnMX7ggmlbkodObWFB9UmlHFLt81iJ9GGS8GPgBHJ7L24sAmZMcQViz5/MljZMK+
+         /0IImS+MOeXkckzAXV7WKiCAILE0tq9baMQBBQP9ZQPpy8jvyZSYOu/HIxTfSZmS/vAK
+         zi+VoaW9/PT/H96Y2FnkjZj24Mq/WERmNAb7DXBx7AqtPrSuHclvdRCEBlxCrgedlvXK
+         eU6U6RQuIxthwBjhFWiA1tKvDK/HB0hr36VT/+YuTcuN8W52PA+v0gM5Blk7rOub7F6B
+         JqFOqAzqb8Vz6EgcYPU6Fyebk4VB8vvmKuGpJ1tV1olS6c18A5m/EB5fI5hHjHS4eTpl
+         5AfQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20160816;
+        h=mime-version:content-language:accept-language:message-id:date
+         :thread-index:thread-topic:subject:to:from
+         :arc-authentication-results;
+        bh=+OQme9gCBGQzCNWniaDJVczF8H4m3ZB/TJhvuZNblZY=;
+        b=Ug9laAoCVKVMbI2YdsyBTitDFGvveGBgq55GMXLkapUTYkx5eWLWf2JBmZG5QqbGj3
+         W+kQuNH7VTc/zkyz50IMoL06Ny3G4TrvKU1YlD3wAvq+FGuKnThdSI+OzaaJAzF5fNvX
+         A5xq2VK85veQkXpT5vCFrtX5+UsFh2SLOomTAYKXxATdlfDk/562hEAdOORYqJIOGaA/
+         8c1j/o6Z7uNrJHygBijVrcRN4s/J90WXYiAc68X2CuCMj3wMQeTDMxACNwjIK3KGx3Uz
+         JOHf1tMr40gVT+EmAo23Ni0CiNcS3GGdvwRhQ3Pe7ad2luljTHcs69DwIRMnttcA554X
+         Xcjg==
+ARC-Authentication-Results: i=1; mx.google.com;
+       spf=pass (google.com: domain of test.case@tests.com designates ###.##.##.## as permitted sender) smtp.mailfrom=test.case@tests.com;
+       dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=students.com
+Return-Path: <test.case@tests.com>
+Received: from EXCAS04.com (smtps.com. [###.##.##.##])
+        by mx.google.com with ESMTPS id o1si916554qtj.298.2018.##.##.##.##.48
+        for <abe.at.olin@gmail.com>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Weekday, DD Mmm YYYY 12:15:48 -0700 (PDT)
+Received-SPF: pass (google.com: domain of test.case@tests.com designates ###.##.##.## as permitted sender) client-ip=###.##.##.##;
+Authentication-Results: mx.google.com;
+       spf=pass (google.com: domain of test.case@tests.com designates ###.##.##.## as permitted sender) smtp.mailfrom=test.case@tests.com;
+       dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=students.com
+Received: from EX04.com (##.##.##.##) by EX03.com (##.##.##.##) with
+ Microsoft SMTP Server (TLS) id 15.0.1320.4; Weekday, DD Mmm YYYY 15:15:47 -0400
+Received: from EX04.com ([fe80::d475:17ef:b18e:6049]) by EX04.com
+ ([fe80::d475:17ef:b18e:6049%15]) with mapi id 15.00.1320.000; Wed, 11 Apr
+ 2018 15:15:46 -0400
+From: Test Case <test.case@tests.com>
+To: "abe.at.olin@gmail.com" <abe.at.olin@gmail.com>
+Subject: Abe Test Event
+Thread-Topic: Abe Test Event
+Thread-Index: AdPRyX6I/XMwnaZ7nk2jDdQK75/JbQ==
+Date: Weekday, DD Mmm YYYY 19:15:46 +0000
+Message-ID: <e4684c92ef6b4ba89fec2128652788d7@EX04.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [###.###.##.##]
+Content-Type: multipart/alternative;
+	boundary="_000_e4684c92ef6b4ba89fec2128652788d7EX04olinedu_"
+MIME-Version: 1.0
+
+--_000_e4684c92ef6b4ba89fec2128652788d7EX04olinedu_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+This is an Event to Save
+
+--_000_e4684c92ef6b4ba89fec2128652788d7EX04olinedu_
+Content-Type: text/html; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
+1">
+<style type=3D"text/css" style=3D"display:none"><!-- p { margin-top: 0px; m=
+argin-bottom: 0px; }--></style>
+</head>
+<body dir=3D"ltr" style=3D"font-size:12pt;color:#000000;background-color:#F=
+FFFFF;font-family:Calibri,Arial,Helvetica,sans-serif;">
+<p>This is an Event to Save<br>
+</p>
+</body>
+</html>
+
+--_000_e4684c92ef6b4ba89fec2128652788d7EX04olinedu_
+Content-Type: text/calendar; charset="utf-8"; method=REQUEST
+Content-Transfer-Encoding: base64
+
+QkVHSU46VkNBTEVOREFSDQpNRVRIT0Q6UkVRVUVTVA0KUFJPRElEOk1pY3Jvc29mdCBFeGNoYW5n
+ZSBTZXJ2ZXIgMjAxMA0KVkVSU0lPTjoyLjANCkJFR0lOOlZUSU1FWk9ORQ0KVFpJRDpFYXN0ZXJu
+IFN0YW5kYXJkIFRpbWUNCkJFR0lOOlNUQU5EQVJEDQpEVFNUQVJUOjE2MDEwMTAxVDAyMDAwMA0K
+VFpPRkZTRVRGUk9NOi0wNDAwDQpUWk9GRlNFVFRPOi0wNTAwDQpSUlVMRTpGUkVRPVlFQVJMWTtJ
+TlRFUlZBTD0xO0JZREFZPTFTVTtCWU1PTlRIPTExDQpFTkQ6U1RBTkRBUkQNCkJFR0lOOkRBWUxJ
+R0hUDQpEVFNUQVJUOjE2MDEwMTAxVDAyMDAwMA0KVFpPRkZTRVRGUk9NOi0wNTAwDQpUWk9GRlNF
+VFRPOi0wNDAwDQpSUlVMRTpGUkVRPVlFQVJMWTtJTlRFUlZBTD0xO0JZREFZPTJTVTtCWU1PTlRI
+PTMNCkVORDpEQVlMSUdIVA0KRU5EOlZUSU1FWk9ORQ0KQkVHSU46VkVWRU5UDQpPUkdBTklaRVI7
+Q049S2FpdGx5biBLZWlsOk1BSUxUTzpLYWl0bHluLktlaWxAc3R1ZGVudHMub2xpbi5lZHUNCkFU
+VEVOREVFO1JPTEU9UkVRLVBBUlRJQ0lQQU5UO1BBUlRTVEFUPU5FRURTLUFDVElPTjtSU1ZQPVRS
+VUU7Q049YWJlLmF0Lm9saQ0KIG5AZ21haWwuY29tOk1BSUxUTzphYmUuYXQub2xpbkBnbWFpbC5j
+b20NCkRFU0NSSVBUSU9OO0xBTkdVQUdFPWVuLVVTOlRoaXMgaXMgYW4gRXZlbnQgdG8gU2F2ZVxu
+DQpTVU1NQVJZO0xBTkdVQUdFPWVuLVVTOkFiZSBUZXN0IEV2ZW50DQpEVFNUQVJUO1RaSUQ9RWFz
+dGVybiBTdGFuZGFyZCBUaW1lOjIwMTgwNDExVDE4MzAwMA0KRFRFTkQ7VFpJRD1FYXN0ZXJuIFN0
+YW5kYXJkIFRpbWU6MjAxODA0MTFUMTkwMDAwDQpVSUQ6MDQwMDAwMDA4MjAwRTAwMDc0QzVCNzEw
+MUE4MkUwMDgwMDAwMDAwMEZGMUU4ODdFQzlEMUQzMDEwMDAwMDAwMDAwMDAwMDANCiAwMTAwMDAw
+MDAxQzcxQkZBQkNBNjY1MzRBQjgyQzgxRDNCMjAxNzM4Qg0KQ0xBU1M6UFVCTElDDQpQUklPUklU
+WTo1DQpEVFNUQU1QOjIwMTgwNDExVDE5MTU0NloNClRSQU5TUDpPUEFRVUUNClNUQVRVUzpDT05G
+SVJNRUQNClNFUVVFTkNFOjANCkxPQ0FUSU9OO0xBTkdVQUdFPWVuLVVTOg0KWC1NSUNST1NPRlQt
+Q0RPLUFQUFQtU0VRVUVOQ0U6MA0KWC1NSUNST1NPRlQtQ0RPLU9XTkVSQVBQVElEOjIxMTYzMTIw
+NjMNClgtTUlDUk9TT0ZULUNETy1CVVNZU1RBVFVTOlRFTlRBVElWRQ0KWC1NSUNST1NPRlQtQ0RP
+LUlOVEVOREVEU1RBVFVTOkJVU1kNClgtTUlDUk9TT0ZULUNETy1BTExEQVlFVkVOVDpGQUxTRQ0K
+WC1NSUNST1NPRlQtQ0RPLUlNUE9SVEFOQ0U6MQ0KWC1NSUNST1NPRlQtQ0RPLUlOU1RUWVBFOjAN
+ClgtTUlDUk9TT0ZULURJU0FMTE9XLUNPVU5URVI6RkFMU0UNCkJFR0lOOlZBTEFSTQ0KREVTQ1JJ
+UFRJT046UkVNSU5ERVINClRSSUdHRVI7UkVMQVRFRD1TVEFSVDotUFQxNU0NCkFDVElPTjpESVNQ
+TEFZDQpFTkQ6VkFMQVJNDQpFTkQ6VkVWRU5UDQpFTkQ6VkNBTEVOREFSDQo=
+
+--_000_e4684c92ef6b4ba89fec2128652788d7EX04olinedu_--
