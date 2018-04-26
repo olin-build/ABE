@@ -18,7 +18,7 @@ from .resource_models.ics_resources import api as ics_api
 from .resource_models.subscription_resources import api as subscription_api
 
 FORMAT = "%(levelname)s:ABE: _||_ %(message)s"
-logging.basicConfig(level=logging.DEBUG, format=FORMAT)
+logging.basicConfig(level=logging.INFO, format=FORMAT)
 
 app = Flask(__name__)
 CORS(app)

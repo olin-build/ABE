@@ -5,29 +5,24 @@ database named "abe-unittest" for testing.
 """
 import os
 import unittest
+
 import flask
 from pymongo import MongoClient
-import logging
-from .context import abe
-from abe import sample_data
-import pdb
+
+from . import abe_unittest
+from .context import abe  # noqa: F401
+
+# These imports have to happen after .context sets the environment variables
+import abe.app  # isort:skip
+from abe import sample_data  # isort:skip
 
 
-class AbeTestCase(unittest.TestCase):
+class AbeTestCase(abe_unittest.TestCase):
 
     def setUp(self):
-        """Setup testing environment"""
-        os.environ["DB_NAME"] = "abe-unittest"
-        os.environ["MONGO_URI"] = ""
-        import abe.app  # import abe after env so it inits correctly
+        super().setUp()
         abe.app.app.debug = True  # enable debug to prevent https redirects
         self.app = abe.app.app.test_client()
-
-    def tearDown(self):
-        """Teardown testing environment"""
-        client = MongoClient()
-        client.drop_database(os.environ['DB_NAME'])  # remove testing db
-        client.close()
 
     def test_empty_db(self):
         event_response = self.app.get('/events/')
@@ -76,7 +71,3 @@ class AbeTestCase(unittest.TestCase):
         with self.subTest("a one-year query works for leap years"):
             response = self.app.get('/events/?start=2020-01-01&end=2021-01-01')
             self.assertEqual(response._status_code, 200)
-
-
-if __name__ == '__main__':
-    unittest.main()

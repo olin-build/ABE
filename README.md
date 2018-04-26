@@ -128,7 +128,7 @@ in a separate terminal. These will run the "beat" and "worker" servers alongside
 
 `python -m unittest`
 
-This is noisy, but should print `OK` at the end:
+This should print `OK` at the end:
 
 ```shell
 $ python -m unittest
@@ -137,6 +137,12 @@ $ python -m unittest
 Ran 4 tests in 1.124s
 
 OK
+```
+
+Test a specific test:
+
+```shell
+$ python -m unittest tests/test_recurrences.py
 ```
 
 ## API Documentation

@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 """Load sample data into the database."""
+import json
+import logging
 from collections import namedtuple
 from datetime import datetime
-from dateutil import parser
-import json
 from pathlib import Path
 
 import arrow
@@ -14,8 +14,12 @@ sample_data_dir = Path(__file__).parent.parent / 'tests/data'
 sample_events_file = sample_data_dir / 'sample-events.json'
 sample_labels_file = sample_data_dir / 'sample-labels.json'
 
-kelly_colors = ['#F2F3F4', '#222222', '#F3C300', '#875692', '#F38400', '#A1CAF1', '#BE0032', '#C2B280', '#848482', '#008856',
-                '#E68FAC', '#0067A5', '#F99379', '#604E97', '#F6A600', '#B3446C', '#DCD300', '#882D17', '#8DB600', '#654522', '#E25822', '#2B3D26']
+kelly_colors = [
+    '#F2F3F4', '#222222', '#F3C300', '#875692', '#F38400', '#A1CAF1', '#BE0032',
+    '#C2B280', '#848482', '#008856', '#E68FAC', '#0067A5', '#F99379', '#604E97',
+    '#F6A600', '#B3446C', '#DCD300', '#882D17', '#8DB600', '#654522', '#E25822',
+    '#2B3D26',
+]
 
 olin_colors = [  # '#009BDF', '#A7A9AC', '#A7A9AC', '#000000',
     '#E31D3C', '#750324',
@@ -29,7 +33,7 @@ olin_colors = [  # '#009BDF', '#A7A9AC', '#A7A9AC', '#000000',
     '#009BDF', '#00458C',
     '#7B5AA6',
     '#C77EB5', '#511C74',
-    '#ED037C'
+    '#ED037C',
 ]
 
 
@@ -80,11 +84,9 @@ def load_event_data(fp):
 
 def insert_data(db, event_data=None, label_data=None, ics_data=None):
     """Insert data into the database."""
-    import logging
     from .helper_functions.sub_event_helpers import find_recurrence_end
-    logging.basicConfig(level=logging.DEBUG)
     if event_data:
-        logging.info("Inserting sample event data")
+        logging.debug("Inserting sample event data")
         for event in event_data:
             for key, value in event.items():
                 if type(value) is datetime:  # convert to UTC from EST
@@ -94,20 +96,21 @@ def insert_data(db, event_data=None, label_data=None, ics_data=None):
                     ).to('utc').datetime
             new_event = db.Event(**event)
             if 'recurrence' in new_event:
-                if new_event.recurrence.forever == False:
+                if not new_event.recurrence.forever:
                     new_event.recurrence_end = find_recurrence_end(new_event)
-                    logging.info("made some end recurrences: {}".format(new_event.recurrence_end))
+                    logging.debug("made some end recurrences: {}".format(new_event.recurrence_end))
             new_event.save()
     if label_data:
-        logging.info("Inserting sample label data")
+        logging.debug("Inserting sample label data")
         for index, label in enumerate(label_data):
             if 'color' not in label:
                 label['color'] = olin_colors[index]
             db.Label(**label).save()
     if ics_data:
-        logging.info("Inserting sample ics data")
+        logging.debug("Inserting sample ics data")
         for ics in ics_data:
             db.ICS(**ics).save()
+
 
 SampleData = namedtuple('SampleData', ['events', 'labels', 'icss'])
 
@@ -146,6 +149,7 @@ def main(events=None, labels=None):
     if all(data is None for data in (event_data, label_data, ics_data)):
         event_data, label_data, ics_data = load_sample_data()
     insert_data(db, event_data, label_data, ics_data)
+
 
 if __name__ == '__main__':  # import data
     main()
