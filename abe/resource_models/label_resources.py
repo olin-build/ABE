@@ -23,6 +23,7 @@ from abe.helper_functions.query_helpers import multi_search
 
 api = Namespace('labels', description='Label related operations')
 
+#This should be kept in sync with the document model, which drives the format
 label_model = api.model("Label_Model", {
     "name": fields.String(required=True),
     "description": fields.String,

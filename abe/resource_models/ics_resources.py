@@ -24,6 +24,7 @@ from abe.helper_functions.ics_helpers import mongo_to_ics, extract_ics
 
 api = Namespace('ics', description='ICS feeds')
 
+#This should be kept in sync with the document model, which drives the format
 ics_model = api.model("ICS_Model", {
     "url" : fields.Url(required=True),
     "labels" : fields.List(fields.String, required=True)

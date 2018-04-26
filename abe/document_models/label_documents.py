@@ -7,6 +7,7 @@ from bson import ObjectId
 class Label(Document):
     """
     Model for labels of events
+    Should be kept in sync with the resource model, which generates swagger documentation.
 
     Fields:
     name 			Name of the label. Required and must be unique

@@ -141,4 +141,4 @@ OK
 
 ## API Documentation
 
-Interactive API documentation can be found at`/swagger/`, e.g. for local develepment: <http://127.0.0.1:3000/swagger/>.
+Interactive API documentation can be found at`/swagger/`, e.g. for local development: <http://127.0.0.1:3000/swagger/>.

@@ -26,6 +26,7 @@ from abe.helper_functions.query_helpers import multi_search
 
 api = Namespace('subscriptions', description='Subscription related operations')
 
+# This should be kept in sync with the document model, which drives the format
 sub_model = api.model('Sub_Model', {
     "labels": fields.List(fields.String)
 })

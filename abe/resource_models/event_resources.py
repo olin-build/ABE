@@ -26,6 +26,7 @@ from abe.helper_functions.query_helpers import get_to_event_search, event_query
 
 api = Namespace('events', description='Events related operations')
 
+#This should be kept in sync with the document model, which drives the format
 event_model = api.model('Events_Model', {
     'title': fields.String(example="Tea time"),
     'start': fields.DateTime(dt_format='iso8601'),

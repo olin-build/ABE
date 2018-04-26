@@ -9,6 +9,7 @@ from bson import ObjectId
 class Subscription(Document):
     """
     Model for subscriptions
+    Should be kept in sync with the resource model, which generates swagger documentation.
 
     """
     sid = StringField(required=True, unique=True)
