@@ -215,6 +215,7 @@ class RecurringEventExc(EmbeddedDocument):  # TODO: get a better name
 class Event(Document):
     """
     Description of an event. Can include embedded documents if it defines a recurring event
+    Should be kept in sync with the resource model, which generates swagger documentation.
 
     Fields:
     _id             The id of the event. Required (we cannot change this value)
