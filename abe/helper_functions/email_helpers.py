@@ -40,45 +40,6 @@ def get_msg_list(pop_items, pop_conn):
     return messages
 
 
-def get_attachments(message):
-    """ Given a message object,
-    checks for an attachment
-    and returns it if one exists.
-    """
-    payload = message.get_payload()
-    if len(payload) >= 2:
-        attachment = payload[1]
-        print(attachment.get_content_type())
-        return attachment
-    return None
-
-
-def email_test(filename):
-    """ TO DO: determine best way to test. Currently, file does
-    not exist in this framework.
-    """
-    with open(filename, 'r') as myfile:
-        data = myfile.read()
-
-    message = email.message_from_string(data)
-    calendars = []
-    if message.is_multipart():
-        for part in message.walk():
-            if part.get_content_type() == 'text/calendar':
-                decoded = base64.b64decode(part.get_payload()).decode('utf-8')
-                cal = ic.Calendar.from_ical(decoded)
-                for event in cal.walk('vevent'):
-                    date = event.decoded('dtstart')
-                    summary = event.decoded('summary')
-
-                    print(date)
-                    print(summary)
-                print("-------------------------------------------------------------")
-                print(decoded)
-                calendars.append(cal)
-    return calendars
-
-
 def ical_to_dict(cal):
     """ Given a calendar, creates a dictionary as
     specified in ics_to_dict.
@@ -117,11 +78,12 @@ def get_messages_from_email():
     :return: List of email message objects
     """
     if not ABE_EMAIL_USERNAME:
-        logging.warning("ABE_EMAIL_USERNAME is not defined. Not fetching messages.")
+        logging.info("ABE_EMAIL_USERNAME is not defined. Not fetching messages.")
         return []
     pop_conn = poplib.POP3_SSL(ABE_EMAIL_HOST)
     pop_conn.user(ABE_EMAIL_USERNAME)
     pop_conn.pass_(ABE_EMAIL_PASSWORD)
+
     resp, items, octets = pop_conn.list()
 
     messages = get_msg_list(items, pop_conn)
@@ -178,7 +140,7 @@ def smtp_connect():
     """
     username = ABE_EMAIL_USERNAME
     if not username:
-        logging.warning("ABE_EMAIL_USERNAME is not defined. Not fetching messages.")
+        logging.info("ABE_EMAIL_USERNAME is not defined. Not fetching messages.")
         return
     try:
         server = smtplib.SMTP_SSL(ABE_EMAIL_HOST, ABE_EMAIL_PORT)
