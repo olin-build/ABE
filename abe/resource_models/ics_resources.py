@@ -2,7 +2,7 @@
 """ICS Resource models for flask"""
 
 from flask import jsonify, request, abort, Response, make_response
-from flask_restful import Resource
+from flask_restplus import Resource, fields, Namespace
 from mongoengine import ValidationError
 from bson.objectid import ObjectId
 from pprint import pprint, pformat
@@ -23,11 +23,21 @@ from abe.helper_functions.converting_helpers import request_to_dict
 from abe.helper_functions.query_helpers import get_to_event_search, event_query
 from abe.helper_functions.ics_helpers import mongo_to_ics, extract_ics
 
+api = Namespace('ics', description='ICS feeds')
+
+#This should be kept in sync with the document model, which drives the format
+ics_model = api.model("ICS_Model", {
+    "url" : fields.Url(required=True),
+    "labels" : fields.List(fields.String, required=True)
+})
+
 class ICSApi(Resource):
     """API for interacting with ics feeds"""
 
+    @api.deprecated
     def get(self):
         """
+        Deprecated, use SubscriptionICSFeed get instead.
         Returns an ICS feed when requested
         """
         # configure ics specs from fullcalendar to be mongoengine searchable
@@ -43,6 +53,7 @@ class ICSApi(Resource):
 
 
     @edit_auth_required
+    @api.expect(ics_model)
     def post(self):
         """
         Converts an ICS feed input to mongoDB objects
@@ -62,4 +73,6 @@ class ICSApi(Resource):
             return {'error_type': 'validation',
                     'validation_errors': [str(err) for err in error.errors],
                     'error_message': error.message}, 400
-        
+
+api.add_resource(ICSApi, '/', methods=['GET', 'POST'], endpoint='ics')
+

@@ -5,6 +5,54 @@ from bson import ObjectId
 
 VISIBILITY = ['public', 'olin', 'students']
 
+
+def Document__repr__(doc, nested=False, skip_empty_values=True):
+    """Return a string containing a printable representation of a MongoDB
+    Document.
+
+    This function makes a string that would return an object of the same
+    value when passed to `eval()`, if the suitable constructors are in scope.
+
+    For example, DocumentSubclass(a=1, b="str").
+    """
+    def value_repr(v):
+        if isinstance(v, EmbeddedDocument):
+            return Document__repr__(v, nested=True, skip_empty_values=skip_empty_values)
+        else:
+            return repr(v)
+    data_iter = ((k, v) for
+                 k, v in doc._data.items()
+                 if k != '_cls')
+    if skip_empty_values:
+        data_iter = ((k, v) for k, v in data_iter if v)
+    sep = ': ' if nested else '='
+    data_repr = ', '.join("{}{}{}".format(k, sep, value_repr(v))
+                          for k, v in data_iter)
+    return '{' + data_repr + '}' if nested else f"{doc.__class__.__name__}({data_repr})"
+
+
+def Document__str__(doc, skip_empty_values=True):
+    """Return a nicely-printable string representation of a MongoDB Document.
+
+    For example, <DocumentSubclass a=1 b="str">.
+    """
+    def value_str(v):
+        if isinstance(v, EmbeddedDocument):
+            return Document__str__(v, skip_empty_values=skip_empty_values)
+        elif isinstance(v, str):
+            return repr(v)
+        else:
+            return str(v)
+    data_iter = ((k, v) for
+                 k, v in doc._data.items()
+                 if k != '_cls')
+    if skip_empty_values:
+        data_iter = ((k, v) for k, v in data_iter if v)
+    data_repr = ' '.join("{}={}".format(k, value_str(v))
+                         for k, v in data_iter)
+    return f"<{doc.__class__.__name__} {data_repr}>"
+
+
 class RecurringEventDefinition(EmbeddedDocument):
     """
     Represents the definition of a recurring event. Is stored as an embedded document of Event with the field 'recurrence'
@@ -18,7 +66,7 @@ class RecurringEventDefinition(EmbeddedDocument):
                     Example: 'WEEKLY' (event occurs every week)
 
     interval        The interval between events. Required.
-                    Takes a string of an integer. 
+                    Takes a string of an integer.
                     Example: '2' (would be every 2 days, 2 weeks, 2 months, or 2 years depending on frequency)
 
     count           How many events should occur. Optional.
@@ -61,6 +109,9 @@ class RecurringEventDefinition(EmbeddedDocument):
 
     forever = BooleanField(default=False)
 
+    __repr__ = Document__repr__
+    __str__ = Document__str__
+
 
 class RecurringEventExc(EmbeddedDocument):  # TODO: get a better name
     """
@@ -79,7 +130,7 @@ class RecurringEventExc(EmbeddedDocument):  # TODO: get a better name
 
     rec_id          The start datetime of the event had it not been edited. Required
                     Takes a datetime
-                    Example: If the recurring event was supposed to occur on July 5th at 5pm, but has 
+                    Example: If the recurring event was supposed to occur on July 5th at 5pm, but has
                     since been edited to occur on July 5th at 6pm, rec_id will be datetime(2017, 7, 5, 5)
 
     _id             The id of the sub_event. Required
@@ -146,9 +197,9 @@ class RecurringEventExc(EmbeddedDocument):  # TODO: get a better name
     start = DateTimeField()
     end = DateTimeField()
     allDay = BooleanField(default=False)
-    
+
     deleted = BooleanField(required=True, default=False)
-    
+
     meta = {
         'indexes': [
             'sid',
@@ -157,10 +208,14 @@ class RecurringEventExc(EmbeddedDocument):  # TODO: get a better name
         ]
     }
 
+    __repr__ = Document__repr__
+    __str__ = Document__str__
+
 
 class Event(Document):
     """
     Description of an event. Can include embedded documents if it defines a recurring event
+    Should be kept in sync with the resource model, which generates swagger documentation.
 
     Fields:
     _id             The id of the event. Required (we cannot change this value)
@@ -239,14 +294,17 @@ class Event(Document):
 
     recurrence = EmbeddedDocumentField(RecurringEventDefinition)
     recurrence_end = DateTimeField()
-    
+
     sub_events = EmbeddedDocumentListField(RecurringEventExc)
- 
+
     meta = {'allow_inheritance': True,
-        'indexes': [
-            'start',
-            'end',
-            'recurrence_end']
-        }
+            'indexes': [
+                'start',
+                'end',
+                'recurrence_end']
+            }
 
     # TODO: look into clean() function for more advanced data validation
+
+    __repr__ = Document__repr__
+    __str__ = Document__str__

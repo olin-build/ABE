@@ -2,7 +2,7 @@
 """Event Resource models for flask"""
 
 from flask import jsonify, request, abort, Response, make_response
-from flask_restful import Resource
+from flask_restplus import Resource, fields, Namespace
 from mongoengine import ValidationError
 from bson.objectid import ObjectId
 from pprint import pprint, pformat
@@ -24,6 +24,20 @@ from abe.helper_functions.converting_helpers import request_to_dict, mongo_to_di
 from abe.helper_functions.recurring_helpers import recurring_to_full, placeholder_recurring_creation
 from abe.helper_functions.sub_event_helpers import create_sub_event, update_sub_event, sub_event_to_full, access_sub_event, find_recurrence_end
 from abe.helper_functions.query_helpers import get_to_event_search, event_query
+
+api = Namespace('events', description='Events related operations')
+
+#This should be kept in sync with the document model, which drives the format
+event_model = api.model('Events_Model', {
+    'title': fields.String(example="Tea time"),
+    'start': fields.DateTime(dt_format='iso8601'),
+    'end': fields.DateTime(dt_format='iso8601'),
+    'location': fields.String(example="EH4L"),
+    'description': fields.String(example="Time for tea"),
+    'visibility': fields.String(enum=['public', 'olin', 'students']),
+    'labels': fields.List(fields.String, description="One of the labels in the DB"),
+    'allDay': fields.Boolean
+})
 
 
 class EventApi(Resource):
@@ -72,6 +86,11 @@ class EventApi(Resource):
         else:  # search database based on parameters
             # make a query to the database
             query_dict = get_to_event_search(request)
+
+            query_time_period = query_dict['end'] - query_dict['start']
+            if query_time_period > timedelta(days=366):
+                return "Too wide of date range in query. Max date range of 1 year allowed.", 404
+
             query = event_query(query_dict)
             results = db.Event.objects(__raw__ = query) #{'start': new Date('2017-06-14')})
             logging.debug('found {} events for query'.format(len(results)))
@@ -79,13 +98,14 @@ class EventApi(Resource):
             if not results: # if no results were found
                 return []
 
+
             # date range for query
             start = query_dict['start']
             end = query_dict['end']
 
             events_list = []
             for event in results:
-                
+
                 if 'recurrence' in event: # checks for recurrent events
                     # expands a recurring event defintion into a json response with individual events
                     events_list = recurring_to_full(event, events_list, start, end)
@@ -94,6 +114,7 @@ class EventApi(Resource):
             return events_list
 
     @edit_auth_required
+    @api.expect(event_model)
     def post(self):
         """
         Create new event with parameters passed in through args or form
@@ -117,6 +138,7 @@ class EventApi(Resource):
             return mongo_to_dict(new_event), 201
 
     @edit_auth_required
+    @api.expect(event_model)
     def put(self, event_id):
         """
         Modify individual event
@@ -180,3 +202,13 @@ class EventApi(Resource):
             logging.debug("Received DELETE data: {}".format(received_data))
             result.delete()
             return mongo_to_dict(result)
+
+
+api.add_resource(EventApi, '/', methods=['GET', 'POST'], endpoint='event')
+# TODO: add route for string/gphycat links
+api.add_resource(EventApi, '/<string:event_id>',
+                 methods=['GET', 'PUT', 'PATCH', 'DELETE'],
+                 endpoint='event_id')
+api.add_resource(EventApi, '/<string:event_id>/<string:rec_id>',
+                 methods=['GET', 'PUT', 'PATCH', 'DELETE'],
+                 endpoint='rec_id')  # TODO: add route for string/gphycat links

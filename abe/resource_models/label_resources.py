@@ -2,7 +2,7 @@
 """Label Resource models for flask"""
 
 from flask import jsonify, request, abort, Response, make_response
-from flask_restful import Resource
+from flask_restplus import Resource, fields, Namespace
 from mongoengine import ValidationError
 from bson.objectid import ObjectId
 from pprint import pprint, pformat
@@ -21,6 +21,19 @@ from abe import database as db
 from abe.auth import edit_auth_required
 from abe.helper_functions.converting_helpers import mongo_to_dict, request_to_dict
 from abe.helper_functions.query_helpers import multi_search
+
+api = Namespace('labels', description='Label related operations')
+
+#This should be kept in sync with the document model, which drives the format
+label_model = api.model("Label_Model", {
+    "name": fields.String(required=True),
+    "description": fields.String,
+    "url": fields.Url,
+    "default":  fields.Boolean,
+    "parent_labels": fields.List(fields.String),
+    "color": fields.String,
+    "visibility": fields.String(enum=['public', 'olin', 'students'])
+})
 
 
 class LabelApi(Resource):
@@ -45,6 +58,7 @@ class LabelApi(Resource):
                 return [mongo_to_dict(result) for result in results]
 
     @edit_auth_required
+    @api.expect(label_model)
     def post(self):
         """Create new label with parameters passed in through args or form"""
         received_data = request_to_dict(request)
@@ -60,7 +74,9 @@ class LabelApi(Resource):
         else:  # return success
             return mongo_to_dict(new_label), 201
 
+
     @edit_auth_required
+    @api.expect(label_model)
     def put(self, label_name):
         """Modify individual label"""
         received_data = request_to_dict(request)
@@ -93,3 +109,9 @@ class LabelApi(Resource):
         logging.debug("Received DELETE data: {}".format(received_data))
         result.delete()
         return mongo_to_dict(result)
+
+
+api.add_resource(LabelApi, '/', methods=['GET', 'POST'], endpoint='label')
+api.add_resource(LabelApi, '/<string:label_name>',
+                 methods=['GET', 'PUT', 'PATCH', 'DELETE'],
+                 endpoint='label_name')
