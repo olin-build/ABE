@@ -27,13 +27,13 @@ from abe.helper_functions.query_helpers import get_to_event_search, event_query
 api = Namespace('events', description='Events related operations')
 
 event_model = api.model('Events_Model', {
-    'title': fields.String,
+    'title': fields.String(example="Tea time"),
     'start': fields.DateTime(dt_format='iso8601'),
     'end': fields.DateTime(dt_format='iso8601'),
-    'location': fields.String,
-    'description': fields.String,
+    'location': fields.String(example="EH4L"),
+    'description': fields.String(example="Time for tea"),
     'visibility': fields.String(enum=['public', 'olin', 'students']),
-    'labels': fields.List(fields.String),
+    'labels': fields.List(fields.String, description="One of the labels in the DB"),
     'allDay': fields.Boolean
 })
 

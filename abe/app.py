@@ -47,7 +47,7 @@ def splash():
     return render_template('splash.html')
 
 
-api = Api(app, doc="/swagger/", version="0.1")
+api = Api(app, doc="/swagger/", version="0.1", title="ABE API")
 
 
 class CustomJSONEncoder(JSONEncoder):
