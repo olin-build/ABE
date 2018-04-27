@@ -3,30 +3,23 @@
 helpful inspiration: https://gist.github.com/jason-w/4969476
 """
 
+import datetime
 import logging
-import pdb
-import pytz
-
-from icalendar import Calendar, Event, vCalAddress, vText, vDatetime, Timezone
-from dateutil.rrule import rrule, MONTHLY, WEEKLY, DAILY, YEARLY
-import datetime  # import datetime, timedelta, timezone, date, time
-from datetime import timedelta, timezone, date
-from bson import objectid
-from mongoengine import *
-from icalendar import Calendar
+from datetime import time, timedelta, timezone
 
 import dateutil.parser
+import pytz
 import requests
 from icalendar import Calendar
-from icalendar import Event
+import icalendar as ical
 
 from abe import database as db
 from abe.helper_functions.converting_helpers import mongo_to_dict
-from abe.helper_functions.sub_event_helpers import create_sub_event, update_sub_event, sub_event_to_full, \
-    find_recurrence_end
+from abe.helper_functions.sub_event_helpers import (create_sub_event, find_recurrence_end, sub_event_to_full,
+                                                    update_sub_event)
 
 
-def create_ics_event(event: db.Event, recurrence=False) -> Event:
+def create_ics_event(event: db.Event, recurrence=False) -> ical.Event:
     """
     This function creates a base ICS event definition. It uses the Event() class of the
     iCalendar library.
@@ -50,7 +43,7 @@ def create_ics_event(event: db.Event, recurrence=False) -> Event:
         return dateutil.parser.parse(a) if not isinstance(a, datetime.datetime) else a
 
     # creates the Event
-    new_event = Event()
+    new_event = ical.Event()
     new_event.add('summary', event['title'])
     new_event.add('location', event['location'])
     new_event.add('description', event['description'])
@@ -174,7 +167,9 @@ def ics_to_dict(component, labels, ics_id=None):
     event_def = {}
 
     utc = pytz.utc
-    convert_timezone = lambda a: a.astimezone(utc) if isinstance(a, datetime.datetime) else a
+
+    def convert_timezone(a):
+        return a.astimezone(utc) if isinstance(a, datetime.datetime) else a
 
     event_def['title'] = str(component.get('summary'))
     event_def['description'] = str(component.get('description'))
@@ -249,7 +244,7 @@ def extract_ics(cal, ics_url, labels=None):
                 # if an event has been modified in the last two hours
                 if difference.total_seconds() < 7200:
                     update_ics_to_mongo(component, results.labels)
-    else:  # if this is the first time this ics feed has been inputted
+    else:  # if this is the first time this ics feed has been input
         # save the ics url feed as an ICS object
         ics_object = db.ICS(**{'url': ics_url, 'labels': labels}).save()
         temporary_dict = []
@@ -271,7 +266,7 @@ def extract_ics(cal, ics_url, labels=None):
                 else:  # if this is a regular event
                     try:
                         new_event = db.Event(**com_dict).save()
-                    except:
+                    except:  # FIXME: bare except
                         logging.debug("com_dict: {}".format(com_dict))
                     if not new_event.labels:  # if the event has no labels
                         new_event.labels = ['unlabeled']

@@ -32,6 +32,7 @@ recurringEvents = dict(
 
 class RecurrenceTestCase(abe_unittest.TestCase):
 
+    # TODO: DRY w/ method in IcsHelpersTestCase
     def get_test_event(self, key):
         db = self.db
         assert key in key
