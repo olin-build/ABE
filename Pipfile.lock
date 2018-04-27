@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "df86a10268a0c57ad42688303177fe178b88177a61f447d5e0b4560c1365b9d6"
+            "sha256": "93a821b8651d52deab788195d9ba3131b9101036eac05a34fb13f2bb84bb0a16"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -9,9 +9,9 @@
             "os_name": "posix",
             "platform_machine": "x86_64",
             "platform_python_implementation": "CPython",
-            "platform_release": "4.4.0-119-generic",
+            "platform_release": "4.13.0-37-generic",
             "platform_system": "Linux",
-            "platform_version": "#143-Ubuntu SMP Mon Apr 2 16:08:24 UTC 2018",
+            "platform_version": "#42~16.04.1-Ubuntu SMP Wed Mar 7 16:03:28 UTC 2018",
             "python_full_version": "3.6.4",
             "python_version": "3.6",
             "sys_platform": "linux"
@@ -117,18 +117,17 @@
         },
         "flask": {
             "hashes": [
-                "sha256:0749df235e3ff61ac108f69ac178c9770caeaccad2509cb762ce1f65570a8856",
-                "sha256:49f44461237b69ecd901cc7ce66feea0319b9158743dd27a2899962ab214dac1"
+                "sha256:b1883637bbee4dc7bc98d900792d0a304d609fce0f5bd9ca91d1b6457e5918dd",
+                "sha256:7fab1062d11dd0038434e790d18c5b9133fd9e6b7257d707c4578ccc1e38b67c"
             ],
-            "version": "==0.12.2"
+            "version": "==1.0"
         },
         "flask-cors": {
             "hashes": [
-                "sha256:55eb3864b4290f939ff19a2250fcb47d8c0f63d250c6780b922629299d011ec8",
-                "sha256:ac4b81b3d90f5f18714c995c807f94501df8c9bbc22ef4261c1cd850748c3850",
-                "sha256:62ebc5ad80dc21ca0ea9f57466c2c74e24a62274af890b391790c260eb7b754b"
+                "sha256:a1bb895b3e98b4325743149ebe0e3a0652537b8e37854f942bde7843f822f129",
+                "sha256:bec996f0603a0693c0ea63c8126e5f8e966bb679cf82e6104b254e9c7f3a7d08"
             ],
-            "version": "==3.0.3"
+            "version": "==3.0.4"
         },
         "flask-restful": {
             "hashes": [
@@ -253,6 +252,13 @@
                 "sha256:f8fed3871dfcefd421d3a3be1b43b3b9a1622db6a4271d78f15f494e51003f75"
             ],
             "version": "==0.15.0"
+        },
+        "netaddr": {
+            "hashes": [
+                "sha256:56b3558bd71f3f6999e4c52e349f38660e54a7a8a9943335f73dfc96883e08ca",
+                "sha256:38aeec7cdd035081d3a4c306394b19d677623bf76fa0913f6695127c7753aefd"
+            ],
+            "version": "==0.7.19"
         },
         "pymongo": {
             "hashes": [
