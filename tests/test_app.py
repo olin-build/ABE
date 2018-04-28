@@ -62,7 +62,7 @@ class AbeTestCase(abe_unittest.TestCase):
         with self.subTest("a one-year query returns all events"):
             response = self.app.get('/events/?start=2017-01-01&end=2018-01-01')
             self.assertEqual(response._status_code, 200)
-            self.assertEqual(len(flask.json.loads(response.data)), 69)
+            self.assertEqual(len(flask.json.loads(response.data)), 91)
 
         with self.subTest("a two-year query is too long"):
             response = self.app.get('/events/?start=2017-01-01&end=2019-01-01')
