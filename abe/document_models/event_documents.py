@@ -262,7 +262,7 @@ class Event(Document):
                     Takes a datetime object
                     Example: datetime(2017, 9, 06, 23)
 
-    all_day          Indicates whether this event is an all day event. Optional (but defaults to False)
+    allDay          Indicates whether this event is an all day event. Optional (but defaults to False)
                     Takes a boolean
                     Example: True (event runs all day)
 
@@ -290,7 +290,7 @@ class Event(Document):
 
     start = DateTimeField(required=True)
     end = DateTimeField()
-    all_day = BooleanField(default=False)
+    allDay = BooleanField(default=False)
 
     recurrence = EmbeddedDocumentField(RecurringEventDefinition)
     recurrence_end = DateTimeField()

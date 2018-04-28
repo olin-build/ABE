@@ -83,7 +83,7 @@
         "visibility": "students",
         "start": "2017-07-14",
         "end": "2017-07-16",
-        "all_day": true,
+        "allDay": true,
         "recurrence_end": "2017-07-30",
         "labels": ["admissions", "featured", "testing"],
         "recurrence": {
