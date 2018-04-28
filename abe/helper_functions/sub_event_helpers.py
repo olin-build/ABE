@@ -147,8 +147,6 @@ def instance_creation(event, start=None, end=None):
 
     rFrequency = rec_type_list.index(recurrence['frequency'])
     rStart = convert_timezone(ensure_date_time(event['start']))
-    if start and start > rStart:  # if we're searching starting after the beginning of the recurring event, start there to speed up rrule
-        rStart = start
     if recurrence['frequency'] == 'YEARLY':
         # extracts the month and day from the date
         rByMonth = int(rStart.month)
@@ -172,11 +170,14 @@ def instance_creation(event, start=None, end=None):
             rByDay = None
 
     rInterval = int(recurrence['interval'])
-    if recurrence.forever == True:
-        rUntil = convert_timezone(ensure_date_time(end)) if end is not None else None
+    rCount = int(recurrence['count']) if 'count' in recurrence else None
+    if rCount is None:
+        if recurrence.forever:
+            rUntil = convert_timezone(ensure_date_time(end)) if end is not None else None
+        else:
+            rUntil = convert_timezone(ensure_date_time(recurrence['until'])) if 'until' in recurrence else end
     else:
-        rUntil = convert_timezone(ensure_date_time(recurrence['until'])) if 'until' in recurrence else end
-    rCount = int(recurrence['count']) if 'count' in recurrence and not rUntil else None
+        rUntil = None
 
     rule_list = list(rrule(freq=rFrequency, count=rCount, interval=rInterval, until=rUntil, bymonth=rByMonth,
                            bymonthday=rByMonthDay, byweekday=rByDay, dtstart=rStart))
