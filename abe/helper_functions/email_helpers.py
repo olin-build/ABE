@@ -212,13 +212,3 @@ def scrape():
     for cal in cals:
         completed.append(cal_to_event(cal))
     return completed
-
-
-if __name__ == '__main__':
-    cals = email_test('test_email.txt')
-    for cal in cals:
-        ical_to_dict(cal)
-    # messages = get_messages_from_email()
-    # calendars = get_calendars_from_messages(messages)
-    # for calendar in calendars:
-    #     print(calendar)
