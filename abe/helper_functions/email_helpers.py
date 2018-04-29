@@ -202,7 +202,7 @@ def reply_email(to, event_dict):
 
 
 def send_email(server, email_text, sent_from, sent_to):
-    server.sendmail(sent_from, sent_to, email_text)
+    server.sendmail(sent_from, sent_to, email_text.encode('utf-8'))
     server.close()
 
 
