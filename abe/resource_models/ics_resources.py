@@ -67,4 +67,5 @@ class ICSApi(Resource):
                     'validation_errors': [str(err) for err in error.errors],
                     'error_message': error.message}, 400
 
+
 api.add_resource(ICSApi, '/', methods=['GET', 'POST'], endpoint='ics')
