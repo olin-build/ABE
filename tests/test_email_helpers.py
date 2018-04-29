@@ -105,7 +105,7 @@ class EmailHelpersTestCase(abe_unittest.TestCase):
         sent_from = 'from address'
         to = 'to address'
         email_helpers.send_email(server, email_text, sent_from, to)
-        server.sendmail.assert_called_once_with(sent_from, to, email_text)
+        server.sendmail.assert_called_once_with(sent_from, to, email_text.encode('utf-8'))
         server.close.assert_called_once()
 
     @patch('abe.helper_functions.email_helpers.send_email', return_value=None)
