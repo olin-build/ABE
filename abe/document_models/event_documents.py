@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Document models for mongoengine"""
-from mongoengine import *
 from bson import ObjectId
+from mongoengine import (BooleanField, DateTimeField, Document, EmailField, EmbeddedDocument, EmbeddedDocumentField,
+                         EmbeddedDocumentListField, ListField, ObjectIdField, StringField, URLField)
 
 VISIBILITY = ['public', 'olin', 'students']
 
@@ -55,47 +56,51 @@ def Document__str__(doc, skip_empty_values=True):
 
 class RecurringEventDefinition(EmbeddedDocument):
     """
-    Represents the definition of a recurring event. Is stored as an embedded document of Event with the field 'recurrence'
-    The definition is based off of the ics format. For more see: http://www.kanzaki.com/docs/ical/rrule.html
+    Represents the definition of a recurring event. Is stored as an embedded
+    document of Event with the field 'recurrence' The definition is based off of
+    the ics format. For more see: http://www.kanzaki.com/docs/ical/rrule.html
 
-    Certain fields must be used with others and some cannot be used with others. See the link above for more information.
+    Certain fields must be used with others and some cannot be used with others.
+    See the link above for more information.
 
-    Fields:
-    frequency       The frequency of an event. Required.
-                    Takes a string from a list of choices ('DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY')
-                    Example: 'WEEKLY' (event occurs every week)
+    Fields: frequency       The frequency of an event. Required. Takes a string
+    from a list of choices ('DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY') Example:
+    'WEEKLY' (event occurs every week)
 
-    interval        The interval between events. Required.
-                    Takes a string of an integer.
-                    Example: '2' (would be every 2 days, 2 weeks, 2 months, or 2 years depending on frequency)
+    interval        The interval between events. Required. Takes a string of an
+                    integer. Example: '2' (would be every 2 days, 2 weeks, 2
+                    months, or 2 years depending on frequency)
 
-    count           How many events should occur. Optional.
-                    Takes a string of an integer. 'Until' and 'count' cannot both be used.
-                    Example: '6' (event occurs 6 times)
+    count           How many events should occur. Optional. Takes a string of an
+                    integer. 'Until' and 'count' cannot both be used. Example:
+                    '6' (event occurs 6 times)
 
-    until           Date at which event should stop occuring. Optional
-                    Takes a datetime object. 'Until' and 'count' cannot both be used.
-                    Example: datetime(2017, 7, 31) (event stops occuring on July 31, 2017)
+    until           Date at which event should stop occuring. Optional Takes a
+                    datetime object. 'Until' and 'count' cannot both be used.
+                    Example: datetime(2017, 7, 31) (event stops occuring on July
+                    31, 2017)
 
-    by_day          Which day of the week an event should occur. Optional
-                    Takes a list of strings from a list of choices ("MO", "TU", "WE", "TH", "FR", "SA", "SU")
-                    Example: ["TU", "FR"] (event occurs every Tuesday and Friday)
+    by_day          Which day of the week an event should occur. Optional Takes
+                    a list of strings from a list of choices ("MO", "TU", "WE",
+                    "TH", "FR", "SA", "SU") Example: ["TU", "FR"] (event occurs
+                    every Tuesday and Friday)
 
-    by_month_day    Which day of the month an event should occur. Optional
-                    Takes a string of an integer
-                    Example: '20' (event occurs on the 20th of a month)
+    by_month_day    Which day of the month an event should occur. Optional Takes
+                    a string of an integer Example: '20' (event occurs on the
+                    20th of a month)
 
-    by_month        Which month an event should occur in. Optional
-                    Takes a list of strings of integers from 1 through 12
-                    Example: ['6', '7'] (event occurs in June and July)
+    by_month        Which month an event should occur in. Optional Takes a list
+                    of strings of integers from 1 through 12 Example: ['6', '7']
+                    (event occurs in June and July)
 
     by_year_day     Which day of the year an event should occur on. Optional
                     Takes a list of strings of integers from 1 through 365
-                    Example: ['1', '100', '200'] (event occurs on the 1rst, 100th, and 200th day of the year)
+                    Example: ['1', '100', '200'] (event occurs on the 1rst,
+                    100th, and 200th day of the year)
 
-    forever         Indicates whether this recurrence has an end. Optional to define, but will default to False
-                    Takes a boolean
-                    Example: True (True indicates this event goes on forever)
+    forever         Indicates whether this recurrence has an end. Optional to
+                    define, but will default to False Takes a boolean Example:
+                    True (True indicates this event goes on forever)
 
     """
     frequency = StringField(required=True)
