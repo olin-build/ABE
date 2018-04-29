@@ -44,7 +44,6 @@ class ICSApi(Resource):
                         mimetype="text/calendar",
                         headers={"Content-Disposition": cd})
 
-
     @edit_auth_required
     @api.expect(ics_model)
     def post(self):
