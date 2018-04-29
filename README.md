@@ -1,6 +1,7 @@
 # ABE
 
 Dev: [![Build Status](https://travis-ci.org/olinlibrary/ABE.svg?branch=dev)](https://travis-ci.org/olinlibrary/ABE/branches)
+[![Coverage](https://codecov.io/gh/olinlibrary/abe/branch/dev/graph/badge.svg)](https://codecov.io/gh/olinlibrary/abe)
 Master: [![Build Status](https://travis-ci.org/olinlibrary/ABE.svg?branch=master)](https://travis-ci.org/olinlibrary/ABE/branches)
 
 **ABE** (Amorphous Blob of Events) is Olin's student-built store of information
@@ -143,6 +144,14 @@ Test a specific test:
 
 ```shell
 $ python -m unittest tests/test_recurrences.py
+```
+
+View code coverage:
+
+```shell
+$ coverage run --source abe -m unittest
+$ coverage html
+$ open htmlcov/index.html
 ```
 
 ## API Documentation
