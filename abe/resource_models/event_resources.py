@@ -19,6 +19,7 @@ import dateutil.parser
 import logging
 
 from abe import database as db
+from abe.auth import edit_auth_required
 from abe.helper_functions.converting_helpers import request_to_dict, mongo_to_dict
 from abe.helper_functions.recurring_helpers import recurring_to_full, placeholder_recurring_creation
 from abe.helper_functions.sub_event_helpers import create_sub_event, update_sub_event, sub_event_to_full, access_sub_event, find_recurrence_end
@@ -112,6 +113,7 @@ class EventApi(Resource):
                     events_list.append(mongo_to_dict(event))
             return events_list
 
+    @edit_auth_required
     @api.expect(event_model)
     def post(self):
         """
@@ -135,6 +137,7 @@ class EventApi(Resource):
         else:  # return success
             return mongo_to_dict(new_event), 201
 
+    @edit_auth_required
     @api.expect(event_model)
     def put(self, event_id):
         """
@@ -170,6 +173,7 @@ class EventApi(Resource):
         else:  # return success
             return mongo_to_dict(result)
 
+    @edit_auth_required
     def delete(self, event_id, rec_id=None):
         """
         Delete individual event

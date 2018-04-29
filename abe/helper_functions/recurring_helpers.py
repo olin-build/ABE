@@ -40,7 +40,6 @@ def recurring_to_full(event, events_list, start, end):
                     events_list.append(sub_event_to_full(mongo_to_dict(sub_event), event))
     # generate a list of all datetimes a recurring event would occur
     rule_list = instance_creation(event, start, end)
-
     # for each instance create a full event definition based on its parent event
     for instance in rule_list:
         convert_timezone = lambda a: a.replace(tzinfo=pytz.UTC) if isinstance(a, datetime) else a
