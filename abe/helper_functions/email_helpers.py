@@ -16,7 +16,8 @@ from abe.helper_functions.sub_event_helpers import find_recurrence_end
 
 ABE_EMAIL_USERNAME = os.environ.get('ABE_EMAIL_USERNAME', None)
 ABE_EMAIL_PASSWORD = os.environ.get('ABE_EMAIL_PASSWORD', None)
-ABE_EMAIL_HOST = os.environ.get('ABE_EMAIL_HOST', 'pop.gmail.com')
+print(ABE_EMAIL_PASSWORD)
+ABE_EMAIL_HOST = os.environ.get('ABE_EMAIL_HOST', 'mail.privateemail.com')
 ABE_EMAIL_PORT = int(os.environ.get('ABE_EMAIL_PORT', 465))
 
 
@@ -35,6 +36,7 @@ def get_msg_list(pop_items, pop_conn):
         text = "\n".join(text)
         orig_email = email.message_from_string(text)
         messages.append(orig_email)
+        pop_conn.dele(id)
     return messages
 
 
