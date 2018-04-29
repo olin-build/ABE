@@ -36,7 +36,12 @@ def get_msg_list(pop_items, pop_conn):
         text = "\n".join(text)
         orig_email = email.message_from_string(text)
         messages.append(orig_email)
-        pop_conn.dele(id)
+        # If the email has a calendar, we are going to read it and delete it.
+        #  Otherwise, we don't want to delete the messages.
+        if orig_email.is_multipart():
+            for part in orig_email.walk():
+                if part.get_content_type() == 'text/calendar':
+                    pop_conn.dele(id)
     return messages
 
 
