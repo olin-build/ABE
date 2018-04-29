@@ -16,7 +16,6 @@ from abe.helper_functions.sub_event_helpers import find_recurrence_end
 
 ABE_EMAIL_USERNAME = os.environ.get('ABE_EMAIL_USERNAME', None)
 ABE_EMAIL_PASSWORD = os.environ.get('ABE_EMAIL_PASSWORD', None)
-print(ABE_EMAIL_PASSWORD)
 ABE_EMAIL_HOST = os.environ.get('ABE_EMAIL_HOST', 'mail.privateemail.com')
 ABE_EMAIL_PORT = int(os.environ.get('ABE_EMAIL_PORT', 465))
 
