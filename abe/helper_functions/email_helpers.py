@@ -16,7 +16,7 @@ from abe.helper_functions.sub_event_helpers import find_recurrence_end
 
 ABE_EMAIL_USERNAME = os.environ.get('ABE_EMAIL_USERNAME', None)
 ABE_EMAIL_PASSWORD = os.environ.get('ABE_EMAIL_PASSWORD', None)
-ABE_EMAIL_HOST = os.environ.get('ABE_EMAIL_HOST', 'pop.gmail.com')
+ABE_EMAIL_HOST = os.environ.get('ABE_EMAIL_HOST', 'mail.privateemail.com')
 ABE_EMAIL_PORT = int(os.environ.get('ABE_EMAIL_PORT', 465))
 
 
@@ -35,6 +35,10 @@ def get_msg_list(pop_items, pop_conn):
         text = "\n".join(text)
         orig_email = email.message_from_string(text)
         messages.append(orig_email)
+        # If the email has a calendar, we are going to read it and delete it.
+        #  Otherwise, we don't want to delete the messages.
+        if orig_email.is_multipart() and any(part.get_content_type() == 'text/calendar' for part in orig_email.walk()):
+            pop_conn.dele(id)
     return messages
 
 
@@ -195,7 +199,7 @@ def reply_email(to, event_dict):
 
 
 def send_email(server, email_text, sent_from, sent_to):
-    server.sendmail(sent_from, sent_to, email_text)
+    server.sendmail(sent_from, sent_to, email_text.encode('utf-8'))
     server.close()
 
 
