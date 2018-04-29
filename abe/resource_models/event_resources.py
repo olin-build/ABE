@@ -2,7 +2,7 @@
 """Event Resource models for flask"""
 
 from flask import jsonify, request, abort, Response, make_response
-from flask_restful import Resource
+from flask_restplus import Resource, fields, Namespace
 from mongoengine import ValidationError
 from bson.objectid import ObjectId
 from pprint import pprint, pformat
@@ -23,6 +23,20 @@ from abe.helper_functions.converting_helpers import request_to_dict, mongo_to_di
 from abe.helper_functions.recurring_helpers import recurring_to_full, placeholder_recurring_creation
 from abe.helper_functions.sub_event_helpers import create_sub_event, update_sub_event, sub_event_to_full, access_sub_event, find_recurrence_end
 from abe.helper_functions.query_helpers import get_to_event_search, event_query
+
+api = Namespace('events', description='Events related operations')
+
+#This should be kept in sync with the document model, which drives the format
+event_model = api.model('Events_Model', {
+    'title': fields.String(example="Tea time"),
+    'start': fields.DateTime(dt_format='iso8601'),
+    'end': fields.DateTime(dt_format='iso8601'),
+    'location': fields.String(example="EH4L"),
+    'description': fields.String(example="Time for tea"),
+    'visibility': fields.String(enum=['public', 'olin', 'students']),
+    'labels': fields.List(fields.String, description="One of the labels in the DB"),
+    'allDay': fields.Boolean
+})
 
 
 class EventApi(Resource):
@@ -83,6 +97,7 @@ class EventApi(Resource):
             if not results: # if no results were found
                 return []
 
+
             # date range for query
             start = query_dict['start']
             end = query_dict['end']
@@ -97,6 +112,7 @@ class EventApi(Resource):
                     events_list.append(mongo_to_dict(event))
             return events_list
 
+    @api.expect(event_model)
     def post(self):
         """
         Create new event with parameters passed in through args or form
@@ -119,6 +135,7 @@ class EventApi(Resource):
         else:  # return success
             return mongo_to_dict(new_event), 201
 
+    @api.expect(event_model)
     def put(self, event_id):
         """
         Modify individual event
@@ -181,3 +198,13 @@ class EventApi(Resource):
             logging.debug("Received DELETE data: {}".format(received_data))
             result.delete()
             return mongo_to_dict(result)
+
+
+api.add_resource(EventApi, '/', methods=['GET', 'POST'], endpoint='event')
+# TODO: add route for string/gphycat links
+api.add_resource(EventApi, '/<string:event_id>',
+                 methods=['GET', 'PUT', 'PATCH', 'DELETE'],
+                 endpoint='event_id')
+api.add_resource(EventApi, '/<string:event_id>/<string:rec_id>',
+                 methods=['GET', 'PUT', 'PATCH', 'DELETE'],
+                 endpoint='rec_id')  # TODO: add route for string/gphycat links

@@ -4,9 +4,11 @@ name = "pypi"
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 
+
 [requires]
 
 python_full_version = "3.6.4" #https://devcenter.heroku.com/articles/python-runtimes
+
 
 [packages]
 
@@ -46,6 +48,7 @@ requests = ">=2.18.1"
 "urllib3" = ">=1.21.1"
 werkzeug = ">=0.12.2"
 gunicorn = "*"
+flask-restplus = "*"
 
 
 [dev-packages]
