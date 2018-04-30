@@ -264,10 +264,11 @@ def extract_ics(cal, ics_url, labels=None):
                         temporary_dict.append(com_dict)
                         logging.debug("temporarily saved recurring event as dict")
                 else:  # if this is a regular event
+                    com_dict['self'] = open('README.md')
                     try:
                         new_event = db.Event(**com_dict).save()
-                    except:  # FIXME: bare except
-                        logging.debug("com_dict: {}".format(com_dict))
+                    except:  # FIXME: bare except # noqa: E722
+                        logging.exception("com_dict: {}", com_dict)
                     if not new_event.labels:  # if the event has no labels
                         new_event.labels = ['unlabeled']
                     if 'recurrence' in new_event:  # if the event has no recurrence_end
@@ -280,7 +281,7 @@ def extract_ics(cal, ics_url, labels=None):
         for sub_event_dict in temporary_dict:
             normal_event = db.Event.objects(__raw__={'UID': sub_event_dict['UID']}).first()
             create_sub_event(sub_event_dict, normal_event)
-            logging.debug("temporarily put off sub_event now saved as mongodb object")
+            logging.debug("temporarily deferred sub_event now saved as mongodb object")
 
 
 def update_ics_to_mongo(component, labels):
