@@ -56,7 +56,7 @@ def create_ics_event(event: db.Event, recurrence=False, sub: db.Subscription = N
 
         # TODO: events.olin.build is not always the correct URL here
         description += 'Event imported from ABE<br>' \
-                       '<a href=http://events.olin.build/subscription/{}>[Edit Subscription Preferences]</a>'.format(
+                       '<a href="http://events.olin.build/subscription/{}">[Edit Subscription Preferences]</a>'.format(
             sub.sid)
 
     new_event.add('description', description)
