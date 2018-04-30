@@ -2,22 +2,12 @@
 """Sub event helper functions
 helpful inspiration: https://gist.github.com/jason-w/4969476
 """
-from mongoengine import ValidationError
 
-import logging
-import pdb
-import pytz
+from datetime import date, datetime, timedelta
 
-from icalendar import Calendar, Event, vCalAddress, vText, vDatetime
-from dateutil.rrule import rrule, MONTHLY, WEEKLY, DAILY, YEARLY
-from datetime import datetime, timedelta, timezone, date
-from bson import objectid
-from mongoengine import *
-from icalendar import Calendar
-
-import isodate
 import dateutil.parser
-import requests
+import pytz
+from dateutil.rrule import rrule
 
 from abe import database as db
 from abe.helper_functions.converting_helpers import mongo_to_dict
@@ -58,9 +48,10 @@ def update_sub_event(received_data, parent_event, sub_event_id, ics=False):
                         if the update is coming from an ics feed:
                             - will be a rec_id (datetime object)
     """
-    convert_timezone = lambda a: a.replace(tzinfo=pytz.UTC) if isinstance(a, datetime) else a
+    def convert_timezone(a):
+        return a.replace(tzinfo=pytz.UTC) if isinstance(a, datetime) else a
     for sub_event in parent_event.sub_events:
-        if ics == False:  # if this update is not coming from an ics feed
+        if not ics:  # if this update is not coming from an ics feed
             # if the sub_event to be updated's id matches the id of the received_data
             if sub_event['_id'] == sub_event_id:
                 updated_sub_event_dict = create_new_sub_event_defintion(
@@ -68,12 +59,12 @@ def update_sub_event(received_data, parent_event, sub_event_id, ics=False):
                 updated_sub_event = db.RecurringEventExc(**updated_sub_event_dict)
                 parent_event.update(pull__sub_events___id=sub_event_id)
                 parent_event.update(add_to_set__sub_events=updated_sub_event_dict)
-                if updated_sub_event_dict['forever'] == False:
+                if not updated_sub_event_dict['forever']:
                     parent_event.recurrence_end = find_recurrence_end(parent_event)
                 parent_event.save()
                 parent_event.reload()
                 return(updated_sub_event)
-        elif ics == True:  # if this update is coming from an ics feed
+        else:  # if this update is coming from an ics feed
             sub_event_compare = convert_timezone(sub_event["rec_id"])
             if sub_event_compare == sub_event_id:
                 updated_sub_event_dict = create_new_sub_event_defintion(
@@ -81,7 +72,7 @@ def update_sub_event(received_data, parent_event, sub_event_id, ics=False):
                 updated_sub_event = db.RecurringEventExc(**updated_sub_event_dict)
                 parent_event.update(pull__sub_events__rec_id=sub_event_id)
                 parent_event.update(add_to_set__sub_events=updated_sub_event_dict)
-                if updated_sub_event_dict['forever'] == False:
+                if not updated_sub_event_dict['forever']:
                     parent_event.recurrence_end = find_recurrence_end(parent_event)
                 parent_event.save()
                 parent_event.reload()

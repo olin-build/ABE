@@ -19,7 +19,7 @@ from abe.helper_functions.sub_event_helpers import (create_sub_event, find_recur
                                                     update_sub_event)
 
 
-def create_ics_event(event: db.Event, recurrence=False) -> ical.Event:
+def create_ics_event(event: db.Event, recurrence=False, sub: db.Subscription = None) -> ical.Event:
     """
     This function creates a base ICS event definition. It uses the Event() class of the
     iCalendar library.
@@ -46,7 +46,20 @@ def create_ics_event(event: db.Event, recurrence=False) -> ical.Event:
     new_event = ical.Event()
     new_event.add('summary', event['title'])
     new_event.add('location', event['location'])
-    new_event.add('description', event['description'])
+    description = event['description']
+    if sub:
+        logging.debug("Working with subscription", sub, sub.sid)
+
+        description = description or ''
+        if description:
+            description += '<br>---<br>'
+
+        # TODO: events.olin.build is not always the correct URL here
+        description += 'Event imported from ABE<br>' \
+                       '<a href="http://events.olin.build/subscription/{}">[Edit Subscription Preferences]</a>'.format(
+            sub.sid)
+
+    new_event.add('description', description)
 
     if event['allDay']:
         start_string = 'dtstart;VALUE=DATE'
@@ -122,7 +135,7 @@ def create_ics_recurrence(new_event, recurrence):
     return new_event
 
 
-def mongo_to_ics(events):
+def mongo_to_ics(events, sub: db.Subscription = None):
     """
     creates the iCal based on the MongoDb database and events submitted
     """
@@ -132,7 +145,7 @@ def mongo_to_ics(events):
     cal.add('PRODID', 'ABE')
     cal.add('VERSION', '2.0')
     for event in events:
-        new_event = create_ics_event(event)  # create the base event fields in ics format
+        new_event = create_ics_event(event, sub=sub)  # create the base event fields in ics format
 
         recurrence = event['recurrence']
         if recurrence:
@@ -264,10 +277,11 @@ def extract_ics(cal, ics_url, labels=None):
                         temporary_dict.append(com_dict)
                         logging.debug("temporarily saved recurring event as dict")
                 else:  # if this is a regular event
+                    com_dict['self'] = open('README.md')
                     try:
                         new_event = db.Event(**com_dict).save()
-                    except:  # FIXME: bare except
-                        logging.debug("com_dict: {}".format(com_dict))
+                    except:  # FIXME: bare except # noqa: E722
+                        logging.exception("com_dict: {}", com_dict)
                     if not new_event.labels:  # if the event has no labels
                         new_event.labels = ['unlabeled']
                     if 'recurrence' in new_event:  # if the event has no recurrence_end
@@ -280,7 +294,7 @@ def extract_ics(cal, ics_url, labels=None):
         for sub_event_dict in temporary_dict:
             normal_event = db.Event.objects(__raw__={'UID': sub_event_dict['UID']}).first()
             create_sub_event(sub_event_dict, normal_event)
-            logging.debug("temporarily put off sub_event now saved as mongodb object")
+            logging.debug("temporarily deferred sub_event now saved as mongodb object")
 
 
 def update_ics_to_mongo(component, labels):

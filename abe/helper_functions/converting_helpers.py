@@ -2,24 +2,9 @@
 """Type converting helper functions
 helpful inspiration: https://gist.github.com/jason-w/4969476
 """
-from mongoengine import ValidationError
 
-import logging
-import pdb
-import pytz
-
-from icalendar import Calendar, Event, vCalAddress, vText, vDatetime
-from dateutil.rrule import rrule, MONTHLY, WEEKLY, DAILY, YEARLY
-from datetime import datetime, timedelta, timezone, date
-from bson import objectid
-from mongoengine import *
-from icalendar import Calendar
-
-import isodate
-import dateutil.parser
-import requests
-
-from abe import database as db
+from mongoengine import (BooleanField, DecimalField, DictField, Document, EmbeddedDocument, EmbeddedDocumentField,
+                         ListField, ObjectIdField)
 
 
 def mongo_to_dict(obj):
@@ -34,7 +19,7 @@ def mongo_to_dict(obj):
 
     # converts the mongoDB id for documents to a string from an ObjectID object
     if isinstance(obj, Document):
-        return_data.append(("id",str(obj.id)))
+        return_data.append(("id", str(obj.id)))
 
     for field_name in obj._fields:
 
@@ -70,7 +55,7 @@ def list_field_to_dict(list_field):
             return_data.append(mongo_to_dict(item))
         # convert the data type
         else:
-            return_data.append(mongo_to_python_type(item,item))
+            return_data.append(mongo_to_python_type(item, item))
 
     return return_data
 

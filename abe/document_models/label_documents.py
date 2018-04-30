@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Document models for mongoengine"""
-from bson import ObjectId
-from mongoengine import *
+from mongoengine import BooleanField, Document, ListField, StringField, URLField
 
 
 class Label(Document):

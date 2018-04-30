@@ -4,23 +4,12 @@ helpful inspiration: https://gist.github.com/jason-w/4969476
 """
 from mongoengine import ValidationError
 
-import logging
-import pdb
-import pytz
 
-from icalendar import Calendar, Event, vCalAddress, vText, vDatetime
-from dateutil.rrule import rrule, MONTHLY, WEEKLY, DAILY, YEARLY
-from datetime import datetime, timedelta, timezone, date
+from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from bson import objectid
-from mongoengine import *
-from icalendar import Calendar
 
-import isodate
 import dateutil.parser
-import requests
 
-from abe import database as db
 from abe.helper_functions.converting_helpers import request_to_dict
 
 
@@ -38,8 +27,11 @@ def get_to_event_search(request):
         'students': ['public', 'olin', 'students'],
     }
 
-    split_into_list = lambda a: a if isinstance(a, list) else a.split(',')
-    ensure_date_time = lambda a: dateutil.parser.parse(a) if not isinstance(a, datetime) else a
+    def split_into_list(a):
+        return a if isinstance(a, list) else a.split(',')
+
+    def ensure_date_time(a):
+        return dateutil.parser.parse(a) if not isinstance(a, datetime) else a
 
     preprocessing = {
         'labels': split_into_list,  # split labels on commas if not already list
@@ -70,24 +62,24 @@ def event_query(search_dict):
     By default FullCalendar sends 'start' and 'end' as ISO8601 date strings
     Has two queries: one for regular events and one for recurring events"""
 
-    #the key in params dicts maps to the keys in the request given
-    #the keys in the lambda functions map to the keys in MongoDb
+    # the key in params dicts maps to the keys in the request given
+    # the keys in the lambda functions map to the keys in MongoDb
     params_reg_event = {
-        'start': lambda a: {'end' : {'$gte': a}},
-        'end': lambda a: {'start' : {'$lte': a}},
-        'labels': lambda a: {'labels' : {'$in': a}},
-        'labels_and': lambda a: {'labels' : {'$all': a}},
-        'labels_not': lambda a: {'labels' :{'$nin': a}},
-        'visibility': lambda a: {'visibility' : {'$in': a}},
+        'start': lambda a: {'end': {'$gte': a}},
+        'end': lambda a: {'start': {'$lte': a}},
+        'labels': lambda a: {'labels': {'$in': a}},
+        'labels_and': lambda a: {'labels': {'$all': a}},
+        'labels_not': lambda a: {'labels': {'$nin': a}},
+        'visibility': lambda a: {'visibility': {'$in': a}},
     }
 
     params_recu_event = {
-        'start': lambda a: {'recurrence_end' : {'$gte': a}},
-        'end': lambda a: {'start' : {'$lte': a}},
-        'labels': lambda a: {'labels' : {'$in': a}},
-        'labels_and': lambda a: {'labels' : {'$all': a}},
-        'labels_not': lambda a: {'labels' :{'$nin': a}},
-        'visibility': lambda a: {'visibility' : {'$in': a}},
+        'start': lambda a: {'recurrence_end': {'$gte': a}},
+        'end': lambda a: {'start': {'$lte': a}},
+        'labels': lambda a: {'labels': {'$in': a}},
+        'labels_and': lambda a: {'labels': {'$all': a}},
+        'labels_not': lambda a: {'labels': {'$nin': a}},
+        'visibility': lambda a: {'visibility': {'$in': a}},
     }
 
     # query for regular events
@@ -102,7 +94,7 @@ def event_query(search_dict):
             query_rec_event.update(get_pattern(search_dict[key]))
 
     # query for recurring events with no end date
-    query_forever = {'start' : {'$lte': search_dict['end']}, 'forever' : True}
+    query_forever = {'start': {'$lte': search_dict['end']}, 'forever': True}
 
     query = {'$or': [query_rec_event, query_reg_event, query_forever]}
     return query

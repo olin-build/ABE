@@ -1,17 +1,23 @@
 language: python
+
 python:
   - '3.6'
+
 cache: pip
+services: mongodb
+
 install:
   - cp .env.template .env
   - pip install pipenv
   - pipenv install --dev --ignore-pipfile
+
 script:
-  - pipenv run python -m unittest
-  # The disjunction prevents flake8 failures from failing the Travis build.
-  # TODO: fix the files, and make this a build failure
-  - pipenv run flake8 abe || echo 'flake8 failed'
-services: mongodb
+  - pipenv run coverage run --source abe -m unittest
+  - pipenv run flake8 abe
+
+after_success:
+  - codecov
+
 notifications:
   slack:
     secure: SNltBAjqOu0c/Alw3euAtEEGBDgKRafbRU7BFVv2LJJOnjocwwcJPpQIk4VSPQsl+WoIc1YwpZ/S4jW/DvkCQW+Fm3NukQCXD6iMeeAn4oIwnJ6vfV/QaL1H8JWkklT+gpATCZ76NoVYH2WXt8xbaVWX42l9jzaXyCpDtdm9x/ijCrCkmwsvvv74BrSEiOwegmIPAoqk8dv5DFvBk8sSrbMEA3EY2JNs2zzL1cumCfjGNghXZ5f+Jb3TX7/HYqGGtvmzFvo3UlM0Qq1C7FMyxMWRqzvFLwEL5uSxLA38DJjzogiiBSvGC/GPL9PC0UVtVIFZ4O/nJNemJmqMGOE/4WnmstAbWeASycH1BoJ6gyq0tGZ/rxWH7wxvB0yJSOA6gM3CmzTtU6zBAPbD2UavyAHmKW4EGxbKtv4BlO5Ndb+0AWjYQfRuncdEUroOdffq3sPRPruwmotz6+AHsb4DAIajCbWtHRmv7dlMPIT4/+KxIYRlr9JHnIM9HFk46Gw4rrt6wBY00p1EA1texH5aJDPXcDdQzxtDbo6OSprcLaK/Je2IA2ZZUW8frrdJqErQ2XGbfeU00qCjhZl6uUN9wqswoeQ0mjkeyiBwx+MouF1gILWlPe5vE67nQet+v/t3NebGTpz5+IkWqcfPoE5fZxD+KxWyaaFue/PPvFPGcpQ=

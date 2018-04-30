@@ -1,28 +1,17 @@
 #!/usr/bin/env python3
 """Subscription Resource models for flask"""
 
-from flask import jsonify, request, abort, Response, make_response, Request
-from flask_restplus import Resource, fields, Namespace
-from mongoengine import ValidationError
-from bson.objectid import ObjectId
-from pprint import pprint, pformat
-from bson import json_util, objectid
-from datetime import datetime, timedelta
-from dateutil.rrule import rrule, MONTHLY, WEEKLY, DAILY, YEARLY
-from icalendar import Calendar
-import isodate
-
-import pdb
-import requests
-
 import logging
+
+from flask import Response, request
+from mongoengine import ValidationError
 
 from abe import database as db
 from abe.document_models.subscription_documents import Subscription
 from abe.helper_functions.converting_helpers import request_to_dict
-from abe.helper_functions.query_helpers import get_to_event_search, event_query
-from abe.helper_functions.ics_helpers import mongo_to_ics, extract_ics
-from abe.helper_functions.query_helpers import multi_search
+from abe.helper_functions.ics_helpers import mongo_to_ics
+from abe.helper_functions.query_helpers import event_query, get_to_event_search
+from flask_restplus import Namespace, Resource, fields
 
 api = Namespace('subscriptions', description='Subscription related operations')
 
@@ -123,7 +112,7 @@ class SubscriptionICS(Resource):
         """
         req_dict = request_to_dict(request)
 
-        sub = db.Subscription.objects(sid=subscription_id).first()
+        sub = db.Subscription.objects(sid=subscription_id).first()  # type: Subscription
 
         if not sub:
             return "Subscription not found with identifier '{}'".format(subscription_id), 404
@@ -139,7 +128,7 @@ class SubscriptionICS(Resource):
         results = db.Event.objects(__raw__=query)
 
         # converts mongoDB objects to an ICS format
-        response = mongo_to_ics(results)
+        response = mongo_to_ics(results, sub=sub)
         logging.debug("ics feed created for Subscription {}".format(sub.id))
         cd = "attachment;filename=abe.ics"
         return Response(response,

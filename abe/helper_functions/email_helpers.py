@@ -149,9 +149,8 @@ def smtp_connect():
         server = smtplib.SMTP_SSL(ABE_EMAIL_HOST, ABE_EMAIL_PORT)
         server.ehlo()
         server.login(ABE_EMAIL_USERNAME, ABE_EMAIL_PASSWORD)
-    # FIXME: catch the specific exception type
-    except:
-        logging.error(f'Connecting to {ABE_EMAIL_HOST} failed...')
+    except (smtplib.SMTPException, ConnectionRefusedError) as e:
+        logging.error(f'Connecting to {ABE_EMAIL_HOST} failed: {e}')
         # FIXME: callers do not handle a `None` return, and will error
         # on upacking this.
         return
@@ -216,13 +215,3 @@ def scrape():
     for cal in cals:
         completed.append(cal_to_event(cal))
     return completed
-
-
-if __name__ == '__main__':
-    cals = email_test('test_email.txt')
-    for cal in cals:
-        ical_to_dict(cal)
-    # messages = get_messages_from_email()
-    # calendars = get_calendars_from_messages(messages)
-    # for calendar in calendars:
-    #     print(calendar)
