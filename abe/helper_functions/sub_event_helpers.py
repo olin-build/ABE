@@ -2,22 +2,12 @@
 """Sub event helper functions
 helpful inspiration: https://gist.github.com/jason-w/4969476
 """
-from mongoengine import ValidationError
 
-import logging
-import pdb
-import pytz
+from datetime import date, datetime, timedelta
 
-from icalendar import Calendar, Event, vCalAddress, vText, vDatetime
-from dateutil.rrule import rrule, MONTHLY, WEEKLY, DAILY, YEARLY
-from datetime import datetime, timedelta, timezone, date
-from bson import objectid
-from mongoengine import *
-from icalendar import Calendar
-
-import isodate
 import dateutil.parser
-import requests
+import pytz
+from dateutil.rrule import rrule
 
 from abe import database as db
 from abe.helper_functions.converting_helpers import mongo_to_dict
@@ -58,7 +48,8 @@ def update_sub_event(received_data, parent_event, sub_event_id, ics=False):
                         if the update is coming from an ics feed:
                             - will be a rec_id (datetime object)
     """
-    convert_timezone = lambda a: a.replace(tzinfo=pytz.UTC) if isinstance(a, datetime) else a
+    def convert_timezone(a):
+        return a.replace(tzinfo=pytz.UTC) if isinstance(a, datetime) else a
     for sub_event in parent_event.sub_events:
         if ics == False:  # if this update is not coming from an ics feed
             # if the sub_event to be updated's id matches the id of the received_data
@@ -147,8 +138,6 @@ def instance_creation(event, start=None, end=None):
 
     rFrequency = rec_type_list.index(recurrence['frequency'])
     rStart = convert_timezone(ensure_date_time(event['start']))
-    if start and start > rStart:  # if we're searching starting after the beginning of the recurring event, start there to speed up rrule
-        rStart = start
     if recurrence['frequency'] == 'YEARLY':
         # extracts the month and day from the date
         rByMonth = int(rStart.month)
@@ -172,14 +161,17 @@ def instance_creation(event, start=None, end=None):
             rByDay = None
 
     rInterval = int(recurrence['interval'])
-    if recurrence.forever == True:
-        rUntil = convert_timezone(ensure_date_time(end)) if end is not None else None
-    else:
-        rUntil = convert_timezone(ensure_date_time(recurrence['until'])) if 'until' in recurrence else end
     rCount = int(recurrence['count']) if 'count' in recurrence else None
+    if rCount is None:
+        if recurrence.forever:
+            rUntil = convert_timezone(ensure_date_time(end)) if end is not None else None
+        else:
+            rUntil = convert_timezone(ensure_date_time(recurrence['until'])) if 'until' in recurrence else end
+    else:
+        rUntil = None
 
-    rule_list = list(rrule(freq=rFrequency, count=rCount, interval=rInterval, until=rUntil, bymonth=rByMonth, \
-        bymonthday=rByMonthDay, byweekday=rByDay, dtstart=rStart))
+    rule_list = list(rrule(freq=rFrequency, count=rCount, interval=rInterval, until=rUntil, bymonth=rByMonth,
+                           bymonthday=rByMonthDay, byweekday=rByDay, dtstart=rStart))
     return(rule_list)
 
 

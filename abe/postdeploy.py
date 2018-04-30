@@ -7,7 +7,6 @@ import os
 from .sample_data import load_data
 from pymongo import MongoClient
 
-import pdb
 
 logging.info('Performing postdeploy process')
 db_name = os.getenv("HEROKU_APP_NAME", "testing")
