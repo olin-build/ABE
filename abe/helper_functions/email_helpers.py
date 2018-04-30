@@ -4,10 +4,11 @@ import logging
 import os
 import poplib
 import smtplib
-from io import StringIO
 
 import icalendar as ic
 from mongoengine import ValidationError
+from datetime import datetime as dt
+from email.message import EmailMessage
 
 from abe import database as db
 from abe.helper_functions.converting_helpers import mongo_to_dict
@@ -161,45 +162,44 @@ def error_reply(to, error):
     """ Given the error, sends an email with the errors that
     occured to the original sender. """
     server, sent_from = smtp_connect()
-    subject = 'Event Failed to Add'
+    msg = EmailMessage()
     body = "ABE didn't manage to add the event, sorry. Here's what went wrong: \n"
     for err in error.errors:
         body = body + str(err) + '\n'
     body = body + "Final error message: " + error.message
 
-    email_text = """
-    From: {}
-    To: {}
-    Subject: {}
-
-    {}
-    """.format(sent_from, to, subject, body)
-
-    send_email(server, email_text, sent_from, to)
+    email_text = f"""{body}
+    """
+    msg['Subject'] = 'Event Failed to Add'
+    msg['From'] = sent_from
+    msg['To'] = [to]
+    msg.set_content(body)
+    server.send_message(msg)
+    server.close()
+    # send_email(server, email_text, sent_from, to)
 
 
 def reply_email(to, event_dict):
     """ Responds after a successful posting with
     the tags under which the event was saved. """
     server, sent_from = smtp_connect()
-    subject = '{} added to ABE!'.format(event_dict['title'])
     tags = ', '.join(event_dict['labels']).strip()
+    start = dt.strptime(event_dict['start'][:16], '%Y-%m-%d %H:%M').strftime('%I:%M %m/%d')
+    end = dt.strptime(event_dict['end'][:16], '%Y-%m-%d %H:%M').strftime('%I:%M %m/%d')
     body = "Your event was added to ABE! Here's the details: "
 
-    email_text = """
-    From: {}
-    To: {}
-    Subject: {}
+    email_text = f"""{body}
+    Time: {start} to {end}
+    Description: {event_dict['description']}
+    Tags: {tags}
+    """
 
-    {}
-    Description: {}
-    Tags: {}
-    """.format(sent_from, to, subject, body, event_dict['description'], tags)
-    send_email(server, email_text, sent_from, to)
-
-
-def send_email(server, email_text, sent_from, sent_to):
-    server.sendmail(sent_from, sent_to, email_text.encode('utf-8'))
+    msg = EmailMessage()
+    msg['Subject'] = f"{event_dict['title']} added to ABE!"
+    msg['From'] = sent_from
+    msg['To'] = [to]
+    msg.set_content(body)
+    server.send_message(msg)
     server.close()
 
 
