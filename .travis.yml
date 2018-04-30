@@ -13,10 +13,7 @@ install:
 
 script:
   - pipenv run coverage run --source abe -m unittest
-  # The || below prevents flake8 errors from failing the Travis build, since we
-  # aren't, yet ready for that.
-  # TODO: fix the flake8 issues, and remove the || to make this a build failure.
-  - pipenv run flake8 abe || echo 'flake8 failed'
+  - pipenv run flake8 abe
 
 after_success:
   - codecov
