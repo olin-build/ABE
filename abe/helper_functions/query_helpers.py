@@ -10,7 +10,6 @@ from dateutil.relativedelta import relativedelta
 
 import dateutil.parser
 
-from abe import database as db
 from abe.helper_functions.converting_helpers import request_to_dict
 
 

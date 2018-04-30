@@ -5,10 +5,12 @@ import os
 
 from mongoengine import connect
 
-from .document_models.event_documents import Event, RecurringEventExc
-from .document_models.ics_documents import ICS
-from .document_models.label_documents import Label
-from .document_models.subscription_documents import Subscription
+# These imports are for effect. They define the document types, that mongodb
+# uses to unserialize.
+from .document_models.event_documents import Event, RecurringEventExc  # noqa: F401
+from .document_models.ics_documents import ICS  # noqa: F401
+from .document_models.label_documents import Label  # noqa: F401
+from .document_models.subscription_documents import Subscription  # noqa: F401
 
 config_present = False
 try:
