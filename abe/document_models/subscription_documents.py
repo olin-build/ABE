@@ -2,8 +2,7 @@
 """Document models for mongoengine"""
 import random
 
-from mongoengine import *
-from bson import ObjectId
+from mongoengine import Document, ListField, StringField
 
 
 class Subscription(Document):

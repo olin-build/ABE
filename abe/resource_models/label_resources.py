@@ -64,7 +64,6 @@ class LabelApi(Resource):
         else:  # return success
             return mongo_to_dict(new_label), 201
 
-
     @edit_auth_required
     @api.expect(label_model)
     def put(self, label_name):
