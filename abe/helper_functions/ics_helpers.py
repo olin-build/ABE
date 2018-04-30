@@ -26,7 +26,7 @@ from abe.helper_functions.sub_event_helpers import create_sub_event, update_sub_
     find_recurrence_end
 
 
-def create_ics_event(event: db.Event, recurrence=False) -> Event:
+def create_ics_event(event: db.Event, recurrence=False, sub: db.Subscription = None) -> Event:
     """
     This function creates a base ICS event definition. It uses the Event() class of the
     iCalendar library.
@@ -53,7 +53,20 @@ def create_ics_event(event: db.Event, recurrence=False) -> Event:
     new_event = Event()
     new_event.add('summary', event['title'])
     new_event.add('location', event['location'])
-    new_event.add('description', event['description'])
+    description = event['description']
+    if sub:
+        logging.debug("Working with subscription", sub, sub.sid)
+
+        description = description or ''
+        if description:
+            description += '<br>---<br>'
+
+        # TODO: events.olin.build is not always the correct URL here
+        description += 'Event imported from ABE<br>' \
+                       '<a href=http://events.olin.build/subscription/{}>[Edit Subscription Preferences]</a>'.format(
+            sub.sid)
+
+    new_event.add('description', description)
 
     if event['allDay']:
         start_string = 'dtstart;VALUE=DATE'
@@ -129,7 +142,7 @@ def create_ics_recurrence(new_event, recurrence):
     return new_event
 
 
-def mongo_to_ics(events):
+def mongo_to_ics(events, sub: db.Subscription = None):
     """
     creates the iCal based on the MongoDb database and events submitted
     """
@@ -139,7 +152,7 @@ def mongo_to_ics(events):
     cal.add('PRODID', 'ABE')
     cal.add('VERSION', '2.0')
     for event in events:
-        new_event = create_ics_event(event)  # create the base event fields in ics format
+        new_event = create_ics_event(event, sub=sub)  # create the base event fields in ics format
 
         recurrence = event['recurrence']
         if recurrence:

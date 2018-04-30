@@ -123,7 +123,7 @@ class SubscriptionICS(Resource):
         """
         req_dict = request_to_dict(request)
 
-        sub = db.Subscription.objects(sid=subscription_id).first()
+        sub = db.Subscription.objects(sid=subscription_id).first()  # type: Subscription
 
         if not sub:
             return "Subscription not found with identifier '{}'".format(subscription_id), 404
@@ -139,7 +139,7 @@ class SubscriptionICS(Resource):
         results = db.Event.objects(__raw__=query)
 
         # converts mongoDB objects to an ICS format
-        response = mongo_to_ics(results)
+        response = mongo_to_ics(results, sub=sub)
         logging.debug("ics feed created for Subscription {}".format(sub.id))
         cd = "attachment;filename=abe.ics"
         return Response(response,
