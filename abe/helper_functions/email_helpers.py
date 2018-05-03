@@ -173,7 +173,7 @@ def error_reply(to, error):
     msg['Subject'] = 'Event Failed to Add'
     msg['From'] = sent_from
     msg['To'] = [to]
-    msg.set_content(body)
+    msg.set_content(email_text)
     server.send_message(msg)
     server.close()
     # send_email(server, email_text, sent_from, to)
@@ -199,7 +199,7 @@ def reply_email(to, event_dict):
     msg['Subject'] = f"{event_dict['title']} added to ABE!"
     msg['From'] = sent_from
     msg['To'] = [to]
-    msg.set_content(body)
+    msg.set_content(email_text)
     server.send_message(msg)
     server.close()
 
