@@ -79,9 +79,8 @@ class EmailHelpersTestCase(abe_unittest.TestCase):
             server.ehlo.assert_called()
             server.login.assert_called()
 
-    @patch('abe.helper_functions.email_helpers.send_email', return_value=None)
     @patch('abe.helper_functions.email_helpers.smtp_connect', return_value=(serv,'from_addr'))
-    def test_error_reply(self, smtp, send):
+    def test_error_reply(self, smtp):
         error = Mock()
         error.errors = [12]
         error.message = "This is an error message"
@@ -92,9 +91,8 @@ class EmailHelpersTestCase(abe_unittest.TestCase):
         serv.close.assert_called()
 
 
-    @patch('abe.helper_functions.email_helpers.send_email', return_value=None)
     @patch('abe.helper_functions.email_helpers.smtp_connect', return_value=(serv,'from_addr'))
-    def test_reply_email(self, smtp, send):
+    def test_reply_email(self, smtp):
         event_dict = {'title':'Test',
         'start':'2018-04-30 14:51:24',
         'end':'2018-04-30 14:51:24',
@@ -107,9 +105,8 @@ class EmailHelpersTestCase(abe_unittest.TestCase):
         serv.send_message.assert_called()
         serv.close.assert_called()
 
-    @patch('abe.helper_functions.email_helpers.send_email', return_value=None)
     @patch('abe.helper_functions.email_helpers.smtp_connect', return_value=(serv, 'from_addr'))
     @patch('abe.helper_functions.email_helpers.get_messages_from_email', return_value=[message])
-    def test_scrape(self, msgs_from_email, smtp, send):
+    def test_scrape(self, msgs_from_email, smtp):
         completed = email_helpers.scrape()
         self.assertEqual(len(completed), 1)
