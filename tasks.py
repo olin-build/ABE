@@ -1,24 +1,27 @@
-from celery import Celery
-from abe.helper_functions.ics_helpers import update_ics_feed
-from abe.helper_functions.email_helpers import scrape
-from abe import database as db
-import time 
 import logging
 
-#Specify mongodb host and datababse to connect to
+from celery import Celery
+
+from abe import database as db
+from abe.helper_functions.email_helpers import scrape
+from abe.helper_functions.ics_helpers import update_ics_feed
+
+# Specify mongodb host and datababse to connect to
 BROKER_URL = db.return_uri()
 
-celery = Celery('EOD_TASKS',broker=BROKER_URL)
+celery = Celery('EOD_TASKS', broker=BROKER_URL)
 
-#Loads settings for Backend to store results of jobs 
+# Loads settings for Backend to store results of jobs
 celery.config_from_object('celeryconfig')
+
 
 @celery.task
 def refresh_calendar():
-	update_ics_feed()
-	return("did the stuff")
+    update_ics_feed()
+    logging.info("updated the ICS feed")
+
 
 @celery.task
 def parse_email_icals():
-	completed_events = scrape()
-	return("scraped the emails")
+    scrape()
+    logging.info("scraped the emails")
