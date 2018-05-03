@@ -16,7 +16,7 @@ env:
 install:
   - cp .env.template .env
   - pip install pipenv
-  - yes | pipenv install --dev --ignore-pipfile
+  - pipenv install --dev --ignore-pipfile
 
 script:
   - pipenv run coverage run --source abe -m unittest
