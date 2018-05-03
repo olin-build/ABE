@@ -19,6 +19,7 @@ ABE_EMAIL_USERNAME = os.environ.get('ABE_EMAIL_USERNAME', None)
 ABE_EMAIL_PASSWORD = os.environ.get('ABE_EMAIL_PASSWORD', None)
 ABE_EMAIL_HOST = os.environ.get('ABE_EMAIL_HOST', 'mail.privateemail.com')
 ABE_EMAIL_PORT = int(os.environ.get('ABE_EMAIL_PORT', 465))
+APP_URL = os.environ.get('APP_URL', 'events.olin.build')
 
 
 def get_msg_list(pop_items, pop_conn):
@@ -191,6 +192,7 @@ def reply_email(to, event_dict):
     Time: {start} to {end}
     Description: {event_dict['description']}
     Tags: {tags}
+    Something wrong? Edit this event at {APP_URL}/edit/{event_dict['id']}
     """
 
     msg = EmailMessage()
