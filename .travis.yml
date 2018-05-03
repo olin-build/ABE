@@ -1,10 +1,17 @@
 language: python
 
-python:
-  - '3.6'
+group: travis_latest
 
-cache: pip
-services: mongodb
+python: '3.6.5'
+
+cache:
+  - pip
+
+services:
+  - mongodb
+
+env:
+  - PIPENV_IGNORE_VIRTUALENVS=1
 
 install:
   - cp .env.template .env
