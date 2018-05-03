@@ -26,6 +26,10 @@
       "description": "Enforce SSL via HSTS",
       "value": "True",
       "required": true
+    },
+    "SHARED_SECRET": {
+      "description": "A secret key for verifying the integrity of signed cookies.",
+      "generator": "secret"
     }
   },
   "formation": {

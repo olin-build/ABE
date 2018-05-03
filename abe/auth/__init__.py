@@ -3,7 +3,7 @@
 import os
 from functools import wraps
 
-from flask import request, abort
+from flask import request, abort, g
 from netaddr import IPNetwork, IPSet
 
 # A set of IP addresses with edit permission.
@@ -17,6 +17,15 @@ from netaddr import IPNetwork, IPSet
 INTRANET_IPS = (IPSet([IPNetwork(s) for s in os.environ.get('INTRANET_IPS', '').split(',')])
                 if 'INTRANET_IPS' in os.environ else IPSet(['0.0.0.0/0', '0000:000::/0']))
 
+shared_secret = os.environ["SHARED_SECRET"] # Should fail if not set
+
+
+def after_this_request(f): # For setting cookie
+    if not hasattr(g, 'after_request_callbacks'):
+        g.after_request_callbacks = []
+    g.after_request_callbacks.append(f)
+    return f
+
 
 def edit_auth_required(f):
     "Decorates f to raise an HTTP UNAUTHORIZED exception if the client IP is not in the list of authorized IPs."
@@ -24,7 +33,13 @@ def edit_auth_required(f):
     def wrapped(*args, **kwargs):
         client_ip = request.headers.get(
             'X-Forwarded-For', request.remote_addr).split(',')[-1]
-        if client_ip not in INTRANET_IPS:
-            abort(401)
+        if client_ip in INTRANET_IPS:
+            @after_this_request
+            def remember_language(response):
+                response.set_cookie('app_secret', shared_secret)
+        else:
+            with request.cookies.get('app_secret') as app_secret:
+                if app_secret != shared_secret:
+                    abort(401)
         return f(*args, **kwargs)
     return wrapped
