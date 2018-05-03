@@ -32,10 +32,14 @@ event_model = api.model('Events_Model', {
     'allDay': fields.Boolean
 })
 
+#events_model = api.model('Event_List_Model', fields.List(event_model))
 
+@api.route('/<event_id>/<rec_id>')
 class EventApi(Resource):
     """API for interacting with events"""
 
+    @api.doc(params={'event_id':'the id of the mongoDB event requested to be found'})
+    @api.response(200, 'Success', event_model)
     def get(self, event_id=None, rec_id=None):
         """
         Retrieve events from mongoDB
@@ -107,6 +111,9 @@ class EventApi(Resource):
 
     @edit_auth_required
     @api.expect(event_model)
+    @api.response(201, 'Created')
+    @api.response(400, 'Validation Error')
+    @api.response(401, 'Unauthorized Access')
     def post(self):
         """
         Create new event with parameters passed in through args or form
