@@ -3,13 +3,19 @@ language: python
 python:
   - '3.6'
 
-cache: pip
-services: mongodb
+cache:
+  - pip
+
+services:
+  - mongodb
+
+env:
+  - PIPENV_IGNORE_VIRTUALENVS=1
 
 install:
   - cp .env.template .env
   - pip install pipenv
-  - pipenv install --dev --ignore-pipfile
+  - yes | pipenv install --dev --ignore-pipfile
 
 script:
   - pipenv run coverage run --source abe -m unittest

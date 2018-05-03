@@ -4,7 +4,7 @@ url = "https://pypi.python.org/simple"
 verify_ssl = true
 
 [requires]
-python_full_version = "3.6.4" #https://devcenter.heroku.com/articles/python-runtimes
+python_full_version = "3.6.5" #https://devcenter.heroku.com/articles/python-runtimes
 
 [packages]
 amqp = ">=1.4.9"
