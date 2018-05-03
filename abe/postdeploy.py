@@ -1,21 +1,26 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""Script used to create databases for Heroku review apps"""
+"""Script used to create databases for Heroku review apps.
+
+The postdeploy script in app.json invokes this.
+"""
 import logging
-logging.basicConfig(level=logging.DEBUG)
 import os
-from .sample_data import load_data
+
 from pymongo import MongoClient
+
+from . import database as db
+from .database import mongo_uri
+from .sample_data import load_data
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 logging.info('Performing postdeploy process')
 db_name = os.getenv("HEROKU_APP_NAME", "testing")
-logging.warning('Dropping db "{}"'.format(db_name))
-from .database import mongo_uri, mongo_db_name
+logging.warning('Dropping mongodb db %s', db_name)
 client = MongoClient(mongo_uri)  # use pymongo to drop database
 client.drop_database(db_name)
 client.close()
-logging.warning('Filling db "{}" with sample data'.format(db_name))
-from . import database as db
+logging.warning('Filling mongodb db %s with sample data', db_name)
 load_data(db)  # fill database with mongoengine
 logging.info('Finished postdeploy process')
