@@ -167,16 +167,12 @@ def error_reply(to, error):
     for err in error.errors:
         body = body + str(err) + '\n'
     body = body + "Final error message: " + error.message
-
-    email_text = f"""{body}
-    """
     msg['Subject'] = 'Event Failed to Add'
     msg['From'] = sent_from
     msg['To'] = [to]
-    msg.set_content(email_text)
+    msg.set_content(body)
     server.send_message(msg)
     server.close()
-    # send_email(server, email_text, sent_from, to)
 
 
 def reply_email(to, event_dict):
@@ -186,20 +182,17 @@ def reply_email(to, event_dict):
     tags = ', '.join(event_dict['labels']).strip()
     start = dt.strptime(event_dict['start'][:16], '%Y-%m-%d %H:%M').strftime('%I:%M %m/%d')
     end = dt.strptime(event_dict['end'][:16], '%Y-%m-%d %H:%M').strftime('%I:%M %m/%d')
-    body = "Your event was added to ABE! Here's the details: "
-
-    email_text = f"""{body}
+    body = f"""Your event was added to ABE! Here's the details: 
     Time: {start} to {end}
     Description: {event_dict['description']}
     Tags: {tags}
     Something wrong? Edit this event at {APP_URL}/edit/{event_dict['id']}
     """
-
     msg = EmailMessage()
     msg['Subject'] = f"{event_dict['title']} added to ABE!"
     msg['From'] = sent_from
     msg['To'] = [to]
-    msg.set_content(email_text)
+    msg.set_content(body)
     server.send_message(msg)
     server.close()
 
