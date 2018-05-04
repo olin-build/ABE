@@ -3,20 +3,18 @@
 """
 import os
 import unittest
-import sys
 from importlib import reload
 
 import flask
-from flask import request
 from werkzeug.exceptions import HTTPException
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from abe import auth
+from abe import auth  # noqa: F401
 
 app = flask.Flask(__name__)
 
 
 class AuthTestCase(unittest.TestCase):
+
     def test_intranet_ips(self):
         global auth
         os.environ['INTRANET_IPS'] = '127.0.0.1/24'
@@ -84,7 +82,3 @@ class AuthTestCase(unittest.TestCase):
         with app.test_request_context('/', headers={"COOKIE": "app_secret=security"},
                                       environ_base={'REMOTE_ADDR': '127.0.1.1'}):
             assert route() == 'ok'
-
-
-if __name__ == '__main__':
-    unittest.main()
