@@ -38,8 +38,7 @@ def edit_auth_required(f):
             def remember_computer(response):
                 response.set_cookie('app_secret', shared_secret)
         else:
-            with request.cookies.get('app_secret') as app_secret:
-                if (not shared_secret) or (app_secret != shared_secret):
-                    abort(401)
+            if (not shared_secret) or (request.cookies.get('app_secret') != shared_secret):
+                abort(401)
         return f(*args, **kwargs)
     return wrapped
