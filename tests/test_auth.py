@@ -82,3 +82,8 @@ class AuthTestCase(unittest.TestCase):
         with app.test_request_context('/', headers={"COOKIE": "app_secret=security"},
                                       environ_base={'REMOTE_ADDR': '127.0.1.1'}):
             assert route() == 'ok'
+        with app.test_request_context('/', headers={"COOKIE": "app_secret=obscurity"},
+                                      environ_base={'REMOTE_ADDR': '127.0.1.1'}):
+            with self.assertRaises(HTTPException) as http_error:
+                route()
+            self.assertEqual(http_error.exception.code, 401)
