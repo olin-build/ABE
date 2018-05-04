@@ -3,7 +3,7 @@
 import os
 from functools import wraps
 
-from flask import request, abort, after_this_request
+from flask import request, abort, g
 from netaddr import IPNetwork, IPSet
 
 # A set of IP addresses with edit permission.
@@ -20,12 +20,15 @@ INTRANET_IPS = (IPSet([IPNetwork(s) for s in os.environ.get('INTRANET_IPS', '').
 shared_secret = os.environ.get("SHARED_SECRET", None)
 
 
+def after_this_request(f):  # For setting cookie
+    if not hasattr(g, 'after_request_callbacks'):
+        g.after_request_callbacks = []
+    g.after_request_callbacks.append(f)
+    return f
+
+
 def edit_auth_required(f):
-    """
-    Decorates f to check if client is or has been in IP whitelist.
-    If authorized, uses deferred callback to set an authorized cookie.
-    Raises an HTTP UNAUTHORIZED exception otherwise.
-    """
+    "Decorates f to raise an HTTP UNAUTHORIZED exception if the client IP is not in the list of authorized IPs."
     @wraps(f)
     def wrapped(*args, **kwargs):
         client_ip = request.headers.get(
