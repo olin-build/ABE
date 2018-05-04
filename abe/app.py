@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Main flask app"""
-from flask import Flask, render_template, jsonify, g
+from flask import Flask, render_template, jsonify
 from flask_restplus import Api
 from flask_cors import CORS
 from flask_sslify import SSLify  # redirect to https
@@ -70,13 +70,6 @@ def output_json(data, code, headers=None):
     resp.status_code = code
     resp.headers.extend(headers or {})
     return resp
-
-
-@app.after_request
-def call_after_request_callbacks(response):  # For deferred callbacks
-    for callback in getattr(g, 'after_request_callbacks', ()):
-        callback(response)
-    return response
 
 
 # Route resources
