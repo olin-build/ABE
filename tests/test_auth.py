@@ -15,6 +15,7 @@ from abe import auth
 
 app = flask.Flask(__name__)
 
+
 class AuthTestCase(unittest.TestCase):
     def test_intranet_ips(self):
         global auth
@@ -75,6 +76,15 @@ class AuthTestCase(unittest.TestCase):
                                       headers={'X-Forwarded-For': '127.0.0.1,192.168.0.1'}):
             with self.assertRaises(HTTPException) as http_error:
                 route()
+
+        # Test auth cookie
+        os.environ['SHARED_SECRET'] = 'security'
+        auth = reload(auth)
+
+        with app.test_request_context('/', headers={"COOKIE": "app_secret=security"},
+                                      environ_base={'REMOTE_ADDR': '127.0.1.1'}):
+            assert route() == 'ok'
+
 
 if __name__ == '__main__':
     unittest.main()
