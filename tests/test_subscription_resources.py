@@ -1,13 +1,9 @@
-from datetime import datetime
 from unittest import skip
-
-import icalendar
 
 from . import abe_unittest
 from .context import abe  # noqa: F401
 
 # This import has to happen after .context sets the environment variables
-# from abe.document_model import subscription_documents  # isort:skip
 from abe.resource_models import subscription_resources  # isort:skip
 
 
