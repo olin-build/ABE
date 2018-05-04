@@ -28,7 +28,7 @@
       "required": true
     },
     "SHARED_SECRET": {
-      "description": "A secret key for verifying the integrity of signed cookies.",
+      "description": "A shared secret for an authorized user cookie",
       "generator": "secret"
     }
   },
