@@ -11,11 +11,10 @@ import abe.app  # isort:skip
 from abe import sample_data  # isort:skip
 
 
-class AbeTestCase(abe_unittest.TestCase):
+class EventsTestCase(abe_unittest.TestCase):
 
     def setUp(self):
         super().setUp()
-        abe.app.app.debug = True  # enable debug to prevent https redirects
         self.app = abe.app.app.test_client()
         sample_data.load_data(self.db)
 
