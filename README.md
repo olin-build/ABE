@@ -157,7 +157,7 @@ $ open htmlcov/index.html
 Lint all the things:
 
 ```shell
-$ flake8 abe *.py
+$ flake8 abe tests *.py
 ```
 
 ## API Documentation

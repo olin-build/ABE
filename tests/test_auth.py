@@ -3,19 +3,18 @@
 """
 import os
 import unittest
-import sys
 from importlib import reload
 
 import flask
-from flask import request
 from werkzeug.exceptions import HTTPException
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from abe import auth
+from abe import auth  # # noqa: F401
 
 app = flask.Flask(__name__)
 
+
 class AuthTestCase(unittest.TestCase):
+
     def test_intranet_ips(self):
         global auth
         os.environ['INTRANET_IPS'] = '127.0.0.1/24'
@@ -75,6 +74,3 @@ class AuthTestCase(unittest.TestCase):
                                       headers={'X-Forwarded-For': '127.0.0.1,192.168.0.1'}):
             with self.assertRaises(HTTPException) as http_error:
                 route()
-
-if __name__ == '__main__':
-    unittest.main()
