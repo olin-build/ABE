@@ -102,7 +102,6 @@ class EventsTestCase(abe_unittest.TestCase):
             self.assertEqual(response.status_code, 201)
 
         with self.subTest("succeeds due to auth cookie"):
-            # self.cookie_jar.clear()  # clear existing auth cookie
             response = self.app.post(
                 '/events/',
                 data=flask.json.dumps(event),
