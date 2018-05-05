@@ -74,3 +74,24 @@ class AuthTestCase(unittest.TestCase):
                                       headers={'X-Forwarded-For': '127.0.0.1,192.168.0.1'}):
             with self.assertRaises(HTTPException) as http_error:
                 route()
+
+        # Test auth cookie
+        os.environ['SHARED_SECRET'] = 'security'
+        auth = reload(auth)
+        with self.subTest("off-whitelist IP, no cookie"):
+            with app.test_request_context('/', environ_base={'REMOTE_ADDR': '127.0.1.1'}):
+                with self.assertRaises(HTTPException) as http_error:
+                    route()
+                self.assertEqual(http_error.exception.code, 401)
+
+        with self.subTest("off-whitelist IP, correct cookie"):
+            with app.test_request_context('/', headers={"COOKIE": "app_secret=security"},
+                                          environ_base={'REMOTE_ADDR': '127.0.1.1'}):
+                assert route() == 'ok'
+
+        with self.subTest("off-whitelist IP, incorrect cookie"):
+            with app.test_request_context('/', headers={"COOKIE": "app_secret=obscurity"},
+                                          environ_base={'REMOTE_ADDR': '127.0.1.1'}):
+                with self.assertRaises(HTTPException) as http_error:
+                    route()
+                self.assertEqual(http_error.exception.code, 401)
