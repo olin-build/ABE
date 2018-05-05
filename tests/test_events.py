@@ -77,14 +77,42 @@ class EventsTestCase(abe_unittest.TestCase):
             self.assertEqual(response.status_code, 400)
             self.assertRegex(flask.json.loads(response.data)['error_message'], r"^ValidationError.*'start'")
 
+    def test_post_auth(self):
+        event = {
+            'title': 'test_post',
+            'start': isodate.parse_datetime('2018-05-04T09:00:00')
+        }
         with self.subTest("fails when the client is not authorized"):
+            # self.cookie_jar.clear()  # clear existing auth cookie
             response = self.app.post(
                 '/events/',
                 data=flask.json.dumps(event),
                 content_type='application/json',
-                headers={'X-Forwarded-For': '192.168.1.1'}
+                headers={
+                    'X-Forwarded-For': '192.168.1.1',
+                    }
             )
             self.assertEqual(response.status_code, 401)
+
+        with self.subTest("succeeds when required fields are present"):
+            response = self.app.post(
+                '/events/',
+                data=flask.json.dumps(event),
+                content_type='application/json'
+            )
+            self.assertEqual(response.status_code, 201)
+
+        with self.subTest("Succeededs due to auth cookie"):
+            # self.cookie_jar.clear()  # clear existing auth cookie
+            response = self.app.post(
+                '/events/',
+                data=flask.json.dumps(event),
+                content_type='application/json',
+                headers={
+                    'X-Forwarded-For': '192.168.1.1',
+                    }
+            )
+            self.assertEqual(response.status_code, 201)
 
     @skip("Unimplemented test")
     def test_put(self):
