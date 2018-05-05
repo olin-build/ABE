@@ -20,7 +20,7 @@ install:
 
 script:
   - pipenv run coverage run --source abe -m unittest
-  - pipenv run flake8 abe *.py
+  - pipenv run flake8 abe tests *.py
 
 after_success:
   - codecov

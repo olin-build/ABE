@@ -1,6 +1,6 @@
-from unittest import skip
-from unittest.mock import Mock, patch, ANY
 import email
+from unittest.mock import ANY, Mock, patch
+
 from icalendar import Calendar
 
 from . import abe_unittest
@@ -21,7 +21,6 @@ serv.close = Mock()
 
 class EmailHelpersTestCase(abe_unittest.TestCase):
 
-
     def test_get_msg_list(self):
         message_txt = [s.encode() for s in ['first line', 'second line']]
         pop_items = ['mock-id 10'.encode()]
@@ -32,13 +31,11 @@ class EmailHelpersTestCase(abe_unittest.TestCase):
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0].as_string(), "\nfirst line\nsecond line")
 
-
     def test_ical_to_dict(self):
         test_dict, test_sender = email_helpers.ical_to_dict(cal)
         self.assertEqual(test_sender, 'test.case@tests.com')
         self.assertEqual(test_dict['description'], 'Test Event')
         self.assertEqual(test_dict['labels'], ['test'])
-
 
     def test_get_messages_from_email(self):
         with patch('poplib.POP3_SSL') as pop_conn_factory:
@@ -52,12 +49,10 @@ class EmailHelpersTestCase(abe_unittest.TestCase):
             pop_conn.quit.assert_called()
             self.assertEqual(len(messages), 1)
 
-
     def test_get_calendars_from_messages(self):
         cal_list = email_helpers.get_calendars_from_messages([message])
         self.assertEqual(len(cal_list), 1)
         self.assertIsInstance(cal_list[0], Calendar)
-
 
     @patch('abe.helper_functions.email_helpers.error_reply', return_value=None)
     @patch('abe.helper_functions.email_helpers.reply_email', return_value=None)
@@ -68,7 +63,6 @@ class EmailHelpersTestCase(abe_unittest.TestCase):
         self.assertIsNotNone(event)
         self.assertEqual(exit_code, 201)
         self.assertEqual(event_dict['description'], event['description'])
-
 
     def test_smtp_connect(self):
         with patch('smtplib.SMTP_SSL') as server_factory:
