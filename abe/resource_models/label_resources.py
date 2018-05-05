@@ -29,14 +29,14 @@ label_model = api.model("Label_Model", {
 class LabelApi(Resource):
     """API for interacting with all labels (searching, creating)"""
 
-    def get(self, label_name=None):
-        """Retrieve labels"""
-        if label_name:  # use label name/object id if present
-            logging.debug('Label requested: %s', label_name)
+    def get(self, id=None):
+        """Retrieve a list of labels"""
+        if id:  # use label name/object id if present
+            logging.debug('Label requested: %s', id)
             search_fields = ['name', 'id']
-            result = multi_search(db.Label, label_name, search_fields)
+            result = multi_search(db.Label, id, search_fields)
             if not result:
-                return "Label not found with identifier '{}'".format(label_name), 404
+                return "Label not found with identifier '{}'".format(id), 404
             else:
                 return mongo_to_dict(result)
         else:  # search database based on parameters
@@ -50,7 +50,7 @@ class LabelApi(Resource):
     @edit_auth_required
     @api.expect(label_model)
     def post(self):
-        """Create new label with parameters passed in through args or form"""
+        """Create a new label"""
         received_data = request_to_dict(request)
         logging.debug("Received POST data: %s", received_data)
         try:
@@ -66,14 +66,14 @@ class LabelApi(Resource):
 
     @edit_auth_required
     @api.expect(label_model)
-    def put(self, label_name):
-        """Modify individual label"""
+    def put(self, id):
+        """Modify a label's properties"""
         received_data = request_to_dict(request)
         logging.debug("Received PUT data: %s", received_data)
         search_fields = ['name', 'id']
-        result = multi_search(db.Label, label_name, search_fields)
+        result = multi_search(db.Label, id, search_fields)
         if not result:
-            return "Label not found with identifier '{}'".format(label_name), 404
+            return "Label not found with identifier '{}'".format(id), 404
 
         try:
             result.update(**received_data)
@@ -86,13 +86,13 @@ class LabelApi(Resource):
             return mongo_to_dict(result)
 
     @edit_auth_required
-    def delete(self, label_name):
-        """Delete individual label"""
-        logging.debug('Label requested: %s', label_name)
+    def delete(self, id):
+        """Delete a label"""
+        logging.debug('Label requested: %s', id)
         search_fields = ['name', 'id']
-        result = multi_search(db.Label, label_name, search_fields)
+        result = multi_search(db.Label, id, search_fields)
         if not result:
-            return "Label not found with identifier '{}'".format(label_name), 404
+            return "Label not found with identifier '{}'".format(id), 404
 
         received_data = request_to_dict(request)
         logging.debug("Received DELETE data: %s", received_data)
@@ -101,6 +101,6 @@ class LabelApi(Resource):
 
 
 api.add_resource(LabelApi, '/', methods=['GET', 'POST'], endpoint='label')
-api.add_resource(LabelApi, '/<string:label_name>',
+api.add_resource(LabelApi, '/<string:id>',
                  methods=['GET', 'PUT', 'PATCH', 'DELETE'],
-                 endpoint='label_name')
+                 endpoint='id')

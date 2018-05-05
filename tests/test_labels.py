@@ -76,7 +76,7 @@ class LabelsTestCase(abe_unittest.TestCase):
             )
             self.assertEqual(response.status_code, 401)
 
-        with self.subTest("succeeds when required fields are present"):
+        with self.subTest("succeeds with an authorized client"):
             response = self.app.post(
                 '/labels/',
                 data=flask.json.dumps(label_success),
@@ -93,18 +93,45 @@ class LabelsTestCase(abe_unittest.TestCase):
             )
             self.assertEqual(response.status_code, 201)
 
+    def get_label_by_name(self, name):
+        response = self.app.get('/labels/')
+        self.assertEqual(response.status_code, 200)
+        return next(label for label in flask.json.loads(response.data)
+                    if label['name'] == name)
+
+    def get_label_by_id(self, id):
+        response = self.app.get('/labels/')
+        self.assertEqual(response.status_code, 200)
+        return next(label for label in flask.json.loads(response.data)
+                    if label['id'] == id)
+
     def test_put(self):
-        # TODO: test success
-        # TODO: test invalid id
-        # TODO: test invalid data
+        # TODO: test w/ invalid id
+        # TODO: test w/ invalid data
+
+        library_label = self.get_label_by_name('library')
+        label_data = {
+            'description': 'New description',
+        }
+
         with self.subTest("fails when the client is not authorized"):
             response = self.app.put(
                 '/labels/library',
-                data=flask.json.dumps({'description': 'new description'}),
+                data=flask.json.dumps(label_data),
                 content_type='application/json',
                 headers={'X-Forwarded-For': '192.168.1.1'}
             )
             self.assertEqual(response.status_code, 401)
+
+        with self.subTest("succeeds with an authorized client"):
+            response = self.app.put(
+                '/labels/' + library_label['id'],
+                data=flask.json.dumps(label_data),
+                content_type='application/json',
+            )
+            self.assertEqual(response.status_code, 200)
+            label = self.get_label_by_id(library_label['id'])
+            self.assertEqual(label['description'], 'New description')
 
     def test_delete(self):
         # TODO: test success
