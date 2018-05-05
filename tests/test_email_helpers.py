@@ -88,11 +88,11 @@ class EmailHelpersTestCase(abe_unittest.TestCase):
     @patch('abe.helper_functions.email_helpers.smtp_connect', return_value=(serv, 'from_addr'))
     def test_reply_email(self, smtp):
         event_dict = {'title': 'Test',
-        'start': '2018-04-30 14:51:24',
-        'end': '2018-04-30 14:51:24',
-        'labels': ['test'],
-        'description': 'empty test',
-        'id': 'id_string'}
+                    'start': '2018-04-30 14:51:24',
+                    'end': '2018-04-30 14:51:24',
+                    'labels': ['test'],
+                    'description': 'empty test',
+                    'id': 'id_string'}
         to = "to_addr"
         email_helpers.reply_email(to, event_dict)
         smtp.assert_called()
