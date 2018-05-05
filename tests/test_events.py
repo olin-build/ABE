@@ -86,14 +86,56 @@ class EventsTestCase(abe_unittest.TestCase):
             )
             self.assertEqual(response.status_code, 401)
 
-    @skip("Unimplemented test")
+    # @skip("Unimplemented test")
     def test_put(self):
         # TODO: test success
-        # TODO: test invalid id
-        # TODO: test invalid data
-        # TODO: test unauthorized user
-        pass
+        event = {
+            'title': 'test_put',
+            'start': isodate.parse_datetime('2018-05-04T09:00:00')
+        }
 
+        with self.subTest("succeeds when required fields are present"):
+            response = self.app.put(
+                '/events/',
+                data=flask.json.dumps(event),
+                content_type='application/json'
+            )
+            self.assertEqual(response.status_code, 201)
+
+        # TODO: test invalid id
+        with self.subTest("fails when the event id is invalid"):
+            response = self.app.put(
+                '/events/',
+                data=flask.json.dumps(event),
+                content_type='application/json',
+                headers={'X-Forwarded-For': '192.168.1.1'}
+            )
+            self.assertEqual(response.status_code, 400)
+            self.assertRegex(flask.json.loads(response.data)['error_message'], r"^ValidationError.*'title'")
+
+        # TODO: test invalid data
+        with self.subTest("fails when fields are missing"):
+            evt = event.copy()
+            del evt['title']
+            response = self.app.put(
+                '/events/',
+                data=flask.json.dumps(evt),
+                content_type='application/json'
+            )
+            self.assertEqual(response.status_code, 400)
+            self.assertRegex(flask.json.loads(response.data)['error_message'], r"^ValidationError.*'title'")
+
+        # TODO: test unauthorized user
+        with self.subTest("fails when the client is not authorized"):
+            response = self.app.put(
+                '/events/',
+                data=flask.json.dumps(event),
+                content_type='application/json',
+                headers={'X-Forwarded-For': '192.168.1.1'}
+            )
+            self.assertEqual(response.status_code, 401)
+        # pass
+    
     @skip("Unimplemented test")
     def test_delete(self):
         # TODO: test success
