@@ -93,7 +93,26 @@ class EventsTestCase(abe_unittest.TestCase):
             )
             self.assertEqual(response.status_code, 401)
 
-    # @skip("Unimplemented test")
+        with self.subTest("succeeds when required fields are present"):
+            response = self.app.post(
+                '/events/',
+                data=flask.json.dumps(event),
+                content_type='application/json'
+            )
+            self.assertEqual(response.status_code, 201)
+
+        with self.subTest("succeeds due to auth cookie"):
+            response = self.app.post(
+                '/events/',
+                data=flask.json.dumps(event),
+                content_type='application/json',
+                headers={
+                    'X-Forwarded-For': '192.168.1.1',
+                    }
+            )
+            self.assertEqual(response.status_code, 201)
+
+    @skip("Unimplemented test")
     def test_put(self):
         # TODO: test success
         event = {
