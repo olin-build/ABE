@@ -182,7 +182,7 @@ def reply_email(to, event_dict):
     tags = ', '.join(event_dict['labels']).strip()
     start = dt.strptime(event_dict['start'][:16], '%Y-%m-%d %H:%M').strftime('%I:%M %m/%d')
     end = dt.strptime(event_dict['end'][:16], '%Y-%m-%d %H:%M').strftime('%I:%M %m/%d')
-    body = f"""Your event was added to ABE! Here's the details: 
+    body = f"""Your event was added to ABE! Here's the details:
     Time: {start} to {end}
     Description: {event_dict['description']}
     Tags: {tags}
