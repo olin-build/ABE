@@ -1,5 +1,5 @@
 import email
-from unittest.mock import ANY, Mock, patch
+from unittest.mock import Mock, patch
 
 from icalendar import Calendar
 
@@ -14,6 +14,10 @@ with open('./tests/email_script.txt', 'r') as email_file:
 
 with open('./tests/cal_script.txt', 'r') as cal_file:
     cal = Calendar.from_ical(cal_file.read())
+
+serv = Mock()
+serv.send_message = Mock()
+serv.close = Mock()
 
 
 class EmailHelpersTestCase(abe_unittest.TestCase):
@@ -70,40 +74,33 @@ class EmailHelpersTestCase(abe_unittest.TestCase):
             server.ehlo.assert_called()
             server.login.assert_called()
 
-    @patch('abe.helper_functions.email_helpers.send_email', return_value=None)
-    @patch('abe.helper_functions.email_helpers.smtp_connect', return_value=('server', 'from_addr'))
-    def test_error_reply(self, smtp, send):
+    @patch('abe.helper_functions.email_helpers.smtp_connect', return_value=(serv, 'from_addr'))
+    def test_error_reply(self, smtp):
         error = Mock()
         error.errors = [12]
         error.message = "This is an error message"
         to = "to_addr"
         email_helpers.error_reply(to, error)
         smtp.assert_called()
-        send.assert_called_with('server', ANY, 'from_addr', to)
+        serv.send_message.assert_called()
+        serv.close.assert_called()
 
-    @patch('abe.helper_functions.email_helpers.send_email', return_value=None)
-    @patch('abe.helper_functions.email_helpers.smtp_connect', return_value=('server', 'from_addr'))
-    def test_reply_email(self, smtp, send):
-        event_dict = {'title': 'Test', 'labels': ['test'], 'description': 'empty test'}
+    @patch('abe.helper_functions.email_helpers.smtp_connect', return_value=(serv, 'from_addr'))
+    def test_reply_email(self, smtp):
+        event_dict = {'title': 'Test',
+                      'start': '2018-04-30 14:51:24',
+                      'end': '2018-04-30 14:51:24',
+                      'labels': ['test'],
+                      'description': 'empty test',
+                      'id': 'id_string'}
         to = "to_addr"
         email_helpers.reply_email(to, event_dict)
         smtp.assert_called()
-        send.assert_called_with('server', ANY, 'from_addr', to)
+        serv.send_message.assert_called()
+        serv.close.assert_called()
 
-    def test_send_email(self):
-        server = Mock()
-        server.sendmail = Mock()
-        server.close = Mock()
-        email_text = 'email text'
-        sent_from = 'from address'
-        to = 'to address'
-        email_helpers.send_email(server, email_text, sent_from, to)
-        server.sendmail.assert_called_once_with(sent_from, to, email_text.encode('utf-8'))
-        server.close.assert_called_once()
-
-    @patch('abe.helper_functions.email_helpers.send_email', return_value=None)
-    @patch('abe.helper_functions.email_helpers.smtp_connect', return_value=('server', 'from_addr'))
+    @patch('abe.helper_functions.email_helpers.smtp_connect', return_value=(serv, 'from_addr'))
     @patch('abe.helper_functions.email_helpers.get_messages_from_email', return_value=[message])
-    def test_scrape(self, msgs_from_email, smtp, send):
+    def test_scrape(self, msgs_from_email, smtp):
         completed = email_helpers.scrape()
         self.assertEqual(len(completed), 1)
