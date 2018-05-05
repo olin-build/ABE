@@ -57,17 +57,41 @@ class LabelsTestCase(abe_unittest.TestCase):
             self.assertEqual(response.status_code, 400)
             self.assertRegex(flask.json.loads(response.data)['error_message'], r"^ValidationError.*'name'")
 
-        with self.subTest("fails when the client is not authorized"):
-            label = {
-                'name': 'label-test-2',
-            }
+    def test_post_auth(self):
+        label_noauth = {
+            'name': 'label-test-notauth',
+        }
+        label_success = {
+            'name': 'label-test-success',
+        }
+        label_auth = {
+            'name': 'label-test-auth',
+        }
+        with self.subTest("fails when the client is not yet authorized"):
             response = self.app.post(
                 '/labels/',
-                data=flask.json.dumps(label),
+                data=flask.json.dumps(label_noauth),
                 content_type='application/json',
                 headers={'X-Forwarded-For': '192.168.1.1'}
             )
             self.assertEqual(response.status_code, 401)
+
+        with self.subTest("succeeds when required fields are present"):
+            response = self.app.post(
+                '/labels/',
+                data=flask.json.dumps(label_success),
+                content_type='application/json'
+            )
+            self.assertEqual(response.status_code, 201)
+
+        with self.subTest("succeededs with auth cookie"):
+            response = self.app.post(
+                '/labels/',
+                data=flask.json.dumps(label_auth),
+                content_type='application/json',
+                headers={'X-Forwarded-For': '192.168.1.1'}
+            )
+            self.assertEqual(response.status_code, 201)
 
     def test_put(self):
         # TODO: test success
