@@ -8,11 +8,11 @@ import dateutil.parser
 from bson import objectid
 from flask import abort, request
 from flask_restplus import Namespace, Resource, fields
-from mongoengine import ValidationError
 
 from abe import database as db
 from abe.auth import edit_auth_required
 from abe.helper_functions.converting_helpers import mongo_to_dict, request_to_dict
+from abe.helper_functions.mongodb_helpers import mongo_resource_errors
 from abe.helper_functions.query_helpers import event_query, get_to_event_search
 from abe.helper_functions.recurring_helpers import placeholder_recurring_creation, recurring_to_full
 from abe.helper_functions.sub_event_helpers import (access_sub_event, create_sub_event, find_recurrence_end,
@@ -36,6 +36,7 @@ event_model = api.model('Events_Model', {
 class EventApi(Resource):
     """API for interacting with events"""
 
+    @mongo_resource_errors
     def get(self, event_id=None, rec_id=None):
         """
         Retrieve events from mongoDB
@@ -106,6 +107,7 @@ class EventApi(Resource):
             return events_list
 
     @edit_auth_required
+    @mongo_resource_errors
     @api.expect(event_model)
     def post(self):
         """
@@ -113,23 +115,18 @@ class EventApi(Resource):
         """
         received_data = request_to_dict(request)
         logging.debug("Received POST data: {}".format(received_data))  # combines args and form
-        try:
-            new_event = db.Event(**received_data)
-            if new_event.labels == []:  # if no labels were given
-                new_event.labels = ['unlabeled']
-            if 'recurrence' in new_event:  # if this is a recurring event
-                if not new_event.recurrence.forever:  # if it doesn't recurr forever
-                    # find the end of the recurrence
-                    new_event.recurrence_end = find_recurrence_end(new_event)
-            new_event.save()
-        except ValidationError as error:
-            return {'error_type': 'validation',
-                    'validation_errors': [str(err) for err in error.errors],
-                    'error_message': error.message}, 400
-        else:  # return success
-            return mongo_to_dict(new_event), 201
+        new_event = db.Event(**received_data)
+        if new_event.labels == []:  # if no labels were given
+            new_event.labels = ['unlabeled']
+        if 'recurrence' in new_event:  # if this is a recurring event
+            if not new_event.recurrence.forever:  # if it doesn't recurr forever
+                # find the end of the recurrence
+                new_event.recurrence_end = find_recurrence_end(new_event)
+        new_event.save()
+        return mongo_to_dict(new_event), 201
 
     @edit_auth_required
+    @mongo_resource_errors
     @api.expect(event_model)
     def put(self, event_id):
         """
@@ -139,35 +136,29 @@ class EventApi(Resource):
         """
         received_data = request_to_dict(request)
         logging.debug("Received PUT data: {}".format(received_data))
-        try:
-            result = db.Event.objects(id=event_id).first()
-            if not result:  # if no event was found
-                # try finding a sub_event with the id and save the parent event it is stored under
-                cur_parent_event = db.Event.objects(__raw__={'sub_events._id': objectid.ObjectId(event_id)}).first()
-                if cur_parent_event:  # if a sub_event was found, updated it with the received_data
-                    result = update_sub_event(received_data, cur_parent_event, objectid.ObjectId(event_id))
-                else:
-                    abort(404)
-            else:  # if event was found
-                # if the received data is a new sub_event
-                if 'sid' in received_data and received_data['sid'] is not None:
+        result = db.Event.objects(id=event_id).first()
+        if not result:  # if no event was found
+            # try finding a sub_event with the id and save the parent event it is stored under
+            cur_parent_event = db.Event.objects(__raw__={'sub_events._id': objectid.ObjectId(event_id)}).first()
+            if cur_parent_event:  # if a sub_event was found, updated it with the received_data
+                result = update_sub_event(received_data, cur_parent_event, objectid.ObjectId(event_id))
+            else:
+                abort(404)
+        else:  # if event was found
+            # if the received data is a new sub_event
+            if 'sid' in received_data and received_data['sid'] is not None:
 
-                    # create a new sub_event document
-                    if 'rec_id' in received_data and received_data['rec_id'] is not None:
-                        received_data['rec_id'] = dateutil.parser.parse(str(received_data['rec_id']))
-                        result = create_sub_event(received_data, result)
-                else:  # if this a normal event to be updated
-                    result.update(**received_data)
-                    result.reload()
-
-        except ValidationError as error:
-            return {'error_type': 'validation',
-                    'validation_errors': [str(err) for err in error.errors],
-                    'error_message': error.message}, 400
-        else:  # return success
-            return mongo_to_dict(result)
+                # create a new sub_event document
+                if 'rec_id' in received_data and received_data['rec_id'] is not None:
+                    received_data['rec_id'] = dateutil.parser.parse(str(received_data['rec_id']))
+                    result = create_sub_event(received_data, result)
+            else:  # if this a normal event to be updated
+                result.update(**received_data)
+                result.reload()
+        return mongo_to_dict(result)
 
     @edit_auth_required
+    @mongo_resource_errors
     def delete(self, event_id, rec_id=None):
         """
         Delete individual event
