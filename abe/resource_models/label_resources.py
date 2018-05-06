@@ -75,6 +75,9 @@ class LabelApi(Resource):
         if not result:
             return "Label not found with identifier '{}'".format(id), 404
 
+        renamed = 'name' in received_data and result['name'] != received_data['name']
+        previous_name = result['name']
+
         try:
             result.update(**received_data)
         except ValidationError as error:
@@ -82,8 +85,11 @@ class LabelApi(Resource):
                     'validation_errors': [str(err) for err in error.errors],
                     'error_message': error.message}, 400
 
-        else:  # return success
-            return mongo_to_dict(result)
+        # TODO: do this inside the same transaction as the update above, on update to mnogo 4.0
+        if renamed:
+            db.Event.objects(labels=previous_name).update(labels__S=received_data['name'])
+
+        return mongo_to_dict(result)
 
     @edit_auth_required
     def delete(self, id):
@@ -97,6 +103,8 @@ class LabelApi(Resource):
         received_data = request_to_dict(request)
         logging.debug("Received DELETE data: %s", received_data)
         result.delete()
+        # TODO: this should also remove the label from tagged events
+        # TODO: should this operation fail if it would leave events untagged?
         return mongo_to_dict(result)
 
 
