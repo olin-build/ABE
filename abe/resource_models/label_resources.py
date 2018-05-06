@@ -56,6 +56,7 @@ class LabelApi(Resource):
         """Create new label with parameters passed in through args or form"""
         received_data = request_to_dict(request)
         logging.debug("Received POST data: %s", received_data)
+        # TODO: replace this try:except: by just the try: block, after PR #229 is merged
         try:
             new_label = db.Label(**received_data)
             new_label.save()
@@ -64,8 +65,7 @@ class LabelApi(Resource):
                     'validation_errors': str(error),  # [str(err) for err in error.errors or [error]],
                     'error_message': error.message,
                     }, 400
-        else:  # return success
-            return mongo_to_dict(new_label), 201
+        return mongo_to_dict(new_label), 201
 
     @edit_auth_required
     @mongo_resource_errors
@@ -79,14 +79,14 @@ class LabelApi(Resource):
         if not result:
             return "Label not found with identifier '{}'".format(label_name), 404
 
+        # TODO: replace this try:except: by just the try: block, after PR #229 is merged
         try:
             result.update(**received_data)
         except ValidationError as error:
             return {'error_type': 'validation',
                     'validation_errors': [str(err) for err in error.errors or [error]],
                     'error_message': error.message}, 400
-        else:  # return success
-            return mongo_to_dict(result)
+        return mongo_to_dict(result)
 
     @edit_auth_required
     @mongo_resource_errors

@@ -119,7 +119,7 @@ class EventApi(Resource):
         if new_event.labels == []:  # if no labels were given
             new_event.labels = ['unlabeled']
         if 'recurrence' in new_event:  # if this is a recurring event
-            if not new_event.recurrence.forever:  # if it doesn't recurr forever
+            if not new_event.recurrence.forever:  # if it doesn't recur forever
                 # find the end of the recurrence
                 new_event.recurrence_end = find_recurrence_end(new_event)
         new_event.save()
