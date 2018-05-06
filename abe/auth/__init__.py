@@ -5,6 +5,7 @@ from functools import wraps
 
 from flask import request, abort, g
 from netaddr import IPNetwork, IPSet
+import logging
 
 # A set of IP addresses with edit permission.
 #
@@ -17,7 +18,9 @@ from netaddr import IPNetwork, IPSet
 INTRANET_IPS = (IPSet([IPNetwork(s) for s in os.environ.get('INTRANET_IPS', '').split(',')])
                 if 'INTRANET_IPS' in os.environ else IPSet(['0.0.0.0/0', '0000:000::/0']))
 
-shared_secret = os.environ.get("SHARED_SECRET", None)
+shared_secret = os.environ.get("SHARED_SECRET", "")
+if not shared_secret:
+    logging.critical("SHARED_SECRET isn't set")
 
 
 def after_this_request(f):  # For setting cookie
@@ -34,7 +37,7 @@ def check_auth(req):
     Returns a Bool of passing.
     """
     client_ip = req.headers.get(
-            'X-Forwarded-For', req.remote_addr).split(',')[-1]
+        'X-Forwarded-For', req.remote_addr).split(',')[-1]
     if client_ip in INTRANET_IPS:
         @after_this_request
         def remember_computer(response):
