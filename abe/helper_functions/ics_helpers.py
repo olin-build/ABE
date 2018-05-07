@@ -45,7 +45,8 @@ def create_ics_event(event: db.Event, recurrence=False, sub: db.Subscription = N
     # creates the Event
     new_event = ical.Event()
     new_event.add('summary', event['title'])
-    new_event.add('location', event['location'])
+    if event['location']:
+        new_event.add('location', event['location'])
     description = event['description']
     if sub:
         logging.debug("Working with subscription", sub, sub.sid)
