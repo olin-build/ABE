@@ -1,11 +1,12 @@
 from datetime import datetime
 
+from abe.helper_functions import recurring_helpers
+
 from . import abe_unittest
 from .context import abe  # noqa: F401
 
 # This import has to happen after .context sets the environment variables
 from abe.helper_functions import sub_event_helpers  # isort:skip
-from abe.helper_functions import recurring_helpers
 
 # TODO: add test cases for YEARLY frequency (are there others)?
 # TODO: add test cases for by_month, by_month_day

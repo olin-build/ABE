@@ -13,6 +13,7 @@ import isodate
 sample_data_dir = Path(__file__).parent.parent / 'tests/data'
 sample_events_file = sample_data_dir / 'sample-events.json'
 sample_labels_file = sample_data_dir / 'sample-labels.json'
+sample_ics_file = sample_data_dir / 'sample-ics-import.ics'
 
 kelly_colors = [
     '#F2F3F4', '#222222', '#F3C300', '#875692', '#F38400', '#A1CAF1', '#BE0032',
@@ -39,7 +40,8 @@ olin_colors = [  # '#009BDF', '#A7A9AC', '#A7A9AC', '#000000',
 
 sample_ics = [
     {
-        "url": "webcal://http://www.olin.edu/calendar-node-field-cal-event-date/ical/calendar.ics"
+        "url": "http://www.olin.edu/calendar-node-field-cal-event-date/ical/2018-05/calendar.ics",
+        "labels": ['Featured'],
     }
 ]
 
@@ -112,7 +114,7 @@ def insert_data(db, event_data=None, label_data=None, ics_data=None):
             db.ICS(**ics).save()
 
 
-SampleData = namedtuple('SampleData', ['events', 'labels', 'icss'])
+SampleData = namedtuple('SampleData', ['events', 'labels', 'icss', 'ics_data'])
 
 
 def load_sample_data():
@@ -124,13 +126,15 @@ def load_sample_data():
         event_data = load_event_data(fp)
     with open(sample_labels_file) as fp:
         label_data = json.load(fp)
-    return SampleData(event_data, label_data, sample_ics)
+    with open(sample_ics_file) as fp:
+        ics_data = fp.read()
+    return SampleData(event_data, label_data, sample_ics, ics_data)
 
 
 def load_data(db):
     """Load the database with sample data. The Heroku postdeploy
     script calls this."""
-    event_data, label_data, sample_ics = load_sample_data()
+    event_data, label_data, sample_ics, _ = load_sample_data()
     insert_data(db, event_data, label_data, sample_ics)
 
 
@@ -147,7 +151,7 @@ def main(events=None, labels=None):
     label_data = json.load(labels) if labels else None
     ics_data = None
     if all(data is None for data in (event_data, label_data, ics_data)):
-        event_data, label_data, ics_data = load_sample_data()
+        event_data, label_data, ics_data, _ = load_sample_data()
     insert_data(db, event_data, label_data, ics_data)
 
 
