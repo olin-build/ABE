@@ -2,7 +2,9 @@ from datetime import datetime
 from unittest import skip
 
 import icalendar
+from icalendar import Calendar
 
+from abe import sample_data
 from . import abe_unittest
 from .context import abe  # noqa: F401
 
@@ -104,10 +106,9 @@ class IcsHelpersTestCase(abe_unittest.TestCase):
         pass
         # TODO: ics_helpers.ics_to_dict(component, labels, ics_id=None)
 
-    @skip('Unimplemented test')
     def test_extract_ics(self):
-        pass
-        # TODO: ics_helpers.extract_ics(cal, ics_url, labels=None)
+        cal = Calendar.from_ical(sample_data.load_sample_data().ics_data)
+        ics_helpers.extract_ics(cal, '')
 
     @skip('Unimplemented test')
     def test_update_ics_to_mongo(self):
