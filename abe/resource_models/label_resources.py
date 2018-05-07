@@ -75,8 +75,8 @@ class LabelApi(Resource):
         if not result:
             return "Label not found with identifier '{}'".format(id), 404
 
-        renamed = 'name' in received_data and result['name'] != received_data['name']
         previous_name = result['name']
+        new_name = received_data.get('name', previous_name)
 
         try:
             result.update(**received_data)
@@ -86,8 +86,10 @@ class LabelApi(Resource):
                     'error_message': error.message}, 400
 
         # TODO: do this inside the same transaction as the update above, on update to mnogo 4.0
-        if renamed:
-            db.Event.objects(labels=previous_name).update(labels__S=received_data['name'])
+        if previous_name != new_name:
+            db.Event.objects(labels=previous_name).update(labels__S=new_name)
+            db.ICS.objects(labels=previous_name).update(labels__S=new_name)
+            db.Subscription.objects(labels=previous_name).update(labels__S=new_name)
 
         return mongo_to_dict(result)
 
