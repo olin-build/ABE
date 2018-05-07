@@ -39,8 +39,8 @@ class AbeTestCase(abe_unittest.TestCase):
     def test_import_ics(self):
         """Imports an ICS feed by URL"""
         for feed in sample_data.load_sample_data().icss:
-            respose = self.app.post('/ics/', data=flask.json.dumps(feed), content_type='application/json')
-            self.assertEqual(respose.status_code, 200)
+            response = self.app.post('/ics/', data=flask.json.dumps(feed), content_type='application/json')
+            self.assertEqual(response.status_code, 200)
 
     def test_add_sample_labels(self):
         """Adds the sample labels to the database"""
