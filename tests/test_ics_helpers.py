@@ -110,8 +110,7 @@ class IcsHelpersTestCase(abe_unittest.TestCase):
         with self.subTest('locationless events'):
             event = self.get_test_event('no_location')
             ics_event = ics_helpers.create_ics_event(event)
-            self.assertEqual(ics_event.has_key('location'), False)
-            
+            self.assertEqual('location' in ics_event, False)
 
     @skip('Unimplemented test')
     def test_create_ics_recurrence(self):
