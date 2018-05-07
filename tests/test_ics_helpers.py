@@ -52,6 +52,23 @@ testEvents = dict(
             'by_day': ['MO', 'TU', 'WE', 'TH', 'FR'],
         },
     },
+    no_location={
+        'id': '5ace6ff26a6942408317afd3',
+        'visibility': 'olin',
+        'title': 'Test event',
+        'description': 'Event description',
+        'start': datetime(2017, 6, 1, 15, 0),
+        'end': datetime(2017, 6, 1, 15, 30),
+        'recurrence_end': datetime(2017, 7, 31),
+        'labels': [],
+        'recurrence': {
+            'frequency': 'WEEKLY',
+            'count': '10',
+            'interval': '1',
+            'until': datetime(2017, 7, 31),
+            'by_day': ['MO', 'TU', 'WE', 'TH', 'FR'],
+        },
+    }
 )
 
 
@@ -90,6 +107,11 @@ class IcsHelpersTestCase(abe_unittest.TestCase):
             # TODO: test that id is from event['sid']
             # TODO: test RECURRENCE_ID from event['rec_id']
             # TODO: test byday, bymonthday, byyearday in RRULE
+        with self.subTest('locationless events'):
+            event = self.get_test_event('no_location')
+            ics_event = ics_helpers.create_ics_event(event)
+            self.assertEqual(ics_event.has_key('location'), False)
+            
 
     @skip('Unimplemented test')
     def test_create_ics_recurrence(self):
