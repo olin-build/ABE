@@ -28,7 +28,7 @@ testEvents = dict(
         'start': datetime(2017, 6, 1, 15, 0),
         'end': datetime(2017, 6, 1, 15, 30),
         'recurrence_end': datetime(2017, 7, 31),
-        'allDay': True,
+        'all_day': True,
         'labels': [],
     },
     recurrence={
