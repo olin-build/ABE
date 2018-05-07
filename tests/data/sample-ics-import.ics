@@ -1,0 +1,233 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Date iCal v3.1//NONSGML kigkonsult.se iCalcreator 2.18//
+METHOD:PUBLISH
+X-WR-CALNAME;VALUE=TEXT:Event Calendar
+BEGIN:VTIMEZONE
+TZID:America/New_York
+BEGIN:STANDARD
+DTSTART:20181104T020000
+TZOFFSETFROM:-0400
+TZOFFSETTO:-0500
+TZNAME:EST
+END:STANDARD
+BEGIN:DAYLIGHT
+DTSTART:20190310T020000
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0400
+TZNAME:EDT
+END:DAYLIGHT
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:calendar.20101.field_event_date.0@www.olin.edu
+DTSTAMP:20180507T012719Z
+CREATED:20180501T180236Z
+DESCRIPTION:Return To News & Events [1]\n\n07 May\, 2018 ------------------
+ -----------------------------------------------\n\n\nAdd to Outlook [2]\n
+ \n\n.. Monday\, May 7 -- 8 to 9 AM\, AC 109 and AC 113\n\nThere will be st
+ udent demos of robotic vacuum cleaners completing various  challenges\, in
+ cluding crossing the bridge of death\, climbing mount doom\, and  running 
+ the gauntlet. \n\n.... For More info\n\nJohn	\n\n			Geddes John.Geddes@olin.ed
+ u\n\n\n[1] http://www.olin.edu/news-events/ [2] http://www.olin.edu/events
+ /feed/20101/event.ics
+DTSTART;TZID=America/New_York:20180507T080000
+DTEND;TZID=America/New_York:20180507T080000
+LAST-MODIFIED:20180501T180236Z
+SUMMARY:QEA Final Demos
+URL;TYPE=URI:http://www.olin.edu/events/qea-final-demos/
+END:VEVENT
+BEGIN:VEVENT
+UID:calendar.20106.field_event_date.0@www.olin.edu
+DTSTAMP:20180507T012719Z
+CREATED:20180501T180636Z
+DESCRIPTION:Return To News & Events [1]\n\n08 May\, 2018 ------------------
+ -----------------------------------------------\n\n\nAdd to Outlook [2]\n
+ \n\n.. Tuesday\, May 8 -- 4 to 5:30 PM\, AC 213\n\nADE teams of Olin\, Bab
+ son\, and Wellesley students will be holding a  presentation and poster se
+ ssion on their social venture work.\n\nAll are invited.\n\nRSVP here https
+ ://goo.gl/forms/mbdhXx8sVzqm5qUs2 [3].\n\nLearn how they are planning to t
+ ransform Reggie Wong Memorial Park in  Boston's Chinatown to improve air q
+ uality\, disseminating hundreds of solar  ray projectors in Ghana and Indi
+ a to create hands-on STEM experiences for  children\, running an after sch
+ ool program in Clarksdale Mississippi's rural  communities to create oppor
+ tunity for youth\, expanding screw press production  with QueenTech to equ
+ ip women entrepreneurs in Ghana\, and developing a  conductive warming bas
+ sinet headed to medical trials in Vietnam to treat  newborn hypothermia. 
+ \n\n.... For More info\n\nBenjamin 	\n\n			Linder Benjamin.Linder@olin.edu\n\n
+ \n[1] http://www.olin.edu/news-events/ [2] http://www.olin.edu/events/feed
+ /20106/event.ics [3] https://goo.gl/forms/mbdhXx8sVzqm5qUs2
+DTSTART;TZID=America/New_York:20180508T160000
+DTEND;TZID=America/New_York:20180508T160000
+LAST-MODIFIED:20180501T180636Z
+SUMMARY:ADE Social Venture Showcase
+URL;TYPE=URI:http://www.olin.edu/events/ade-social-venture-showcase/
+END:VEVENT
+BEGIN:VEVENT
+UID:calendar.20111.field_event_date.0@www.olin.edu
+DTSTAMP:20180507T012719Z
+CREATED:20180501T181135Z
+DESCRIPTION:Return To News & Events [1]\n\n08 May\, 2018 ------------------
+ -----------------------------------------------\n\n\nAdd to Outlook [2]\n
+ \n\n.. Tuesday\, May 8 -- 4:15 to 6 PM\, AC 4th floor hallway\n\nStudent t
+ eams will present two deliverables: (1) an 'impacts infographic'  illustra
+ ting environmental and/or societal impacts of metals mining and  processin
+ g\, and (2) a microstructure of one of the team's processed alloys\,  with
+  analysis of its structure and properties\n\n.... For More info\n\nJon	\n\n
+ 			Stolk Jonathan.Stolk@olin.edu\n\n\n[1] http://www.olin.edu/news-events/ [2
+ ] http://www.olin.edu/events/feed/20111/event.ics
+DTSTART;TZID=America/New_York:20180508T161500
+DTEND;TZID=America/New_York:20180508T161500
+LAST-MODIFIED:20180501T181135Z
+SUMMARY:MatSci Final Event
+URL;TYPE=URI:http://www.olin.edu/events/matsci-final-event/
+END:VEVENT
+BEGIN:VEVENT
+UID:calendar.20116.field_event_date.0@www.olin.edu
+DTSTAMP:20180507T012719Z
+CREATED:20180501T181640Z
+DESCRIPTION:Return To News & Events [1]\n\n09 May\, 2018 ------------------
+ -----------------------------------------------\n\n\nAdd to Outlook [2]\n
+ \n\n.. Wednesday\, May 9 -- 8 to 9 AM\, Outside AC 128\n\n5 student teams 
+ will present their fully operational amazing kinematic  sculptures. This y
+ ear's theme was 'something in outer space' \n\n.... For More info\n\nDave	
+ \n\n			Barrett David.Barrett@olin.edu\n\n\n[1] http://www.olin.edu/news-event
+ s/ [2] http://www.olin.edu/events/feed/20116/event.ics
+DTSTART;TZID=America/New_York:20180509T080000
+DTEND;TZID=America/New_York:20180509T080000
+LAST-MODIFIED:20180501T181640Z
+SUMMARY:Final kinematic sculpture presentation
+URL;TYPE=URI:http://www.olin.edu/events/final-kinematic-sculpture-presentat
+ ion/
+END:VEVENT
+BEGIN:VEVENT
+UID:calendar.20121.field_event_date.0@www.olin.edu
+DTSTAMP:20180507T012719Z
+CREATED:20180501T182030Z
+DESCRIPTION:Return To News & Events [1]\n\n09 May\, 2018 ------------------
+ -----------------------------------------------\n\n\nAdd to Outlook [2]\n
+ \n\n.. Wednesday\, May 9 -- 8 to 11 AM\, AC 428\n\nStudents will explain a
+ nd give demonstrations of\n\n• how a new Olin network architecture will he
+ lp everyone (even CEOs)  understand past\, plan for future and fix present
+  implementations of  communication systems • what research computer networ
+ k students have been undertaking to  understand\, implement\, test and ref
+ ine the Olin network architecture\n\n.... For More info\n\nAlex	\n\n			Morrow 
+ Alexander.Morrow@olin.edu\n\n\n[1] http://www.olin.edu/news-events/ [2] ht
+ tp://www.olin.edu/events/feed/20121/event.ics
+DTSTART;TZID=America/New_York:20180509T090000
+DTEND;TZID=America/New_York:20180509T090000
+LAST-MODIFIED:20180501T182030Z
+SUMMARY:Computer Networks Class: Past\, Future and Present including Fun Fa
+ cts
+URL;TYPE=URI:http://www.olin.edu/events/computer-networks-class-past-future
+ -and-present-including-fun-facts/
+END:VEVENT
+BEGIN:VEVENT
+UID:calendar.20126.field_event_date.0@www.olin.edu
+DTSTAMP:20180507T012719Z
+CREATED:20180501T182735Z
+DESCRIPTION:Return To News & Events [1]\n\n09 May\, 2018 ------------------
+ -----------------------------------------------\n\n\nAdd to Outlook [2]\n
+ \n\n.. Wednesday\, May 9 -- 5 to 7 PM\, AC 309 and hallway outside it\n\nP
+ lease join us to hear Rocket Talks (5-5:45\, AC 309) and Expo (5:45-7\, 3r
+ d  floor hallway). All projects are co-design projects with local communit
+ y  partners\; all are related to design with/for people who are blind or v
+ isually  impaired. Come hear about cane-training games for kids who are bl
+ ind\;  increasing accessibility of flat-screened home appliances\; an auto
+ mated  website audit system for accessibility\; a website with recipes and
+  cooking  tips for people who are blind or visually impaired\; a proposal 
+ to redesign a  residential facility for people with visual impairments rel
+ ated to multiple  sclerosis\; and a classroom spinner game for kids at Per
+ kins School for the  Blind.\n\n.... For More info\n\nCaitrin Lynch	\n\n			 and
+  Paul Ruvolo Caitrin.Lynch@olin.edu\n\n\n[1] http://www.olin.edu/news-even
+ ts/ [2] http://www.olin.edu/events/feed/20126/event.ics
+DTSTART;TZID=America/New_York:20180509T170000
+DTEND;TZID=America/New_York:20180509T170000
+LAST-MODIFIED:20180501T182735Z
+SUMMARY:Technology\, Accessibility\, and Design final presentations/demos
+URL;TYPE=URI:http://www.olin.edu/events/technology-accessibility-and-design
+ -final-presentationsdemos/
+END:VEVENT
+BEGIN:VEVENT
+UID:calendar.20136.field_event_date.0@www.olin.edu
+DTSTAMP:20180507T012719Z
+CREATED:20180501T184948Z
+DESCRIPTION:Return To News & Events [1]\n\n10 May\, 2018 ------------------
+ -----------------------------------------------\n\n\nAdd to Outlook [2]\n
+ \n\n.. Thursday\, May 10 -- 12:30 to 2 PM\, AC 213\n\nAll are welcome to s
+ ee demos of students working on teams and on individual  efforts in DREAM.
+  Each aim to provide resources and opportunities that  facilitate differen
+ t groups empowering themselves to make new things or new  narratives aroun
+ d their identities. Projects range from developing SnapChat  filters to ex
+ pose hidden histories of underrepresented makers in MA to  designing curri
+ cula for fabricating musical instruments in mobile maker  spaces (trailers
+ ) in MS. \n\n.... For More info\n\nAmon Millner 	\n\n			Millner Amon.Millner@o
+ lin.edu\n\n\n[1] http://www.olin.edu/news-events/ [2] http://www.olin.edu/
+ events/feed/20136/event.ics
+DTSTART;TZID=America/New_York:20180510T100000
+DTEND;TZID=America/New_York:20180510T100000
+LAST-MODIFIED:20180501T184948Z
+SUMMARY:DREAM Final Open House Demos
+URL;TYPE=URI:http://www.olin.edu/events/dream-final-open-house-demos/
+END:VEVENT
+BEGIN:VEVENT
+UID:calendar.20131.field_event_date.0@www.olin.edu
+DTSTAMP:20180507T012719Z
+CREATED:20180501T183423Z
+DESCRIPTION:Return To News & Events [1]\n\n10 May\, 2018 ------------------
+ -----------------------------------------------\n\n\nAdd to Outlook [2]\n
+ \n\n.. Thursday\, May 10 -- 12 to 2 PM\, AC 428\n\nStudent teams will pres
+ ent their final projects involving experimental  observations of pattern f
+ orming systems.\n\n.... For More info\n\nJohn 	\n\n			Geddes John.Geddes@olin.
+ edu\n\n\n[1] http://www.olin.edu/news-events/ [2] http://www.olin.edu/even
+ ts/feed/20131/event.ics
+DTSTART;TZID=America/New_York:20180510T100000
+DTEND;TZID=America/New_York:20180510T100000
+LAST-MODIFIED:20180501T183423Z
+SUMMARY:Nonlinear Science Lab Final Presentations
+URL;TYPE=URI:http://www.olin.edu/events/nonlinear-science-lab-final-present
+ ations/
+END:VEVENT
+BEGIN:VEVENT
+UID:calendar.20141.field_event_date.0@www.olin.edu
+DTSTAMP:20180507T012719Z
+CREATED:20180501T190928Z
+DESCRIPTION:Return To News & Events [1]\n\n12 May\, 2018 ------------------
+ -----------------------------------------------\n\n\nAdd to Outlook [2]\n
+ \n\n.. Saturday\, May 12 -- Wednesday\, May 16\, Library\n\nStudents in th
+ e Temporary Autonomous Infrastructural Research Group\, an  experimental w
+ orkshop course\, will be displaying materials that they made to  communica
+ te aspects of our shared infrastructural systems to the Olin  community. 
+ \n\n.... For More info\n\nDebbie 	\n\n			Chachra Debbie.Chachra@olin.edu\n\n\n
+ [1] http://www.olin.edu/news-events/ [2] http://www.olin.edu/events/feed/2
+ 0141/event.ics
+DTSTART;TZID=America/New_York:20180512T120000
+DTEND;TZID=America/New_York:20180512T120000
+LAST-MODIFIED:20180501T190928Z
+SUMMARY:Infrastructure Workshop Course Exhibition
+URL;TYPE=URI:http://www.olin.edu/events/infrastructure-workshop-course-exhi
+ bition/
+END:VEVENT
+BEGIN:VEVENT
+UID:calendar.20281.field_event_date.0@www.olin.edu
+DTSTAMP:20180507T012719Z
+CREATED:20180503T184401Z
+DESCRIPTION:Return To News & Events [1]\n\n12 May\, 2018 ------------------
+ -----------------------------------------------\n\n\nAdd to Outlook [2]\n
+ \n\n.. *Saturday\, May 12th 2018 from 12pm-4pm on the Firepit Lawn (behind
+   Residence Halls)*\n\nThis year’s spring carnival will feature a cook-out
+  of burgers\, hotdogs\,  veggie burgers\, and sides\, with snowcones and c
+ otton candy for dessert.  Activities include a caricature artist\, sign-st
+ op shop [3]\, and airbrush hats  and t-shirts. There will also be classic 
+ carnival games such as ring toss\,  frog fling\, duck knock down\, and mor
+ e! Open to Olin students\, faculty\, staff  and their friends and families
+ !\n\n \n\n.... For More info\n\nAshlee	\n\n			Talbot ashlee.talbot@olin.edu\n
+ \n\n[1] http://www.olin.edu/news-events/ [2] http://www.olin.edu/events/fe
+ ed/20281/event.ics [3] http://www.partyvision.com/entertainment-events-ren
+ tals/sign-shop
+DTSTART;TZID=America/New_York:20180512T120000
+DTEND;TZID=America/New_York:20180512T120000
+LAST-MODIFIED:20180503T184401Z
+SUMMARY:Olin Carnival 2018
+URL;TYPE=URI:http://www.olin.edu/events/olin-carnival-2018/
+END:VEVENT
+END:VCALENDAR

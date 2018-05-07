@@ -1,4 +1,4 @@
-# Contributing to Atom
+# Contributing to ABE
 
 :+1::tada: First off, thanks for taking the time to contribute to ABE! :tada::+1:
 

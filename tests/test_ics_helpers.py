@@ -2,7 +2,9 @@ from datetime import datetime
 from unittest import skip
 
 import icalendar
+from icalendar import Calendar
 
+from abe import sample_data
 from . import abe_unittest
 from .context import abe  # noqa: F401
 
@@ -50,6 +52,23 @@ testEvents = dict(
             'by_day': ['MO', 'TU', 'WE', 'TH', 'FR'],
         },
     },
+    no_location={
+        'id': '5ace6ff26a6942408317afd3',
+        'visibility': 'olin',
+        'title': 'Test event',
+        'description': 'Event description',
+        'start': datetime(2017, 6, 1, 15, 0),
+        'end': datetime(2017, 6, 1, 15, 30),
+        'recurrence_end': datetime(2017, 7, 31),
+        'labels': [],
+        'recurrence': {
+            'frequency': 'WEEKLY',
+            'count': '10',
+            'interval': '1',
+            'until': datetime(2017, 7, 31),
+            'by_day': ['MO', 'TU', 'WE', 'TH', 'FR'],
+        },
+    }
 )
 
 
@@ -88,6 +107,10 @@ class IcsHelpersTestCase(abe_unittest.TestCase):
             # TODO: test that id is from event['sid']
             # TODO: test RECURRENCE_ID from event['rec_id']
             # TODO: test byday, bymonthday, byyearday in RRULE
+        with self.subTest('locationless events'):
+            event = self.get_test_event('no_location')
+            ics_event = ics_helpers.create_ics_event(event)
+            self.assertEqual('location' in ics_event, False)
 
     @skip('Unimplemented test')
     def test_create_ics_recurrence(self):
@@ -104,10 +127,9 @@ class IcsHelpersTestCase(abe_unittest.TestCase):
         pass
         # TODO: ics_helpers.ics_to_dict(component, labels, ics_id=None)
 
-    @skip('Unimplemented test')
     def test_extract_ics(self):
-        pass
-        # TODO: ics_helpers.extract_ics(cal, ics_url, labels=None)
+        cal = Calendar.from_ical(sample_data.load_sample_data().ics_data)
+        ics_helpers.extract_ics(cal, '')
 
     @skip('Unimplemented test')
     def test_update_ics_to_mongo(self):

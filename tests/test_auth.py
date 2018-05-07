@@ -3,19 +3,18 @@
 """
 import os
 import unittest
-import sys
 from importlib import reload
 
 import flask
-from flask import request
 from werkzeug.exceptions import HTTPException
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from abe import auth
+from abe import auth  # noqa: F401
 
 app = flask.Flask(__name__)
 
+
 class AuthTestCase(unittest.TestCase):
+
     def test_intranet_ips(self):
         global auth
         os.environ['INTRANET_IPS'] = '127.0.0.1/24'
@@ -76,5 +75,23 @@ class AuthTestCase(unittest.TestCase):
             with self.assertRaises(HTTPException) as http_error:
                 route()
 
-if __name__ == '__main__':
-    unittest.main()
+        # Test auth cookie
+        os.environ['SHARED_SECRET'] = 'security'
+        auth = reload(auth)
+        with self.subTest("off-whitelist IP, no cookie"):
+            with app.test_request_context('/', environ_base={'REMOTE_ADDR': '127.0.1.1'}):
+                with self.assertRaises(HTTPException) as http_error:
+                    route()
+                self.assertEqual(http_error.exception.code, 401)
+
+        with self.subTest("off-whitelist IP, correct cookie"):
+            with app.test_request_context('/', headers={"COOKIE": "app_secret=security"},
+                                          environ_base={'REMOTE_ADDR': '127.0.1.1'}):
+                assert route() == 'ok'
+
+        with self.subTest("off-whitelist IP, incorrect cookie"):
+            with app.test_request_context('/', headers={"COOKIE": "app_secret=obscurity"},
+                                          environ_base={'REMOTE_ADDR': '127.0.1.1'}):
+                with self.assertRaises(HTTPException) as http_error:
+                    route()
+                self.assertEqual(http_error.exception.code, 401)

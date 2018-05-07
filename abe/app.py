@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Main flask app"""
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, g
 from flask_restplus import Api
 from flask_cors import CORS
 from flask_sslify import SSLify  # redirect to https
@@ -17,7 +17,7 @@ from .resource_models.label_resources import api as label_api
 from .resource_models.ics_resources import api as ics_api
 from .resource_models.subscription_resources import api as subscription_api
 
-FORMAT = "%(levelname)s:ABE: _||_ %(message)s"
+FORMAT = "%(levelname)s:ABE: 🎩 %(message)s"
 logging.basicConfig(level=logging.INFO, format=FORMAT)
 
 app = Flask(__name__)
@@ -47,7 +47,7 @@ def splash():
     return render_template('splash.html')
 
 
-api = Api(app, doc="/swagger/", version="0.1", title="ABE API")
+api = Api(app, doc="/docs/", version="0.1", title="ABE API")
 
 
 class CustomJSONEncoder(JSONEncoder):
@@ -70,6 +70,13 @@ def output_json(data, code, headers=None):
     resp.status_code = code
     resp.headers.extend(headers or {})
     return resp
+
+
+@app.after_request
+def call_after_request_callbacks(response):  # For deferred callbacks
+    for callback in getattr(g, 'after_request_callbacks', ()):
+        callback(response)
+    return response
 
 
 # Route resources

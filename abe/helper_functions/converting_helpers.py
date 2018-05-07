@@ -6,8 +6,6 @@ helpful inspiration: https://gist.github.com/jason-w/4969476
 from mongoengine import (BooleanField, DecimalField, DictField, Document, EmbeddedDocument, EmbeddedDocumentField,
                          ListField, ObjectIdField)
 
-from abe import database as db
-
 
 def mongo_to_dict(obj):
     """Get dictionary from mongoengine object

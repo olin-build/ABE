@@ -154,6 +154,12 @@ $ coverage html
 $ open htmlcov/index.html
 ```
 
+Lint all the things:
+
+```shell
+$ flake8 abe tests *.py
+```
+
 ## API Documentation
 
-Interactive API documentation can be found at`/swagger/`, e.g. for local development: <http://127.0.0.1:3000/swagger/>.
+Interactive API documentation can be found at`/docs/`, e.g. for local development: <http://127.0.0.1:3000/docs/>.

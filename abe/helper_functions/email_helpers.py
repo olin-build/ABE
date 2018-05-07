@@ -4,10 +4,11 @@ import logging
 import os
 import poplib
 import smtplib
-from io import StringIO
 
 import icalendar as ic
 from mongoengine import ValidationError
+from datetime import datetime as dt
+from email.message import EmailMessage
 
 from abe import database as db
 from abe.helper_functions.converting_helpers import mongo_to_dict
@@ -18,6 +19,7 @@ ABE_EMAIL_USERNAME = os.environ.get('ABE_EMAIL_USERNAME', None)
 ABE_EMAIL_PASSWORD = os.environ.get('ABE_EMAIL_PASSWORD', None)
 ABE_EMAIL_HOST = os.environ.get('ABE_EMAIL_HOST', 'mail.privateemail.com')
 ABE_EMAIL_PORT = int(os.environ.get('ABE_EMAIL_PORT', 465))
+APP_URL = os.environ.get('APP_URL', 'events.olin.build')
 
 
 def get_msg_list(pop_items, pop_conn):
@@ -148,9 +150,8 @@ def smtp_connect():
         server = smtplib.SMTP_SSL(ABE_EMAIL_HOST, ABE_EMAIL_PORT)
         server.ehlo()
         server.login(ABE_EMAIL_USERNAME, ABE_EMAIL_PASSWORD)
-    # FIXME: catch the specific exception type
-    except:
-        logging.error(f'Connecting to {ABE_EMAIL_HOST} failed...')
+    except (smtplib.SMTPException, ConnectionRefusedError) as e:
+        logging.error(f'Connecting to {ABE_EMAIL_HOST} failed: {e}')
         # FIXME: callers do not handle a `None` return, and will error
         # on upacking this.
         return
@@ -161,45 +162,38 @@ def error_reply(to, error):
     """ Given the error, sends an email with the errors that
     occured to the original sender. """
     server, sent_from = smtp_connect()
-    subject = 'Event Failed to Add'
+    msg = EmailMessage()
     body = "ABE didn't manage to add the event, sorry. Here's what went wrong: \n"
     for err in error.errors:
         body = body + str(err) + '\n'
     body = body + "Final error message: " + error.message
-
-    email_text = """
-    From: {}
-    To: {}
-    Subject: {}
-
-    {}
-    """.format(sent_from, to, subject, body)
-
-    send_email(server, email_text, sent_from, to)
+    msg['Subject'] = 'Event Failed to Add'
+    msg['From'] = sent_from
+    msg['To'] = [to]
+    msg.set_content(body)
+    server.send_message(msg)
+    server.close()
 
 
 def reply_email(to, event_dict):
     """ Responds after a successful posting with
     the tags under which the event was saved. """
     server, sent_from = smtp_connect()
-    subject = '{} added to ABE!'.format(event_dict['title'])
     tags = ', '.join(event_dict['labels']).strip()
-    body = "Your event was added to ABE! Here's the details: "
-
-    email_text = """
-    From: {}
-    To: {}
-    Subject: {}
-
-    {}
-    Description: {}
-    Tags: {}
-    """.format(sent_from, to, subject, body, event_dict['description'], tags)
-    send_email(server, email_text, sent_from, to)
-
-
-def send_email(server, email_text, sent_from, sent_to):
-    server.sendmail(sent_from, sent_to, email_text.encode('utf-8'))
+    start = dt.strptime(event_dict['start'][:16], '%Y-%m-%d %H:%M').strftime('%I:%M %m/%d')
+    end = dt.strptime(event_dict['end'][:16], '%Y-%m-%d %H:%M').strftime('%I:%M %m/%d')
+    body = f"""Your event was added to ABE! Here's the details:
+    Time: {start} to {end}
+    Description: {event_dict['description']}
+    Tags: {tags}
+    Something wrong? Edit this event at {APP_URL}/edit/{event_dict['id']}
+    """
+    msg = EmailMessage()
+    msg['Subject'] = f"{event_dict['title']} added to ABE!"
+    msg['From'] = sent_from
+    msg['To'] = [to]
+    msg.set_content(body)
+    server.send_message(msg)
     server.close()
 
 
