@@ -17,7 +17,7 @@ from netaddr import IPNetwork, IPSet
 INTRANET_IPS = (IPSet([IPNetwork(s) for s in os.environ.get('INTRANET_IPS', '').split(',')])
                 if 'INTRANET_IPS' in os.environ else IPSet(['0.0.0.0/0', '0000:000::/0']))
 
-shared_secret = os.environ.get("SHARED_SECRET", None)
+shared_secret = os.environ.get("SHARED_SECRET", '')
 
 
 def after_this_request(f):  # For setting cookie

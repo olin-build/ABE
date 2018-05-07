@@ -36,6 +36,14 @@ class AbeTestCase(abe_unittest.TestCase):
             )
             self.assertEqual(response.status_code, 201)  # check only status code
 
+    def test_import_ics(self):
+        """Imports an ICS feed by URL"""
+        pass
+        # for feed in sample_data.load_sample_data().icss:
+        #     respose = self.app.post('/ics/', data=feed, content_type='application/json')
+        #     self.assertEqual(respose.status_code, 200)
+
+
     def test_add_sample_labels(self):
         """Adds the sample labels to the database"""
         for event in sample_data.load_sample_data().labels:
