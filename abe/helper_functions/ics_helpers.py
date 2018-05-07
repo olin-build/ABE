@@ -200,7 +200,7 @@ def ics_to_dict(component, labels, ics_id=None):
     elif isinstance(event_def['end'], datetime.date):
         event_def['end'] = event_def['end'] - timedelta(days=1)
         midnight_time = time(23, 59, 59)
-        event_def['end'] = datetime.dateime.combine(event_def['end'], midnight_time)
+        event_def['end'] = datetime.datetime.combine(event_def['end'], midnight_time)
         event_def['allDay'] = True
 
     event_def['labels'] = labels
