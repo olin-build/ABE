@@ -21,7 +21,7 @@ from abe.helper_functions.sub_event_helpers import (access_sub_event, create_sub
 api = Namespace('events', description='Events related operations')
 
 # This should be kept in sync with the document model, which drives the format
-event_model = api.model('Events_Model', {
+event_model = api.model('Event_Model', {
     'title': fields.String(example="Tea time"),
     'start': fields.DateTime(dt_format='iso8601'),
     'end': fields.DateTime(dt_format='iso8601'),
@@ -32,14 +32,21 @@ event_model = api.model('Events_Model', {
     'allDay': fields.Boolean
 })
 
+
+events_model = api.schema_model('Events_Model',{
+    'type':'array',
+    'items': {'$ref':'Event_Model'}}
+)
+
 #events_model = api.model('Event_List_Model', fields.List(event_model))
 
 @api.route('/<event_id>/<rec_id>')
 class EventApi(Resource):
     """API for interacting with events"""
 
-    @api.doc(params={'event_id':'the id of the mongoDB event requested to be found'})
-    @api.response(200, 'Success', event_model)
+    @api.doc(params={'event_id':'the id of the mongoDB event requested to be found',
+                     'rec_id':'the rec_id of the sub_event information requested to be retrieved'})
+    @api.response(200, 'Success', events_model)
     def get(self, event_id=None, rec_id=None):
         """
         Retrieve events from mongoDB
@@ -111,7 +118,7 @@ class EventApi(Resource):
 
     @edit_auth_required
     @api.expect(event_model)
-    @api.response(201, 'Created')
+    #@api.doc(responses={201, 'Created'})
     @api.response(400, 'Validation Error')
     @api.response(401, 'Unauthorized Access')
     def post(self):
