@@ -76,7 +76,6 @@ class AuthTestCase(unittest.TestCase):
                 route()
 
         # Test auth cookie
-        os.environ['SHARED_SECRET'] = 'security'
         auth = reload(auth)
         with self.subTest("off-whitelist IP, no cookie"):
             with app.test_request_context('/', environ_base={'REMOTE_ADDR': '127.0.1.1'}):
@@ -85,7 +84,7 @@ class AuthTestCase(unittest.TestCase):
                 self.assertEqual(http_error.exception.code, 401)
 
         with self.subTest("off-whitelist IP, correct cookie"):
-            with app.test_request_context('/', headers={"COOKIE": "app_secret=security"},
+            with app.test_request_context('/', headers={"COOKIE": "app_secret=F8F8E5FA-680C-4169-8D94-9EC007A5B03A"},
                                           environ_base={'REMOTE_ADDR': '127.0.1.1'}):
                 assert route() == 'ok'
 
