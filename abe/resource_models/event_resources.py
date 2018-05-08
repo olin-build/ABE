@@ -38,8 +38,6 @@ events_model = api.schema_model('Events_Model',{
     'items': {'$ref':'Event_Model'}}
 )
 
-#events_model = api.model('Event_List_Model', fields.List(event_model))
-
 @api.route('/<event_id>/<rec_id>')
 class EventApi(Resource):
     """API for interacting with events"""
@@ -118,9 +116,9 @@ class EventApi(Resource):
 
     @edit_auth_required
     @api.expect(event_model)
-    #@api.doc(responses={201, 'Created'})
-    @api.response(400, 'Validation Error')
-    @api.response(401, 'Unauthorized Access')
+    @api.response(201, 'Created', event_model)
+    @api.doc(responses={400: 'Validation Error',
+                        401: 'Unauthorized Acces'})
     def post(self):
         """
         Create new event with parameters passed in through args or form
