@@ -61,7 +61,7 @@ def ical_to_dict(cal):
     # [tags][go][here]\n
     # "rest of description"
     labels_and_desc = str(event.get('description')).strip().split('\n')
-    if '[' == labels_and_desc[0][0]:  # if the bracket is in the first line of the description, there are labels
+    if len(labels_and_desc[0]) > 0 and '[' == labels_and_desc[0][0]:  # if the bracket is in the first line of the description, there are labels
         label_str = labels_and_desc[0].lower()
         labels = label_str.replace('[', ' ').replace(']', '').strip().split()
         desc = '\n'.join(labels_and_desc[1:]).strip()
