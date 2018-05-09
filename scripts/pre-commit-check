@@ -1,0 +1,4 @@
+#!/usr/bin/env bash -eu
+
+flake8 abe tests *.py
+python -m unittest
