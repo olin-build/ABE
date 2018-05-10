@@ -204,7 +204,7 @@ class EventsTestCase(abe_unittest.TestCase):
                 content_type='application/json'
             )
             self.assertEqual(response.status_code, 200)
-            # TODO: test that the event is updated
+            self.assertIn(b'new title', response.data)
 
         with self.subTest("succeeds due to auth cookie"):
             response = self.app.put(
