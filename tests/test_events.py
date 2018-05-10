@@ -134,7 +134,6 @@ class EventsTestCase(abe_unittest.TestCase):
             self.assertEqual(response.status_code, 201)
 
     def test_put(self):
-        # TODO: test unauthorized user
         response = self.app.get('/events/?start=2017-01-01&end=2017-07-01')
         self.assertEqual(response.status_code, 200)
         event_id = flask.json.loads(response.data)[0]['id']
@@ -181,17 +180,42 @@ class EventsTestCase(abe_unittest.TestCase):
                                        'invalid_field-2': 'value'}),
                 content_type='application/json'
             )
-            self.assertEqual(response.status_code, 400)
 
-        # TODO: test unauthorized user
-        with self.subTest("fails when the client is not authorized"):
+    def test_put_auth(self):
+        response = self.app.get('/events/?start=2017-01-01&end=2017-07-01')
+        self.assertEqual(response.status_code, 200)
+        event_id = flask.json.loads(response.data)[0]['id']
+
+        with self.subTest("fails when the client is not yet authorized"):
             response = self.app.put(
-                '/events/',
-                data=flask.json.dumps(event),
+                f'/events/{event_id}',
+                data=flask.json.dumps({'title': 'new title'}),
                 content_type='application/json',
-                headers={'X-Forwarded-For': '192.168.1.1'}
+                headers={
+                    'X-Forwarded-For': '192.168.1.1',
+                }
             )
             self.assertEqual(response.status_code, 401)
+
+        with self.subTest("succeeds when required fields are present"):
+            response = self.app.put(
+                f'/events/{event_id}',
+                data=flask.json.dumps({'title': 'new title'}),
+                content_type='application/json'
+            )
+            self.assertEqual(response.status_code, 200)
+            # TODO: test that the event is updated
+
+        with self.subTest("succeeds due to auth cookie"):
+            response = self.app.put(
+                f'/events/{event_id}',
+                data=flask.json.dumps({'title': 'new title'}),
+                content_type='application/json',
+                headers={
+                    'X-Forwarded-For': '192.168.1.1',
+                }
+            )
+            self.assertEqual(response.status_code, 200)
         # pass
     
     @skip("Unimplemented test")
