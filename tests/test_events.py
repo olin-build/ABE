@@ -1,4 +1,4 @@
-from unittest import skip
+# from unittest import skip
 
 import flask
 import isodate
@@ -216,7 +216,7 @@ class EventsTestCase(abe_unittest.TestCase):
                 }
             )
             self.assertEqual(response.status_code, 200)
-    
+
     def test_delete(self):
         # TODO: test invalid data
         response = self.app.get('/events/?start=2017-01-01&end=2017-07-01')
