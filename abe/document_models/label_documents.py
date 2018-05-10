@@ -32,6 +32,8 @@ class Label(Document):
 
     visibility 		Indicates who can see the label. Optional
                                 Takes a string
+
+    protected       Indicates whether the event is editable
     """
     name = StringField(required=True, unique=True)
     description = StringField()
@@ -40,3 +42,4 @@ class Label(Document):
     parent_labels = ListField(StringField())  # rudimentary hierarchy of labels
     color = StringField(regex=r'#[0-9a-zA-Z]{6}')  # suggested color for label
     visibility = StringField()  # suggested visibility
+    protected = BooleanField()

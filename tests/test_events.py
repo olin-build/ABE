@@ -183,6 +183,35 @@ class EventsTestCase(abe_unittest.TestCase):
             )
             self.assertEqual(response.status_code, 400)
 
+        with self.subTest("fails if event is protected"):
+            self.skipTest('Unimplemented test')
+            label1 = {
+                'name': 'protected_label',
+                'protected': True
+            }
+            self.app.post(
+                '/labels/',
+                data=flask.json.dumps(label1),
+                content_type='application/json'
+            )
+            event = {
+                'title': 'test_post',
+                'start': isodate.parse_datetime('2018-05-10T09:00:00'),
+                'labels': ["protected_label"]
+            }
+            response = self.app.post(
+                '/events/',
+                data=flask.json.dumps(event),
+                content_type='application/json'
+            )
+            event_id = flask.json.loads(response.data.decode("utf-8"))['id']
+            response = self.app.put(
+                f'/events/{event_id}',
+                data=flask.json.dumps({'title': 'new title'}),
+                content_type='application/json'
+            )
+            self.assertEqual(response.status_code, 401)
+
     @skip("Unimplemented test")
     def test_delete(self):
         # TODO: test success
