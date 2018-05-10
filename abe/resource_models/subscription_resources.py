@@ -4,11 +4,11 @@
 import logging
 
 from flask import Response, request
-from mongoengine import ValidationError
 
 from abe import database as db
 from abe.document_models.subscription_documents import Subscription
 from abe.helper_functions.converting_helpers import request_to_dict
+from abe.helper_functions.mongodb_helpers import mongo_resource_errors
 from abe.helper_functions.ics_helpers import mongo_to_ics
 from abe.helper_functions.query_helpers import event_query, get_to_event_search
 from flask_restplus import Namespace, Resource, fields
@@ -30,6 +30,7 @@ def subscription_to_dict(s: Subscription):
 class SubscriptionAPI(Resource):
     """API for managing subscription feeds"""
 
+    @mongo_resource_errors
     def get(self, subscription_id: str):
         """
         Returns information about the subscription feed with the provided ID
@@ -44,35 +45,31 @@ class SubscriptionAPI(Resource):
 
         return subscription_to_dict(subscription)
 
+    @mongo_resource_errors
     @api.expect(sub_model)
     def post(self, subscription_id: str = ''):
         """
         Creates a subscription object with a list of labels, returning it with an ID
         """
-        try:
-            d = request_to_dict(request)
+        d = request_to_dict(request)
 
-            subscription = Subscription.new()  # Creates a subscription with a random ID
-            if subscription_id:
-                subscription.sid = subscription_id
+        subscription = Subscription.new()  # Creates a subscription with a random ID
+        if subscription_id:
+            subscription.sid = subscription_id
 
-            if isinstance(d['labels'], list):
-                subscription.labels = d['labels']
-            elif isinstance(d['labels'], str):
-                subscription.labels = d['labels'].split(',')
-            else:
-                raise ValueError('labels must be a list or comma-separated string')
+        if isinstance(d['labels'], list):
+            subscription.labels = d['labels']
+        elif isinstance(d['labels'], str):
+            subscription.labels = d['labels'].split(',')
+        else:
+            raise ValueError('labels must be a list or comma-separated string')
 
-            subscription.save()
-            logging.debug("Subscription {} saved to the database".format(subscription.sid))
+        subscription.save()
+        logging.debug("Subscription {} saved to the database".format(subscription.sid))
 
-            return subscription_to_dict(subscription)
+        return subscription_to_dict(subscription)
 
-        except ValidationError as error:
-            return {'error_type': 'validation',
-                    'validation_errors': [str(err) for err in error.errors],
-                    'error_message': error.message}, 400
-
+    @mongo_resource_errors
     @api.expect(sub_model)
     def put(self, subscription_id: str):
         """Modify an existing subscription"""
@@ -80,31 +77,25 @@ class SubscriptionAPI(Resource):
         data = request_to_dict(request)
         logging.debug("Received Subscription PUT data: {}".format(data))
 
-        try:
-            subscription = db.Subscription.objects(sid=subscription_id).first()
+        subscription = db.Subscription.objects(sid=subscription_id).first()
 
-            if not subscription:
-                return "Subscription not found with identifier '{}'".format(subscription_id), 404
+        if not subscription:
+            return "Subscription not found with identifier '{}'".format(subscription_id), 404
 
-            if isinstance(data['labels'], list):
-                subscription.labels = data['labels']
-            elif isinstance(data['labels'], str):
-                subscription.labels = data['labels'].split(',')
+        if isinstance(data['labels'], list):
+            subscription.labels = data['labels']
+        elif isinstance(data['labels'], str):
+            subscription.labels = data['labels'].split(',')
 
-            subscription.save()
+        subscription.save()
 
-        except ValidationError as error:
-            return {'error_type': 'validation',
-                    'validation_errors': [str(err) for err in error.errors],
-                    'error_message': error.message}, 400
-
-        else:  # return success
-            return subscription_to_dict(subscription)
+        return subscription_to_dict(subscription)
 
 
 class SubscriptionICS(Resource):
     """Retrieves data from the given subscription as an ICS feed"""
 
+    @mongo_resource_errors
     def get(self, subscription_id: str):
         """
         Returns an ICS feed when requested.

@@ -45,7 +45,8 @@ def create_ics_event(event: db.Event, recurrence=False, sub: db.Subscription = N
     # creates the Event
     new_event = ical.Event()
     new_event.add('summary', event['title'])
-    new_event.add('location', event['location'])
+    if event['location']:
+        new_event.add('location', event['location'])
     description = event['description']
     if sub:
         logging.debug("Working with subscription", sub, sub.sid)
@@ -198,9 +199,9 @@ def ics_to_dict(component, labels, ics_id=None):
             event_def['end'].replace(hour=23, minute=59, second=59)
 
     elif isinstance(event_def['end'], datetime.date):
-        event_def['end'] = event_def['end'] - timedelta(day=1)
+        event_def['end'] = event_def['end'] - timedelta(days=1)
         midnight_time = time(23, 59, 59)
-        event_def['end'] = datetime.combine(event_def['end'], midnight_time)
+        event_def['end'] = datetime.datetime.combine(event_def['end'], midnight_time)
         event_def['allDay'] = True
 
     event_def['labels'] = labels
@@ -253,7 +254,7 @@ def extract_ics(cal, ics_url, labels=None):
         for component in cal.walk():
             if component.name == "VEVENT":
                 last_modified = component.get('LAST-MODIFIED').dt
-                now = datetime.now(timezone.utc)
+                now = datetime.datetime.now(timezone.utc)
                 difference = now - last_modified
                 # if an event has been modified in the last two hours
                 if difference.total_seconds() < 7200:
@@ -278,11 +279,11 @@ def extract_ics(cal, ics_url, labels=None):
                         temporary_dict.append(com_dict)
                         logging.debug("temporarily saved recurring event as dict")
                 else:  # if this is a regular event
-                    com_dict['self'] = open('README.md')
                     try:
                         new_event = db.Event(**com_dict).save()
                     except:  # FIXME: bare except # noqa: E722
-                        logging.exception("com_dict: {}", com_dict)
+                        logging.exception("com_dict: {}".format(com_dict))
+                        continue
                     if not new_event.labels:  # if the event has no labels
                         new_event.labels = ['unlabeled']
                     if 'recurrence' in new_event:  # if the event has no recurrence_end

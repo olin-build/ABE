@@ -17,7 +17,7 @@ from .resource_models.label_resources import api as label_api
 from .resource_models.ics_resources import api as ics_api
 from .resource_models.subscription_resources import api as subscription_api
 
-FORMAT = "%(levelname)s:ABE: _||_ %(message)s"
+FORMAT = "%(levelname)s:ABE: 🎩 %(message)s"
 logging.basicConfig(level=logging.INFO, format=FORMAT)
 
 app = Flask(__name__)
