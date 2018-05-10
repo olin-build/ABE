@@ -95,3 +95,5 @@ class AuthTestCase(unittest.TestCase):
                 with self.assertRaises(HTTPException) as http_error:
                     route()
                 self.assertEqual(http_error.exception.code, 401)
+
+    # TODO: add test for viewing auth

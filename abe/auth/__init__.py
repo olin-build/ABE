@@ -55,3 +55,5 @@ def edit_auth_required(f):
             abort(401)
         return f(*args, **kwargs)
     return wrapped
+
+# TODO: add function for viewing auth

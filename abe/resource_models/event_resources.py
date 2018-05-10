@@ -36,6 +36,7 @@ event_model = api.model('Events_Model', {
 class EventApi(Resource):
     """API for interacting with events"""
 
+    # TODO: add auth check for viewing non-public events
     @mongo_resource_errors
     def get(self, event_id=None, rec_id=None):
         """
