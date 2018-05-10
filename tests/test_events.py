@@ -1,5 +1,3 @@
-# from unittest import skip
-
 import flask
 import isodate
 
@@ -145,7 +143,7 @@ class EventsTestCase(abe_unittest.TestCase):
                 content_type='application/json'
             )
             self.assertEqual(response.status_code, 200)
-            self.assertIn(b'new title', response.data)
+            self.assertEqual(flask.json.loads(response.data)['title'], 'new title')
 
         with self.subTest("fails on invalid id"):
             response = self.app.put(
@@ -204,7 +202,7 @@ class EventsTestCase(abe_unittest.TestCase):
                 content_type='application/json'
             )
             self.assertEqual(response.status_code, 200)
-            self.assertIn(b'new title', response.data)
+            self.assertEqual(flask.json.loads(response.data)['title'], 'new title')
 
         with self.subTest("succeeds due to auth cookie"):
             response = self.app.put(
@@ -250,7 +248,7 @@ class EventsTestCase(abe_unittest.TestCase):
             )
             self.assertEqual(response.status_code, 401)
 
-        with self.subTest("succeeds when required fields are present"):
+        with self.subTest("succeeds when user is within local network"):
             response = self.app.delete(
                 f'/events/{event_id}'
             )
