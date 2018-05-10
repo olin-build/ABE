@@ -217,10 +217,22 @@ class EventsTestCase(abe_unittest.TestCase):
             )
             self.assertEqual(response.status_code, 200)
     
-    @skip("Unimplemented test")
     def test_delete(self):
-        # TODO: test success
-        # TODO: test invalid id
+        response = self.app.get('/events/?start=2017-01-01&end=2017-07-01')
+        self.assertEqual(response.status_code, 200)
+        event_id = flask.json.loads(response.data)[0]['id']
+
+        with self.subTest("succeeds on valid id"):
+            response = self.app.delete(
+                f'/events/{event_id}'
+            )
+            self.assertEqual(response.status_code, 200)
+
+        with self.subTest("fails on invalid id"):
+            response = self.app.delete(
+                f'/events/{event_id}x'
+            )
+            # FIXME: why is this not 404?
+            self.assertEqual(response.status_code, 400)
         # TODO: test invalid data
         # TODO: test unauthorized user
-        pass
