@@ -145,7 +145,7 @@ class EventsTestCase(abe_unittest.TestCase):
                 content_type='application/json'
             )
             self.assertEqual(response.status_code, 200)
-            # TODO: test that the event has a new value
+            self.assertIn(b'new title', response.data)
 
         with self.subTest("fails on invalid id"):
             response = self.app.put(
@@ -216,7 +216,6 @@ class EventsTestCase(abe_unittest.TestCase):
                 }
             )
             self.assertEqual(response.status_code, 200)
-        # pass
     
     @skip("Unimplemented test")
     def test_delete(self):
