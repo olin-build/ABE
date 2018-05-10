@@ -9,7 +9,6 @@ from .context import abe  # noqa: F401
 # These imports have to happen after .context sets the environment variables
 import abe.app  # isort:skip
 from abe import sample_data  # isort:skip
-from abe.resource_models import event_resources
 
 
 class EventsTestCase(abe_unittest.TestCase):
@@ -196,9 +195,9 @@ class EventsTestCase(abe_unittest.TestCase):
                 content_type='application/json'
             )
             event = {
-            'title': 'test_post',
-            'start': isodate.parse_datetime('2018-05-10T09:00:00'),
-            'labels': ["protected_label"]
+                'title': 'test_post',
+                'start': isodate.parse_datetime('2018-05-10T09:00:00'),
+                'labels': ["protected_label"]
             }
             response = self.app.post(
                 '/events/',
@@ -212,7 +211,6 @@ class EventsTestCase(abe_unittest.TestCase):
                 content_type='application/json'
             )
             self.assertEqual(response.status_code, 401)
-
 
     @skip("Unimplemented test")
     def test_delete(self):
