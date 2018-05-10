@@ -218,6 +218,7 @@ class EventsTestCase(abe_unittest.TestCase):
             self.assertEqual(response.status_code, 200)
     
     def test_delete(self):
+        # TODO: test invalid data
         response = self.app.get('/events/?start=2017-01-01&end=2017-07-01')
         self.assertEqual(response.status_code, 200)
         event_id = flask.json.loads(response.data)[0]['id']
@@ -234,5 +235,32 @@ class EventsTestCase(abe_unittest.TestCase):
             )
             # FIXME: why is this not 404?
             self.assertEqual(response.status_code, 400)
-        # TODO: test invalid data
-        # TODO: test unauthorized user
+
+    def test_delete_auth(self):
+        response = self.app.get('/events/?start=2017-01-01&end=2017-07-01')
+        self.assertEqual(response.status_code, 200)
+        event_id = flask.json.loads(response.data)[0]['id']
+
+        with self.subTest("fails when the client is not yet authorized"):
+            response = self.app.delete(
+                f'/events/{event_id}',
+                headers={
+                    'X-Forwarded-For': '192.168.1.1',
+                }
+            )
+            self.assertEqual(response.status_code, 401)
+
+        with self.subTest("succeeds when required fields are present"):
+            response = self.app.delete(
+                f'/events/{event_id}'
+            )
+            self.assertEqual(response.status_code, 200)
+
+        with self.subTest("succeeds due to auth cookie"):
+            response = self.app.delete(
+                f'/events/{event_id}',
+                headers={
+                    'X-Forwarded-For': '192.168.1.1',
+                }
+            )
+            self.assertEqual(response.status_code, 200)
