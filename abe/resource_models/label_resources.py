@@ -23,7 +23,8 @@ label_model = api.model("Label_Model", {
     "default":  fields.Boolean,
     "parent_labels": fields.List(fields.String),
     "color": fields.String,
-    "visibility": fields.String(enum=['public', 'olin', 'students'])
+    "visibility": fields.String(enum=['public', 'olin', 'students']),
+    "protected": fields.Boolean
 })
 
 
