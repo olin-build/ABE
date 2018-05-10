@@ -125,7 +125,13 @@ celery -A tasks worker --beat -l info
 
 in a separate terminal. These will run the "beat" and "worker" servers alongside the web server.
 
-### Testing
+### Code Quality
+
+Run `./scripts/pre-commit-check` before you commit (and certainly before you
+submit a PR). This runs the test suite and the linter. You can also run these
+separately:
+
+#### Testing
 
 `python -m unittest`
 
@@ -154,7 +160,9 @@ $ coverage html
 $ open htmlcov/index.html
 ```
 
-Lint all the things:
+The test suite will print some `DeprecationWarning`s from files in `…/site-packages/mongoengine/` (#151). It is safe to ignore these.
+
+#### Linting
 
 ```shell
 $ flake8 abe tests *.py
@@ -163,3 +171,4 @@ $ flake8 abe tests *.py
 ## API Documentation
 
 Interactive API documentation can be found at`/docs/`, e.g. for local development: <http://127.0.0.1:3000/docs/>.
+****

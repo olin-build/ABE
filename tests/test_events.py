@@ -56,7 +56,7 @@ class EventsTestCase(abe_unittest.TestCase):
             )
             self.assertEqual(response.status_code, 201)
 
-        with self.subTest("fails when fields are missing"):
+        with self.subTest("fails on missing fields"):
             evt = event.copy()
             del evt['title']
             response = self.app.post(
@@ -77,6 +77,26 @@ class EventsTestCase(abe_unittest.TestCase):
             self.assertEqual(response.status_code, 400)
             self.assertRegex(flask.json.loads(response.data)['error_message'], r"^ValidationError.*'start'")
 
+        with self.subTest("fails on invalid fields"):
+            evt = event.copy()
+            evt['invalid'] = 'invalid field'
+            response = self.app.post(
+                '/events/',
+                data=flask.json.dumps(evt),
+                content_type='application/json'
+            )
+            self.assertEqual(response.status_code, 400)
+
+        with self.subTest("fails on invalid field values"):
+            evt = event.copy()
+            evt['url'] = 'invalid field value'
+            response = self.app.post(
+                '/events/',
+                data=flask.json.dumps(evt),
+                content_type='application/json'
+            )
+            self.assertEqual(response.status_code, 400)
+
     def test_post_auth(self):
         event = {
             'title': 'test_post',
@@ -89,7 +109,7 @@ class EventsTestCase(abe_unittest.TestCase):
                 content_type='application/json',
                 headers={
                     'X-Forwarded-For': '192.168.1.1',
-                    }
+                }
             )
             self.assertEqual(response.status_code, 401)
 
@@ -100,6 +120,7 @@ class EventsTestCase(abe_unittest.TestCase):
                 content_type='application/json'
             )
             self.assertEqual(response.status_code, 201)
+            # TODO: test that the event is in the database
 
         with self.subTest("succeeds due to auth cookie"):
             response = self.app.post(
@@ -108,17 +129,59 @@ class EventsTestCase(abe_unittest.TestCase):
                 content_type='application/json',
                 headers={
                     'X-Forwarded-For': '192.168.1.1',
-                    }
+                }
             )
             self.assertEqual(response.status_code, 201)
 
-    @skip("Unimplemented test")
     def test_put(self):
-        # TODO: test success
-        # TODO: test invalid id
-        # TODO: test invalid data
         # TODO: test unauthorized user
-        pass
+        response = self.app.get('/events/?start=2017-01-01&end=2017-07-01')
+        self.assertEqual(response.status_code, 200)
+        event_id = flask.json.loads(response.data)[0]['id']
+
+        with self.subTest("succeeds on valid id"):
+            response = self.app.put(
+                f'/events/{event_id}',
+                data=flask.json.dumps({'title': 'new title'}),
+                content_type='application/json'
+            )
+            self.assertEqual(response.status_code, 200)
+            # TODO: test that the event has a new value
+
+        with self.subTest("fails on invalid id"):
+            response = self.app.put(
+                f'/events/{event_id}x',
+                data=flask.json.dumps({'title': 'new title'}),
+                content_type='application/json'
+            )
+            # FIXME: why is this not 404?
+            self.assertEqual(response.status_code, 400)
+
+        with self.subTest("fails on invalid field"):
+            response = self.app.put(
+                f'/events/{event_id}',
+                data=flask.json.dumps({'invalid_field': 'value'}),
+                content_type='application/json'
+            )
+            self.assertEqual(response.status_code, 400)
+
+        with self.subTest("fails on invalid field value"):
+            response = self.app.put(
+                f'/events/{event_id}',
+                data=flask.json.dumps({'url': 'invalid url'}),
+                content_type='application/json'
+            )
+            self.assertEqual(response.status_code, 400)
+
+        # This exercises a different code path in mongodb -> JOSN error conversion
+        with self.subTest("fails on multiple invalid fields"):
+            response = self.app.put(
+                f'/events/{event_id}',
+                data=flask.json.dumps({'invalid_field-1': 'value',
+                                       'invalid_field-2': 'value'}),
+                content_type='application/json'
+            )
+            self.assertEqual(response.status_code, 400)
 
     @skip("Unimplemented test")
     def test_delete(self):
