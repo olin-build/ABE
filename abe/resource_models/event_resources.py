@@ -33,18 +33,18 @@ event_model = api.model('Event_Model', {
 })
 
 
-events_model = api.schema_model('Events_Model',{
-    'type':'array',
-    'items': {'$ref':'Event_Model'}}
+events_model = api.schema_model('Events_Model', {
+    'type': 'array',
+    'items': {'$ref': 'Event_Model'}}
 )
+
 
 @api.route('/<event_id>/<rec_id>')
 class EventApi(Resource):
     """API for interacting with events"""
 
-
-    @api.doc(params={'event_id':'the id of the mongoDB event requested to be found',
-                     'rec_id':'the rec_id of the sub_event information requested to be retrieved'})
+    @api.doc(params={'event_id': 'the id of the mongoDB event requested to be found',
+                     'rec_id': 'the rec_id of the sub_event information requested to be retrieved'})
     @api.response(200, 'Success', events_model)
     @mongo_resource_errors
     def get(self, event_id=None, rec_id=None):
