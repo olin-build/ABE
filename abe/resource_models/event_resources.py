@@ -21,7 +21,7 @@ from abe.helper_functions.sub_event_helpers import (access_sub_event, create_sub
 api = Namespace('events', description='Events related operations')
 
 # This should be kept in sync with the document model, which drives the format
-event_model = api.model('Events_Model', {
+event_model = api.model('Event_Model', {
     'title': fields.String(example="Tea time"),
     'start': fields.DateTime(dt_format='iso8601'),
     'end': fields.DateTime(dt_format='iso8601'),
@@ -33,9 +33,19 @@ event_model = api.model('Events_Model', {
 })
 
 
+events_model = api.schema_model('Events_Model', {
+    'type': 'array',
+    'items': {'$ref': 'Event_Model'}}
+)
+
+
+@api.route('/<event_id>/<rec_id>')
 class EventApi(Resource):
     """API for interacting with events"""
 
+    @api.doc(params={'event_id': 'the id of the mongoDB event requested to be found',
+                     'rec_id': 'the rec_id of the sub_event information requested to be retrieved'})
+    @api.response(200, 'Success', events_model)
     @mongo_resource_errors
     def get(self, event_id=None, rec_id=None):
         """
@@ -109,6 +119,9 @@ class EventApi(Resource):
     @edit_auth_required
     @mongo_resource_errors
     @api.expect(event_model)
+    @api.response(201, 'Created', event_model)
+    @api.doc(responses={400: 'Validation Error',
+                        401: 'Unauthorized Acces'})
     def post(self):
         """
         Create new event with parameters passed in through args or form
