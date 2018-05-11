@@ -23,7 +23,7 @@ script:
   - pipenv run flake8 abe tests *.py
 
 after_success:
-  - codecov
+  - pipenv run codecov
 
 notifications:
   slack:
