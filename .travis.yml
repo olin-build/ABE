@@ -14,7 +14,6 @@ env:
   - PIPENV_IGNORE_VIRTUALENVS=1
 
 install:
-  - cp .env.template .env
   - pip install pipenv
   - pipenv install --dev --ignore-pipfile
 
@@ -23,7 +22,7 @@ script:
   - pipenv run flake8 abe tests *.py
 
 after_success:
-  - codecov
+  - pipenv run codecov
 
 notifications:
   slack:
