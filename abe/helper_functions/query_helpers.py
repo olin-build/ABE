@@ -70,7 +70,7 @@ def event_query(search_dict):
         'labels': lambda a: {'labels': {'$in': a}},
         'labels_and': lambda a: {'labels': {'$all': a}},
         'labels_not': lambda a: {'labels': {'$nin': a}},
-        'visibility': lambda a: {'visibility': {'$in': a}},
+        'visibility': lambda a: {'visibility': {'$eq': a}},
     }
 
     params_recu_event = {
@@ -79,7 +79,7 @@ def event_query(search_dict):
         'labels': lambda a: {'labels': {'$in': a}},
         'labels_and': lambda a: {'labels': {'$all': a}},
         'labels_not': lambda a: {'labels': {'$nin': a}},
-        'visibility': lambda a: {'visibility': {'$in': a}},
+        'visibility': lambda a: {'visibility': {'$eq': a}},
     }
 
     # query for regular events
