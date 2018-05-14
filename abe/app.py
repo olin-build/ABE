@@ -12,6 +12,7 @@ import os
 
 import logging
 
+from .resource_models.account_resources import api as account_api
 from .resource_models.event_resources import api as event_api
 from .resource_models.label_resources import api as label_api
 from .resource_models.ics_resources import api as ics_api
@@ -80,6 +81,7 @@ def call_after_request_callbacks(response):  # For deferred callbacks
 
 
 # Route resources
+api.add_namespace(account_api)
 api.add_namespace(event_api)
 api.add_namespace(label_api)
 api.add_namespace(ics_api)
