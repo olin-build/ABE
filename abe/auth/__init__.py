@@ -2,7 +2,7 @@
 
 import os
 from functools import wraps
-
+import re
 from flask import request, abort, g
 from netaddr import IPNetwork, IPSet
 import logging
@@ -25,6 +25,15 @@ if not SHARED_SECRET:
     logging.critical("SHARED_SECRET isn't set")
 
 
+def create_access_token():
+    return f"secret:{SHARED_SECRET or '---'}"
+
+
+def is_valid_access_token(token):
+    # There is currently only one access tokens
+    return token == create_access_token()
+
+
 def after_this_request(f):  # For setting cookie
     if not hasattr(g, 'after_request_callbacks'):
         g.after_request_callbacks = []
@@ -38,20 +47,26 @@ def check_auth(req):
     If the request is in the IP whitelist, sets the secret cookie.
     Returns a Bool of passing.
     """
-    access_token = f"secret:{SHARED_SECRET or '---'}"
     client_ip = req.headers.get('X-Forwarded-For', req.remote_addr).split(',')[-1]
     if client_ip in INTRANET_IPS:
+        access_token = create_access_token()
+
         @after_this_request
         def remember_computer(response):
-            response.headers['Access-Control-Expose-Headers'] = 'Access-Token'
-            response.headers['Access-Token'] = access_token
             response.set_cookie(ACCESS_TOKEN_COOKIE_NAME, access_token, max_age=180 * 24 * 3600)
         return True
-    if req.cookies.get(ACCESS_TOKEN_COOKIE_NAME) == access_token:
+    if is_valid_access_token(req.cookies.get(ACCESS_TOKEN_COOKIE_NAME)):
         return True
-    if req.headers.get('Authorization') == f"Bearer {access_token}":
-        return True
+    if 'Authorization' in req.headers:
+        match = re.match(r'Bearer (.+)', req.headers['Authorization'])
+        return match and is_valid_access_token(match[1])
     return False
+
+
+def clear_auth_cookie():
+    @after_this_request
+    def remove_cookie(response):
+        response.set_cookie(ACCESS_TOKEN_COOKIE_NAME, '', expires=0)
 
 
 def edit_auth_required(f):
