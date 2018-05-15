@@ -50,33 +50,36 @@ class AuthTestCase(unittest.TestCase):
         def route():
             return 'ok'
 
-        with app.test_request_context('/', environ_base={'REMOTE_ADDR': '127.0.0.1'}):
-            assert route() == 'ok'
-        with app.test_request_context('/', environ_base={'REMOTE_ADDR': '127.0.1.1'}):
-            with self.assertRaises(HTTPException) as http_error:
-                route()
-            self.assertEqual(http_error.exception.code, 401)
+        with self.subTest("permits a whitelisted IP"):
+            with app.test_request_context('/', environ_base={'REMOTE_ADDR': '127.0.0.1'}):
+                assert route() == 'ok'
 
-        # Read the client IP instead of the Proxy
-        with app.test_request_context('/', headers={'X-Forwarded-For': '127.0.0.1'}):
-            assert route() == 'ok'
-        with app.test_request_context('/', headers={'X-Forwarded-For': '127.0.0.255'}):
-            assert route() == 'ok'
-        with app.test_request_context('/',
-                                      environ_base={'REMOTE_ADDR': '127.0.0.1'},
-                                      headers={'X-Forwarded-For': '127.0.1.1'}):
-            with self.assertRaises(HTTPException) as http_error:
-                route()
-            self.assertEqual(http_error.exception.code, 401)
+        with self.subTest("denies a non-whitelisted IP"):
+            with app.test_request_context('/', environ_base={'REMOTE_ADDR': '127.0.1.1'}):
+                with self.assertRaises(HTTPException) as http_error:
+                    route()
+                self.assertEqual(http_error.exception.code, 401)
 
-        # Detect attempt to spoof the client IP.
-        with app.test_request_context('/',
-                                      headers={'X-Forwarded-For': '127.0.0.1,192.168.0.1'}):
-            with self.assertRaises(HTTPException) as http_error:
-                route()
+        with self.subTest("read the client IP instead of the proxy"):
+            with app.test_request_context('/', headers={'X-Forwarded-For': '127.0.0.1'}):
+                assert route() == 'ok'
+            with app.test_request_context('/', headers={'X-Forwarded-For': '127.0.0.255'}):
+                assert route() == 'ok'
+            with app.test_request_context('/',
+                                          environ_base={'REMOTE_ADDR': '127.0.0.1'},
+                                          headers={'X-Forwarded-For': '127.0.1.1'}):
+                with self.assertRaises(HTTPException) as http_error:
+                    route()
+                self.assertEqual(http_error.exception.code, 401)
+
+        with self.subTest("detects attempt to spoof the client IP"):
+            with app.test_request_context('/',
+                                          headers={'X-Forwarded-For': '127.0.0.1,192.168.0.1'}):
+                with self.assertRaises(HTTPException) as http_error:
+                    route()
 
         # Test auth cookie
-        os.environ['SHARED_SECRET'] = 'security'
+        os.environ['SHARED_SECRET'] = 'valid-secret'
         auth = reload(auth)
         with self.subTest("off-whitelist IP, no cookie"):
             with app.test_request_context('/', environ_base={'REMOTE_ADDR': '127.0.1.1'}):
@@ -85,12 +88,23 @@ class AuthTestCase(unittest.TestCase):
                 self.assertEqual(http_error.exception.code, 401)
 
         with self.subTest("off-whitelist IP, correct cookie"):
-            with app.test_request_context('/', headers={"COOKIE": "app_secret=security"},
+            with app.test_request_context('/', headers={"COOKIE": "access_token=secret:valid-secret"},
                                           environ_base={'REMOTE_ADDR': '127.0.1.1'}):
                 assert route() == 'ok'
 
         with self.subTest("off-whitelist IP, incorrect cookie"):
-            with app.test_request_context('/', headers={"COOKIE": "app_secret=obscurity"},
+            with app.test_request_context('/', headers={"COOKIE": "access_token=secret:invalid-secret"},
+                                          environ_base={'REMOTE_ADDR': '127.0.1.1'}):
+                with self.assertRaises(HTTPException) as http_error:
+                    route()
+                self.assertEqual(http_error.exception.code, 401)
+
+        with self.subTest("off-whitelist IP, authorization header"):
+            with app.test_request_context('/', headers={"Authorization": "Bearer secret:valid-secret"},
+                                          environ_base={'REMOTE_ADDR': '127.0.1.1'}):
+                assert route() == 'ok'
+
+            with app.test_request_context('/', headers={"Authorization": "Bearer secret:invalid-secret"},
                                           environ_base={'REMOTE_ADDR': '127.0.1.1'}):
                 with self.assertRaises(HTTPException) as http_error:
                     route()

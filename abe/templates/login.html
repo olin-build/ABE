@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>ABE : Sign In</title>
+    <meta name="description" content="Sign into ABE">
+</head>
+<body>
+    <div>
+        <h2>Sign in with Slack</h2>
+        <p>
+            Sign into ABE with Slack. This lets us know that you're in the Olin
+            Community (and therefore that have an <code>@olin.edu</code> or
+            <code>@students.olin.edu</code>
+            address, or that someone vouched for you), and show you community
+            information.
+        </p>
+        <a href="https://slack.com/oauth/authorize?scope=identity.basic&client_id={{ client_id }}&state={{ state }}&redirect_uri={{ redirect_uri }}">
+            <img src="https://api.slack.com/img/sign_in_with_slack.png" />
+        </a>
+    </div>
+</body>
+</html>
