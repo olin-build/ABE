@@ -3,22 +3,83 @@
   <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>ABE : Sign In</title>
     <meta name="description" content="Sign into ABE">
+    <title>ABE : Sign In</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
+    <style type="text/css">
+        body {
+            font-family: 'Century';
+            font-size: 18px;
+            line-height: 1.6em;
+            color: #5D6063;
+            max-width: 780px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0 10px;
+      }
+        h1, h2 {
+            font-family: 'Roboto Slab', serif;
+        }
+        .subtitle {
+            font-style: italic;
+        }
+        .center {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
 </head>
 <body>
     <div>
-        <h2>Sign in with Slack</h2>
+        <h1>Sign into ABE</h1>
+        <div class="subtitle">
+            Use your Olin Slack account to sign into ABE.
+        </div>
         <p>
-            Sign into ABE with Slack. This lets us know that you're in the Olin
-            Community (and therefore that have an <code>@olin.edu</code> or
-            <code>@students.olin.edu</code>
-            address, or that someone vouched for you), and show you community
-            information.
+            If you have an account on the <a href="https://olin.slack.com">Olin
+            College Slack account</a>, you can use that to sign in here:
         </p>
-        <a href="https://slack.com/oauth/authorize?scope=identity.basic&client_id={{ client_id }}&state={{ state }}&redirect_uri={{ redirect_uri }}">
+        <a class="center" href="https://slack.com/oauth/authorize?scope=identity.basic&client_id={{ client_id }}&state={{ state }}&redirect_uri={{ redirect_uri }}">
             <img src="https://api.slack.com/img/sign_in_with_slack.png" />
         </a>
+
+        <h2>I Don't Have an Olin Slack Account</h2>
+        <p>
+            If you have a <code>@olin.edu</code> or <code>@student.olin.edu</code>
+            email address, you can use that to create a Slack account, and use
+            that to sign in here. Visit <a href="https://olin.slack.com">olin.slack.com</a>
+            to create an account.
+        </p>
+        <p>
+            Otherwise, ask someone in the Olin community to add you to Slack.
+        </p>
+
+        <h2>Why Do I Need to Sign In?</h2>
+        <p>
+            This lets us know that you're in the Olin Community. We'll show you
+            Olin community events, and we'll trust you to add and edit events on
+            the calendar.
+        </p>
+        <p>
+            You don't need to sign in (a) if you're on campus, or (b) to view
+            only public events.
+        </p>
+
+        <h2>Why Slack?</h2>
+        <p>
+            We may add other means for signing into ABE, that don't require a
+            Slack account.
+        </p>
+        <p>
+            For example, Olin IT has a Single Sign-On system, that may become
+            available for student projects.
+        </p>
+
+        <h2>Privacy</h2>
+        <p>Here's what we currently store about you:</p>
+        <p>Nothing.</p>
+
     </div>
 </body>
 </html>
