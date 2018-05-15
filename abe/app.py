@@ -22,7 +22,9 @@ FORMAT = "%(levelname)s:ABE: 🎩 %(message)s"
 logging.basicConfig(level=logging.INFO, format=FORMAT)
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, allow_headers='Authorization', supports_credentials=True)
+
+# Access-Control-Allow-Headers
 
 # Redirect HTTP to HTTPS.
 #

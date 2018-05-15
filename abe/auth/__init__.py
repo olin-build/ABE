@@ -7,6 +7,8 @@ from flask import request, abort, g
 from netaddr import IPNetwork, IPSet
 import logging
 
+ACCESS_TOKEN_COOKIE_NAME = 'access_token'
+
 # A set of IP addresses with edit permission.
 #
 # If the INTRANET_IPS environment variable is set, it should be a
@@ -18,8 +20,8 @@ import logging
 INTRANET_IPS = (IPSet([IPNetwork(s) for s in os.environ.get('INTRANET_IPS', '').split(',')])
                 if 'INTRANET_IPS' in os.environ else IPSet(['0.0.0.0/0', '0000:000::/0']))
 
-shared_secret = os.environ.get("SHARED_SECRET", "")
-if not shared_secret:
+SHARED_SECRET = os.environ.get("SHARED_SECRET", "")
+if not SHARED_SECRET:
     logging.critical("SHARED_SECRET isn't set")
 
 
@@ -36,15 +38,20 @@ def check_auth(req):
     If the request is in the IP whitelist, sets the secret cookie.
     Returns a Bool of passing.
     """
-    client_ip = req.headers.get(
-        'X-Forwarded-For', req.remote_addr).split(',')[-1]
+    access_token = f"secret:{SHARED_SECRET or '---'}"
+    client_ip = req.headers.get('X-Forwarded-For', req.remote_addr).split(',')[-1]
     if client_ip in INTRANET_IPS:
         @after_this_request
         def remember_computer(response):
-            response.set_cookie('app_secret', shared_secret)
+            response.headers['Access-Control-Expose-Headers'] = 'Access-Token'
+            response.headers['Access-Token'] = access_token
+            response.set_cookie(ACCESS_TOKEN_COOKIE_NAME, access_token, max_age=180 * 24 * 3600)
         return True
-    else:
-        return bool(shared_secret) and (req.cookies.get('app_secret') == shared_secret)
+    if req.cookies.get(ACCESS_TOKEN_COOKIE_NAME) == access_token:
+        return True
+    if req.headers.get('Authorization') == f"Bearer {access_token}":
+        return True
+    return False
 
 
 def edit_auth_required(f):
