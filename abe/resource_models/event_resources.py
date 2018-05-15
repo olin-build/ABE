@@ -10,7 +10,7 @@ from flask import abort, request
 from flask_restplus import Namespace, Resource, fields
 
 from abe import database as db
-from abe.auth import edit_auth_required
+from abe.auth import check_auth, edit_auth_required
 from abe.helper_functions.converting_helpers import mongo_to_dict, request_to_dict
 from abe.helper_functions.mongodb_helpers import mongo_resource_errors
 from abe.helper_functions.query_helpers import event_query, get_to_event_search
@@ -21,7 +21,7 @@ from abe.helper_functions.sub_event_helpers import (access_sub_event, create_sub
 api = Namespace('events', description='Events related operations')
 
 # This should be kept in sync with the document model, which drives the format
-event_model = api.model('Events_Model', {
+event_model = api.model('Event_Model', {
     'title': fields.String(example="Tea time"),
     'start': fields.DateTime(dt_format='iso8601'),
     'end': fields.DateTime(dt_format='iso8601'),
@@ -33,9 +33,19 @@ event_model = api.model('Events_Model', {
 })
 
 
+events_model = api.schema_model('Events_Model', {
+    'type': 'array',
+    'items': {'$ref': 'Event_Model'}}
+)
+
+
+@api.route('/<event_id>/<rec_id>')
 class EventApi(Resource):
     """API for interacting with events"""
 
+    @api.doc(params={'event_id': 'the id of the mongoDB event requested to be found',
+                     'rec_id': 'the rec_id of the sub_event information requested to be retrieved'})
+    @api.response(200, 'Success', events_model)
     @mongo_resource_errors
     def get(self, event_id=None, rec_id=None):
         """
@@ -85,9 +95,12 @@ class EventApi(Resource):
             if query_time_period > timedelta(days=366):
                 return "Too wide of date range in query. Max date range of 1 year allowed.", 404
 
+            if not check_auth(request):
+                query_dict['visibility'] = 'public'
+
             query = event_query(query_dict)
             results = db.Event.objects(__raw__=query)  # {'start': new Date('2017-06-14')})
-            logging.debug('found {} events for query'.format(len(results)))
+            logging.debug('found %s events for query', len(results))
 
             if not results:  # if no results were found
                 return []
@@ -98,7 +111,6 @@ class EventApi(Resource):
 
             events_list = []
             for event in results:
-
                 if 'recurrence' in event:  # checks for recurrent events
                     # expands a recurring event defintion into a json response with individual events
                     events_list = recurring_to_full(event, events_list, start, end)
@@ -109,12 +121,15 @@ class EventApi(Resource):
     @edit_auth_required
     @mongo_resource_errors
     @api.expect(event_model)
+    @api.response(201, 'Created', event_model)
+    @api.doc(responses={400: 'Validation Error',
+                        401: 'Unauthorized Acces'})
     def post(self):
         """
         Create new event with parameters passed in through args or form
         """
         received_data = request_to_dict(request)
-        logging.debug("Received POST data: {}".format(received_data))  # combines args and form
+        logging.debug("Received POST data: %s", received_data)  # combines args and form
         new_event = db.Event(**received_data)
         if new_event.labels == []:  # if no labels were given
             new_event.labels = ['unlabeled']
@@ -135,7 +150,7 @@ class EventApi(Resource):
         event_id        id of the event to modify
         """
         received_data = request_to_dict(request)
-        logging.debug("Received PUT data: {}".format(received_data))
+        logging.debug("Received PUT data: %s", received_data)
         result = db.Event.objects(id=event_id).first()
         if not result:  # if no event was found
             # try finding a sub_event with the id and save the parent event it is stored under
@@ -167,7 +182,7 @@ class EventApi(Resource):
 
         rec_id          the rec_id of a sub_event to be deleted
         """
-        logging.debug('Event requested: ' + event_id)
+        logging.debug('Event requested: %s', event_id)
         result = db.Event.objects(id=event_id).first()
         if not result:  # if no event is found with the id given
             # try finding a sub_event with that id
@@ -184,7 +199,7 @@ class EventApi(Resource):
             logging.debug("Deleted sub_event for the first time")
         else:  # if a normal event is to be deleted
             received_data = request_to_dict(request)
-            logging.debug("Received DELETE data: {}".format(received_data))
+            logging.debug("Received DELETE data: %s", received_data)
             result.delete()
             return mongo_to_dict(result)
 

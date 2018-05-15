@@ -65,28 +65,42 @@
         background-color: black;
       }
 
-      #how {
+      .corner {
         position:absolute;
-        bottom:0;
-        right:0;
       }
 
-      #more {
-        position:absolute;
-        top:20px;
-        right:0;
-      }
-
-      #what {
-        position:absolute;
-        top:20px;
+      .left.corner {
         left:0;
       }
 
-      #where {
-        position:absolute;
+      .right.corner {
+        right:0;
+      }
+
+      .top.corner {
+        top:20px;
+      }
+
+      .bottom.corner {
         bottom:0;
-        left:0;
+      }
+
+      .corner h1 {
+        text-transform: uppercase;
+      }
+
+      .left.corner h1::before {
+        content: "\2190 "; // &larr;
+        padding-right: 0.25em;
+      }
+
+      .right.corner h1::after {
+        content: "\2192"; // &rarr;
+        padding-left: 0.25em;
+      }
+
+      .left.corner h2 {
+        text-align: right;
       }
     </style>
   </head>
@@ -99,27 +113,27 @@
       </div>
     </a>
     <a href="/docs/">
-      <div id="how">
-        <h1>HOW &rarr;</h1>
+      <div class="bottom right corner">
+        <h1>How</h1>
         <h2>API Documentation</h2>
       </div>
     </a>
     <a href="https://olin.build/">
-      <div id="more">
-        <h1>MORE &rarr;</h1>
+      <div class="top right corner">
+        <h1>More</h1>
         <h2>Other Olin Projects</h2>
       </div>
     </a>
     <a href="https://github.com/olinlibrary/abe/wiki/what-is-abe%3f">
-      <div id="what">
-        <h1>&larr; WHAT</h1>
-        <h2 style="text-align:right">Why does ABE exist?</h2>
+      <div class="top left corner">
+        <h1>What</h1>
+        <h2>Why does ABE exist?</h2>
       </div>
     </a>
     <a href="https://events.olin.build/">
-      <div id="where">
-        <h1>&larr; WHERE</h1>
-        <h2 style="text-align:right">See what ABE powers</h2>
+      <div class="bottom left corner">
+        <h1>Where</h1>
+        <h2>See what ABE powers</h2>
       </div>
     </a>
   </body>

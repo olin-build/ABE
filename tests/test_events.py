@@ -15,30 +15,30 @@ class EventsTestCase(abe_unittest.TestCase):
 
     def setUp(self):
         super().setUp()
-        self.app = abe.app.app.test_client()
+        self.client = abe.app.app.test_client()
         sample_data.load_data(self.db)
 
     def test_get_events(self):
         with self.subTest("a six-month query returns some events"):
-            response = self.app.get('/events/?start=2017-01-01&end=2017-07-01')
+            response = self.client.get('/events/?start=2017-01-01&end=2017-07-01')
             self.assertEqual(response.status_code, 200)
             self.assertEqual(len(flask.json.loads(response.data)), 25)
 
         with self.subTest("a one-year query returns all events"):
-            response = self.app.get('/events/?start=2017-01-01&end=2018-01-01')
+            response = self.client.get('/events/?start=2017-01-01&end=2018-01-01')
             self.assertEqual(response.status_code, 200)
             self.assertEqual(len(flask.json.loads(response.data)), 69)
 
         with self.subTest("a two-year query is too long"):
-            response = self.app.get('/events/?start=2017-01-01&end=2019-01-01')
+            response = self.client.get('/events/?start=2017-01-01&end=2019-01-01')
             self.assertEqual(response.status_code, 404)
 
         with self.subTest("a one-year query works for leap years"):
-            response = self.app.get('/events/?start=2020-01-01&end=2021-01-01')
+            response = self.client.get('/events/?start=2020-01-01&end=2021-01-01')
             self.assertEqual(response.status_code, 200)
 
         with self.subTest("an unauthenticated sender retrieves only public events"):
-            event_response = self.app.get('/events/?start=2017-01-01&end=2017-07-01')
+            event_response = self.client.get('/events/?start=2017-01-01&end=2017-07-01')
             # TODO: change the following when #75 is implemented
             self.assertEqual(len(flask.json.loads(event_response.data)), 25)
 
@@ -49,7 +49,7 @@ class EventsTestCase(abe_unittest.TestCase):
         }
 
         with self.subTest("succeeds when required fields are present"):
-            response = self.app.post(
+            response = self.client.post(
                 '/events/',
                 data=flask.json.dumps(event),
                 content_type='application/json'
@@ -59,7 +59,7 @@ class EventsTestCase(abe_unittest.TestCase):
         with self.subTest("fails on missing fields"):
             evt = event.copy()
             del evt['title']
-            response = self.app.post(
+            response = self.client.post(
                 '/events/',
                 data=flask.json.dumps(evt),
                 content_type='application/json'
@@ -69,7 +69,7 @@ class EventsTestCase(abe_unittest.TestCase):
 
             evt = event.copy()
             del evt['start']
-            response = self.app.post(
+            response = self.client.post(
                 '/events/',
                 data=flask.json.dumps(evt),
                 content_type='application/json'
@@ -80,7 +80,7 @@ class EventsTestCase(abe_unittest.TestCase):
         with self.subTest("fails on invalid fields"):
             evt = event.copy()
             evt['invalid'] = 'invalid field'
-            response = self.app.post(
+            response = self.client.post(
                 '/events/',
                 data=flask.json.dumps(evt),
                 content_type='application/json'
@@ -90,7 +90,7 @@ class EventsTestCase(abe_unittest.TestCase):
         with self.subTest("fails on invalid field values"):
             evt = event.copy()
             evt['url'] = 'invalid field value'
-            response = self.app.post(
+            response = self.client.post(
                 '/events/',
                 data=flask.json.dumps(evt),
                 content_type='application/json'
@@ -103,7 +103,7 @@ class EventsTestCase(abe_unittest.TestCase):
             'start': isodate.parse_datetime('2018-05-04T09:00:00')
         }
         with self.subTest("fails when the client is not yet authorized"):
-            response = self.app.post(
+            response = self.client.post(
                 '/events/',
                 data=flask.json.dumps(event),
                 content_type='application/json',
@@ -114,7 +114,7 @@ class EventsTestCase(abe_unittest.TestCase):
             self.assertEqual(response.status_code, 401)
 
         with self.subTest("succeeds when required fields are present"):
-            response = self.app.post(
+            response = self.client.post(
                 '/events/',
                 data=flask.json.dumps(event),
                 content_type='application/json'
@@ -123,7 +123,7 @@ class EventsTestCase(abe_unittest.TestCase):
             # TODO: test that the event is in the database
 
         with self.subTest("succeeds due to auth cookie"):
-            response = self.app.post(
+            response = self.client.post(
                 '/events/',
                 data=flask.json.dumps(event),
                 content_type='application/json',
@@ -135,12 +135,12 @@ class EventsTestCase(abe_unittest.TestCase):
 
     def test_put(self):
         # TODO: test unauthorized user
-        response = self.app.get('/events/?start=2017-01-01&end=2017-07-01')
+        response = self.client.get('/events/?start=2017-01-01&end=2017-07-01')
         self.assertEqual(response.status_code, 200)
         event_id = flask.json.loads(response.data)[0]['id']
 
         with self.subTest("succeeds on valid id"):
-            response = self.app.put(
+            response = self.client.put(
                 f'/events/{event_id}',
                 data=flask.json.dumps({'title': 'new title'}),
                 content_type='application/json'
@@ -149,7 +149,7 @@ class EventsTestCase(abe_unittest.TestCase):
             # TODO: test that the event has a new value
 
         with self.subTest("fails on invalid id"):
-            response = self.app.put(
+            response = self.client.put(
                 f'/events/{event_id}x',
                 data=flask.json.dumps({'title': 'new title'}),
                 content_type='application/json'
@@ -158,7 +158,7 @@ class EventsTestCase(abe_unittest.TestCase):
             self.assertEqual(response.status_code, 400)
 
         with self.subTest("fails on invalid field"):
-            response = self.app.put(
+            response = self.client.put(
                 f'/events/{event_id}',
                 data=flask.json.dumps({'invalid_field': 'value'}),
                 content_type='application/json'
@@ -166,7 +166,7 @@ class EventsTestCase(abe_unittest.TestCase):
             self.assertEqual(response.status_code, 400)
 
         with self.subTest("fails on invalid field value"):
-            response = self.app.put(
+            response = self.client.put(
                 f'/events/{event_id}',
                 data=flask.json.dumps({'url': 'invalid url'}),
                 content_type='application/json'
@@ -175,13 +175,42 @@ class EventsTestCase(abe_unittest.TestCase):
 
         # This exercises a different code path in mongodb -> JOSN error conversion
         with self.subTest("fails on multiple invalid fields"):
-            response = self.app.put(
+            response = self.client.put(
                 f'/events/{event_id}',
                 data=flask.json.dumps({'invalid_field-1': 'value',
                                        'invalid_field-2': 'value'}),
                 content_type='application/json'
             )
             self.assertEqual(response.status_code, 400)
+
+        with self.subTest("fails if event is protected"):
+            self.skipTest('Unimplemented test')
+            label1 = {
+                'name': 'protected_label',
+                'protected': True
+            }
+            self.client.post(
+                '/labels/',
+                data=flask.json.dumps(label1),
+                content_type='application/json'
+            )
+            event = {
+                'title': 'test_post',
+                'start': isodate.parse_datetime('2018-05-10T09:00:00'),
+                'labels': ["protected_label"]
+            }
+            response = self.client.post(
+                '/events/',
+                data=flask.json.dumps(event),
+                content_type='application/json'
+            )
+            event_id = flask.json.loads(response.data.decode("utf-8"))['id']
+            response = self.client.put(
+                f'/events/{event_id}',
+                data=flask.json.dumps({'title': 'new title'}),
+                content_type='application/json'
+            )
+            self.assertEqual(response.status_code, 401)
 
     @skip("Unimplemented test")
     def test_delete(self):
