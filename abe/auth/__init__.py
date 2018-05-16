@@ -5,7 +5,9 @@ from functools import wraps
 import re
 from flask import request, abort, g
 from netaddr import IPNetwork, IPSet
-import logging
+from uuid import uuid4
+import time
+import jwt
 
 ACCESS_TOKEN_COOKIE_NAME = 'access_token'
 
@@ -20,18 +22,23 @@ ACCESS_TOKEN_COOKIE_NAME = 'access_token'
 INTRANET_IPS = (IPSet([IPNetwork(s) for s in os.environ.get('INTRANET_IPS', '').split(',')])
                 if 'INTRANET_IPS' in os.environ else IPSet(['0.0.0.0/0', '0000:000::/0']))
 
-SHARED_SECRET = os.environ.get("SHARED_SECRET", "")
-if not SHARED_SECRET:
-    logging.critical("SHARED_SECRET isn't set")
+# For development and testing, default to an instance-specific secret.
+AUTH_TOKEN_SECRET = os.environ.get("AUTH_TOKEN_SECRET", str(uuid4()))
 
 
 def create_access_token():
-    return f"secret:{SHARED_SECRET or '---'}"
+    return jwt.encode({'iat': int(time.time())}, AUTH_TOKEN_SECRET, algorithm='HS256').decode()
 
 
 def is_valid_access_token(token):
-    # There is currently only one access tokens
-    return token == create_access_token()
+    if not token:
+        return False
+    enc = token.encode()
+    try:
+        jwt.decode(enc, AUTH_TOKEN_SECRET, algorithms='HS256')  # for effect
+    except Exception:
+        return False
+    return True
 
 
 def after_this_request(f):  # For setting cookie

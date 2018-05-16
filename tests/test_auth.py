@@ -88,23 +88,23 @@ class AuthTestCase(unittest.TestCase):
                 self.assertEqual(http_error.exception.code, 401)
 
         with self.subTest("off-whitelist IP, correct cookie"):
-            with app.test_request_context('/', headers={"COOKIE": "access_token=secret:valid-secret"},
+            with app.test_request_context('/', headers={"COOKIE": f"access_token={auth.create_access_token()}"},
                                           environ_base={'REMOTE_ADDR': '127.0.1.1'}):
                 assert route() == 'ok'
 
         with self.subTest("off-whitelist IP, incorrect cookie"):
-            with app.test_request_context('/', headers={"COOKIE": "access_token=secret:invalid-secret"},
+            with app.test_request_context('/', headers={"COOKIE": "access_token=invalid-token"},
                                           environ_base={'REMOTE_ADDR': '127.0.1.1'}):
                 with self.assertRaises(HTTPException) as http_error:
                     route()
                 self.assertEqual(http_error.exception.code, 401)
 
         with self.subTest("off-whitelist IP, authorization header"):
-            with app.test_request_context('/', headers={"Authorization": "Bearer secret:valid-secret"},
+            with app.test_request_context('/', headers={"Authorization": f"Bearer {auth.create_access_token()}"},
                                           environ_base={'REMOTE_ADDR': '127.0.1.1'}):
                 assert route() == 'ok'
 
-            with app.test_request_context('/', headers={"Authorization": "Bearer secret:invalid-secret"},
+            with app.test_request_context('/', headers={"Authorization": "Bearer invalid-token"},
                                           environ_base={'REMOTE_ADDR': '127.0.1.1'}):
                 with self.assertRaises(HTTPException) as http_error:
                     route()

@@ -27,8 +27,8 @@
       "value": "True",
       "required": true
     },
-    "SHARED_SECRET": {
-      "description": "A shared secret for an authorized user cookie",
+    "AUTH_TOKEN_SECRET": {
+      "description": "A secret for encoding authorization tokens.",
       "generator": "secret"
     }
   },
