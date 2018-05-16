@@ -36,7 +36,7 @@ def authorize():
         'client_id': SLACK_OAUTH_CLIENT_ID,
         'redirect_uri': upstream_redirect_uri,
         'scope': 'identity.basic',
-        'state': state,
+        'state': flask.json.dumps(state),
     })
     if not SLACK_OAUTH_CLIENT_ID:
         logging.warning("SLACK_OAUTH_CLIENT_ID isn't set")
@@ -53,7 +53,9 @@ def deauthorize():
 
 @profile.route('/oauth/slack')
 def slack_auth():
+    logging.warning('decode %s', request.args['state'])
     state = flask.json.loads(request.args['state'])
+    logging.warning('decoded %s', state)
     redirect_uri = state.get('redirect_uri', None) or request.args['redirect_uri']
     if state['validation_code'] != SLACK_OAUTH_VALIDATION_CODE:
         redirect_uri = url_add_query_params(redirect_uri,
