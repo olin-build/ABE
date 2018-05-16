@@ -1,5 +1,4 @@
 """Main flask app"""
-import logging
 import os
 from datetime import datetime
 from urllib.parse import quote_plus as url_quote_plus
@@ -16,9 +15,6 @@ from .resource_models.ics_resources import api as ics_api
 from .resource_models.label_resources import api as label_api
 from .resource_models.subscription_resources import api as subscription_api
 from .routes.oauth_routes import profile as oauth_blueprint
-
-FORMAT = "%(levelname)s:ABE: 🎩 %(message)s"
-logging.basicConfig(level=logging.INFO, format=FORMAT)
 
 app = Flask(__name__)
 CORS(app, allow_headers='Authorization', supports_credentials=True)

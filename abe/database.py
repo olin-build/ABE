@@ -2,6 +2,7 @@
 """Connect to mongodb"""
 import logging
 import os
+import re
 
 from mongoengine import connect
 
@@ -12,35 +13,22 @@ from .document_models.ics_documents import ICS  # noqa: F401
 from .document_models.label_documents import Label  # noqa: F401
 from .document_models.subscription_documents import Subscription  # noqa: F401
 
-config_present = False
-try:
-    from .mongo_config import uri, use_local, db_name
-except ImportError:
-    use_local = False
-    uri = None
-    db_name = "no-config"
-else:
-    config_present = True
 
-# Support legacy env name
+# Support legacy environment variable names
 if os.environ.get('MONGO_URI') and not os.environ.get('MONGODB_URI'):
     os.environ['MONGODB_URI'] = os.environ['MONGO_URI']
 
-env_present = os.environ.get('MONGODB_URI')
-
-mongo_uri = os.getenv('MONGODB_URI', uri) if not use_local else None
-mongo_db_name = os.getenv('DB_NAME', os.getenv('HEROKU_APP_NAME', db_name))
+mongo_uri = os.getenv('MONGODB_URI')
+mongo_db_name = os.getenv('DB_NAME', os.getenv('HEROKU_APP_NAME', 'abe'))
 
 connect(mongo_db_name, host=mongo_uri)
 
-if env_present:
-    location = 'uri from environment variable'
-elif config_present and not use_local:
-    location = 'uri from config file'
-else:
-    location = 'localhost'
 
-logging.info('Using db "{}" with {}'.format(mongo_db_name, location))
+def sanitize_passwords(s):
+    return re.sub(r':[^,/]+', ':•••', s) if s else s
+
+
+logging.info('Using db %r on %s', mongo_db_name, sanitize_passwords(mongo_uri) or 'localhost')
 
 
 def return_uri():
