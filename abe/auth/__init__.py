@@ -48,14 +48,21 @@ def after_this_request(f):  # For setting cookie
     return f
 
 
-def check_auth(req):
-    """
-    Checks if a request is from an IP whitelist, or if it has a secret cookie.
-    If the request is in the IP whitelist, sets the secret cookie.
-    Returns a Bool of passing.
-    """
+def request_is_from_inside_intranet(req):
+    """Return a bool indicating whether a request is from inside the intranet."""
     client_ip = req.headers.get('X-Forwarded-For', req.remote_addr).split(',')[-1]
-    if client_ip in INTRANET_CDIRS:
+    return client_ip in INTRANET_CDIRS
+
+
+def check_auth(req):
+    """Checks if a request is from an IP whitelist, or if it has a secret cookie,
+    or a valid bearer token.
+
+    If the request is in the IP whitelist, sets the secret cookie.
+
+    Returns a bool that indicates whether the request is authorized.
+    """
+    if request_is_from_inside_intranet(req):
         access_token = create_access_token()
 
         @after_this_request
