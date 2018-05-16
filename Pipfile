@@ -45,6 +45,7 @@ werkzeug = ">=0.12.2"
 gunicorn = "*"
 flask-restplus = "*"
 netaddr = "*"
+pyjwt = "*"
 
 [dev-packages]
 "flake8" = ">=3.3.0"
