@@ -1,14 +1,16 @@
 import os
 from urllib.parse import quote_plus as url_quote_plus
+from urllib.parse import urlencode
 from uuid import uuid4
 
 import flask
 from flask import Blueprint, redirect, render_template, request
 
+import logging
+from abe.auth import clear_auth_cookie, create_access_token
 from abe.helper_functions.url_helpers import url_add_query_params
 
-from abe.auth import clear_auth_cookie, create_access_token
-
+SLACK_OAUTH_CLIENT_ID = os.environ.get('SLACK_OAUTH_CLIENT_ID')
 SLACK_OAUTH_VALIDATION_CODE = os.environ.get('SLACK_OAUTH_VALIDATION_CODE', str(uuid4()))
 
 profile = Blueprint('oauth', __name__)
@@ -30,11 +32,16 @@ def authorize():
         state['redirect_uri'] = downstream_redirect_uri
     else:
         upstream_redirect_uri += '?redirect_uri=' + url_quote_plus(downstream_redirect_uri)
-    return render_template('login.html',
-                           client_id=os.environ['SLACK_OAUTH_CLIENT_ID'],
-                           state=flask.json.dumps(state),
-                           redirect_uri=url_quote_plus(upstream_redirect_uri)
-                           )
+    oauth_url = "https://slack.com/oauth/authorize?" + urlencode({
+        'client_id': SLACK_OAUTH_CLIENT_ID,
+        'redirect_uri': upstream_redirect_uri,
+        'scope': 'identity.basic',
+        'state': state,
+    })
+    if not SLACK_OAUTH_CLIENT_ID:
+        logging.warning("SLACK_OAUTH_CLIENT_ID isn't set")
+        oauth_url = "javascript:alert('Set SLACK_OAUTH_CLIENT_ID to enable this feature')"
+    return render_template('login.html', oauth_url=oauth_url)
 
 
 @profile.route('/oauth/deauthorize')
