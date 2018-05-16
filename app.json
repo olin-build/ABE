@@ -5,8 +5,21 @@
     "pr-predestroy": "python -m abe.pr-predestroy"
   },
   "env": {
-    "MONGO_URI": {
-      "description": "The connection URI for MongoDB.",
+    "AUTH_TOKEN_SECRET": {
+      "description": "A secret for encoding authorization tokens.",
+      "generator": "secret"
+    },
+    "BINDING_HOST": {
+      "description": "The hostname for gunicorn to bind to.",
+      "value": "0.0.0.0",
+      "required": true
+    },
+    "ENABLE_HSTS": {
+      "description": "Enforce SSL via HSTS",
+      "required": false
+    },
+    "MONGODB_URI": {
+      "description": "The MongoDB connection URI.",
       "required": true
     },
     "FLASK_DEBUG": {
@@ -15,21 +28,11 @@
       "required": true
     },
     "HEROKU_APP_NAME": {
-      "required": true
+      "required": false
     },
-    "HOST": {
-      "description": "The hostname for gunicorn to bind to.",
-      "value": "0.0.0.0",
-      "required": true
-    },
-    "HSTS_ENABLE": {
-      "description": "Enforce SSL via HSTS",
-      "value": "True",
-      "required": true
-    },
-    "AUTH_TOKEN_SECRET": {
-      "description": "A secret for encoding authorization tokens.",
-      "generator": "secret"
+    "INTRANET_CDIRS": {
+      "description": "Whitelisted CDIRs don't require auth.",
+      "required": false
     }
   },
   "formation": {

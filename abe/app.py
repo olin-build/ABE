@@ -38,7 +38,7 @@ CORS(app, allow_headers='Authorization', supports_credentials=True)
 # Use tests/tests_https_redirection.sh to test changes to this code.
 #
 # Disabled by default for local development. See issue #158.
-if os.environ.get('HSTS_ENABLED'):
+if os.environ.get('ENABLE_HSTS'):
     SSLify(app, age=10, skips=['.well-known/acme-challenge/'])
 
 

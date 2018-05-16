@@ -22,9 +22,13 @@ except ImportError:
 else:
     config_present = True
 
-env_present = os.environ.get('MONGO_URI')
+# Support legacy env name
+if os.environ.get('MONGO_URI') and not os.environ.get('MONGODB_URI'):
+    os.environ['MONGODB_URI'] = os.environ['MONGO_URI']
 
-mongo_uri = os.getenv('MONGO_URI', uri) if not use_local else None
+env_present = os.environ.get('MONGODB_URI')
+
+mongo_uri = os.getenv('MONGODB_URI', uri) if not use_local else None
 mongo_db_name = os.getenv('DB_NAME', os.getenv('HEROKU_APP_NAME', db_name))
 
 connect(mongo_db_name, host=mongo_uri)

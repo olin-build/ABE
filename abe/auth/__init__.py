@@ -13,14 +13,14 @@ ACCESS_TOKEN_COOKIE_NAME = 'access_token'
 
 # A set of IP addresses with edit permission.
 #
-# If the INTRANET_IPS environment variable is set, it should be a
+# If the INTRANET_CDIRS environment variable is set, it should be a
 # comma-separated list of CDIR blocks, e.g. `192.168.100.14/24` (IPv4) or
 # `2001:db8::/48` (IPv6).
 #
-# If the INTRANET_IPS environment variable is not set, this defaults to the
+# If the INTRANET_CDIRS environment variable is not set, this defaults to the
 # entire range of IP addresses.
-INTRANET_IPS = (IPSet([IPNetwork(s) for s in os.environ.get('INTRANET_IPS', '').split(',')])
-                if 'INTRANET_IPS' in os.environ else IPSet(['0.0.0.0/0', '0000:000::/0']))
+INTRANET_CDIRS = (IPSet([IPNetwork(s) for s in os.environ.get('INTRANET_CDIRS', '').split(',')])
+                  if 'INTRANET_CDIRS' in os.environ else IPSet(['0.0.0.0/0', '0000:000::/0']))
 
 # For development and testing, default to an instance-specific secret.
 AUTH_TOKEN_SECRET = os.environ.get("AUTH_TOKEN_SECRET", str(uuid4()))
@@ -55,7 +55,7 @@ def check_auth(req):
     Returns a Bool of passing.
     """
     client_ip = req.headers.get('X-Forwarded-For', req.remote_addr).split(',')[-1]
-    if client_ip in INTRANET_IPS:
+    if client_ip in INTRANET_CDIRS:
         access_token = create_access_token()
 
         @after_this_request

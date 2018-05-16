@@ -17,33 +17,33 @@ class AuthTestCase(unittest.TestCase):
 
     def test_intranet_ips(self):
         global auth
-        os.environ['INTRANET_IPS'] = '127.0.0.1/24'
+        os.environ['INTRANET_CDIRS'] = '127.0.0.1/24'
         auth = reload(auth)
-        assert '127.0.0.1' in auth.INTRANET_IPS
-        assert '127.0.0.10' in auth.INTRANET_IPS
-        assert '127.0.1.0' not in auth.INTRANET_IPS
-        assert '192.0.0.1' not in auth.INTRANET_IPS
+        assert '127.0.0.1' in auth.INTRANET_CDIRS
+        assert '127.0.0.10' in auth.INTRANET_CDIRS
+        assert '127.0.1.0' not in auth.INTRANET_CDIRS
+        assert '192.0.0.1' not in auth.INTRANET_CDIRS
 
-        os.environ['INTRANET_IPS'] = '127.0.0.1,192.0.0.1/16'
+        os.environ['INTRANET_CDIRS'] = '127.0.0.1,192.0.0.1/16'
         auth = reload(auth)
-        assert '127.0.0.1' in auth.INTRANET_IPS
-        assert '127.0.0.10' not in auth.INTRANET_IPS
-        assert '192.0.0.1' in auth.INTRANET_IPS
-        assert '192.0.1.1' in auth.INTRANET_IPS
-        assert '192.0.255.1' in auth.INTRANET_IPS
-        assert '192.1.0.1' not in auth.INTRANET_IPS
+        assert '127.0.0.1' in auth.INTRANET_CDIRS
+        assert '127.0.0.10' not in auth.INTRANET_CDIRS
+        assert '192.0.0.1' in auth.INTRANET_CDIRS
+        assert '192.0.1.1' in auth.INTRANET_CDIRS
+        assert '192.0.255.1' in auth.INTRANET_CDIRS
+        assert '192.1.0.1' not in auth.INTRANET_CDIRS
 
     def test_intranet_ips_v5(self):
         global auth
-        os.environ['INTRANET_IPS'] = '127.0.0.1/24,2001:0db8::/32'
+        os.environ['INTRANET_CDIRS'] = '127.0.0.1/24,2001:0db8::/32'
         auth = reload(auth)
-        assert '127.0.0.1' in auth.INTRANET_IPS
-        assert '2001:0db8:85a3:0000:0000:8a2e:0370:7334' in auth.INTRANET_IPS
-        assert '2001:0db9:85a3:0000:0000:8a2e:0370:7334' not in auth.INTRANET_IPS
+        assert '127.0.0.1' in auth.INTRANET_CDIRS
+        assert '2001:0db8:85a3:0000:0000:8a2e:0370:7334' in auth.INTRANET_CDIRS
+        assert '2001:0db9:85a3:0000:0000:8a2e:0370:7334' not in auth.INTRANET_CDIRS
 
     def test_edit_auth_required(self):
         global auth
-        os.environ['INTRANET_IPS'] = '127.0.0.1/24'
+        os.environ['INTRANET_CDIRS'] = '127.0.0.1/24'
         auth = reload(auth)
 
         @auth.edit_auth_required
