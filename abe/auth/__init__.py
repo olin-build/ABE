@@ -5,33 +5,40 @@ from functools import wraps
 import re
 from flask import request, abort, g
 from netaddr import IPNetwork, IPSet
-import logging
+from uuid import uuid4
+import time
+import jwt
 
 ACCESS_TOKEN_COOKIE_NAME = 'access_token'
 
 # A set of IP addresses with edit permission.
 #
-# If the INTRANET_IPS environment variable is set, it should be a
+# If the INTRANET_CDIRS environment variable is set, it should be a
 # comma-separated list of CDIR blocks, e.g. `192.168.100.14/24` (IPv4) or
 # `2001:db8::/48` (IPv6).
 #
-# If the INTRANET_IPS environment variable is not set, this defaults to the
+# If the INTRANET_CDIRS environment variable is not set, this defaults to the
 # entire range of IP addresses.
-INTRANET_IPS = (IPSet([IPNetwork(s) for s in os.environ.get('INTRANET_IPS', '').split(',')])
-                if 'INTRANET_IPS' in os.environ else IPSet(['0.0.0.0/0', '0000:000::/0']))
+INTRANET_CDIRS = (IPSet([IPNetwork(s) for s in os.environ.get('INTRANET_CDIRS', '').split(',')])
+                  if 'INTRANET_CDIRS' in os.environ else IPSet(['0.0.0.0/0', '0000:000::/0']))
 
-SHARED_SECRET = os.environ.get("SHARED_SECRET", "")
-if not SHARED_SECRET:
-    logging.critical("SHARED_SECRET isn't set")
+# For development and testing, default to an instance-specific secret.
+AUTH_TOKEN_SECRET = os.environ.get("AUTH_TOKEN_SECRET", str(uuid4()))
 
 
 def create_access_token():
-    return f"secret:{SHARED_SECRET or '---'}"
+    return jwt.encode({'iat': int(time.time())}, AUTH_TOKEN_SECRET, algorithm='HS256').decode()
 
 
 def is_valid_access_token(token):
-    # There is currently only one access tokens
-    return token == create_access_token()
+    if not token:
+        return False
+    enc = token.encode()
+    try:
+        jwt.decode(enc, AUTH_TOKEN_SECRET, algorithms='HS256')  # for effect
+    except Exception:
+        return False
+    return True
 
 
 def after_this_request(f):  # For setting cookie
@@ -41,14 +48,21 @@ def after_this_request(f):  # For setting cookie
     return f
 
 
-def check_auth(req):
-    """
-    Checks if a request is from an IP whitelist, or if it has a secret cookie.
-    If the request is in the IP whitelist, sets the secret cookie.
-    Returns a Bool of passing.
-    """
+def request_is_from_inside_intranet(req):
+    """Return a bool indicating whether a request is from inside the intranet."""
     client_ip = req.headers.get('X-Forwarded-For', req.remote_addr).split(',')[-1]
-    if client_ip in INTRANET_IPS:
+    return client_ip in INTRANET_CDIRS
+
+
+def check_auth(req):
+    """Checks if a request is from an IP whitelist, or if it has a secret cookie,
+    or a valid bearer token.
+
+    If the request is in the IP whitelist, sets the secret cookie.
+
+    Returns a bool that indicates whether the request is authorized.
+    """
+    if request_is_from_inside_intranet(req):
         access_token = create_access_token()
 
         @after_this_request

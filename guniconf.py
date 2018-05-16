@@ -21,7 +21,7 @@
 # In production, HOST should be set to 0.0.0.0
 
 import os
-_HOST = os.environ.get('HOST', "127.0.0.1")
+_HOST = os.environ.get('BINDING_HOST', "127.0.0.1")
 _PORT = os.environ.get('PORT', "3000")
 bind = _HOST + ':' + _PORT
 

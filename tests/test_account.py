@@ -17,7 +17,7 @@ class AccountTestCase(abe_unittest.TestCase):
         global auth
         super().setUp()
         # self.app = app.test_client(use_cookies=False)
-        os.environ['INTRANET_IPS'] = "127.0.0.1/24"
+        os.environ['INTRANET_CDIRS'] = "127.0.0.1/24"
         reload(auth)
 
     def test_unauthorized_client(self):

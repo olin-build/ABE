@@ -11,7 +11,6 @@ MONGODB_TEST_DB_NAME = "abe-unittest"
 os.environ["DB_NAME"] = MONGODB_TEST_DB_NAME
 os.environ["INTRANET_IPS"] = "127.0.0.1/24"
 os.environ["MONGO_URI"] = ""
-os.environ["SHARED_SECRET"] = "F8F8E5FA-680C-4169-8D94-9EC007A5B03A"
 
 os.environ['ABE_EMAIL_USERNAME'] = 'email-test-user'
 os.environ['ABE_EMAIL_PASSWORD'] = 'email-test-password'
