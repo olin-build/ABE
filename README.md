@@ -33,6 +33,6 @@ ABE is a platform. Some online experiences that use the data in ABE include:
   experiment in deriving a conference-track-style schedule from ABE events.
 
 [abe-web]: https://github.com/olinlibrary/abe-web
-[contributing]: ./.github/contributing.md
+[contributing]: ./docs/CONTRIBUTING.md
 [good-first-issue]: https://github.com/olinlibrary/ABE/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22
 [issues]: https://github.com/olinlibrary/ABE/issues
