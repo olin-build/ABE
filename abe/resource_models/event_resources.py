@@ -10,6 +10,7 @@ from flask import abort, request
 from flask_restplus import Namespace, Resource, fields
 
 from abe import database as db
+from abe.resource_models import label_resources
 from abe.auth import check_auth, edit_auth_required
 from abe.helper_functions.converting_helpers import mongo_to_dict, request_to_dict
 from abe.helper_functions.mongodb_helpers import mongo_resource_errors
@@ -133,6 +134,12 @@ class EventApi(Resource):
         new_event = db.Event(**received_data)
         if new_event.labels == []:  # if no labels were given
             new_event.labels = ['unlabeled']
+        else:
+            for label in new_event.labels:
+                label_info = label_resources.LabelApi().get(id=label)
+                if type(label_info) is dict and 'protected' in label_info:
+                    if label_info['protected']:
+                        abort(401)
         if 'recurrence' in new_event:  # if this is a recurring event
             if not new_event.recurrence.forever:  # if it doesn't recur forever
                 # find the end of the recurrence
@@ -160,6 +167,12 @@ class EventApi(Resource):
             else:
                 abort(404)
         else:  # if event was found
+            # abort if event is protected
+            for label in result.labels:
+                label_info = label_resources.LabelApi().get(id=label)
+                if type(label_info) is dict and 'protected' in label_info:
+                    if label_info['protected']:
+                        abort(401)
             # if the received data is a new sub_event
             if 'sid' in received_data and received_data['sid'] is not None:
 

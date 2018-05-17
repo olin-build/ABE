@@ -112,5 +112,11 @@
         "start": "2017-08-31",
         "end": "2017-08-31",
         "labels": ["library", "food"]
+    },
+    {
+        "title": "Chair Massages",
+        "start": "2018-05-30",
+        "end": "2018-05-31",
+        "labels": ["STAR"]
     }
 ]
