@@ -40,6 +40,14 @@ events_model = api.schema_model('Events_Model', {
 )
 
 
+def check_protected_labels(label_list):
+    for label in label_list:
+        label_info = label_resources.LabelApi().get(id=label)
+        if type(label_info) is dict:
+            if label_info.get('protected', False):
+                abort(401)
+
+
 @api.route('/<event_id>/<rec_id>')
 class EventApi(Resource):
     """API for interacting with events"""
@@ -135,11 +143,7 @@ class EventApi(Resource):
         if new_event.labels == []:  # if no labels were given
             new_event.labels = ['unlabeled']
         else:
-            for label in new_event.labels:
-                label_info = label_resources.LabelApi().get(id=label)
-                if type(label_info) is dict and 'protected' in label_info:
-                    if label_info['protected']:
-                        abort(401)
+            check_protected_labels(new_event.labels)
         if 'recurrence' in new_event:  # if this is a recurring event
             if not new_event.recurrence.forever:  # if it doesn't recur forever
                 # find the end of the recurrence
@@ -168,11 +172,7 @@ class EventApi(Resource):
                 abort(404)
         else:  # if event was found
             # abort if event is protected
-            for label in result.labels:
-                label_info = label_resources.LabelApi().get(id=label)
-                if type(label_info) is dict and 'protected' in label_info:
-                    if label_info['protected']:
-                        abort(401)
+            check_protected_labels(result.labels)
             # if the received data is a new sub_event
             if 'sid' in received_data and received_data['sid'] is not None:
 
