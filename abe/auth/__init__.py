@@ -25,6 +25,8 @@ INTRANET_CDIRS = (IPSet([IPNetwork(s) for s in os.environ.get('INTRANET_CDIRS', 
 # For development and testing, default to an instance-specific secret.
 AUTH_TOKEN_SECRET = os.environ.get("AUTH_TOKEN_SECRET", uuid4().hex)
 
+AUTHENTICATED_USER_SCOPE = ['events:create', 'events:edit', 'community_events:read']
+
 
 def create_access_token():
     return jwt.encode({'iat': int(time.time())}, AUTH_TOKEN_SECRET, algorithm='HS256').decode()
@@ -62,22 +64,40 @@ def check_auth(req):
 
     Returns a bool that indicates whether the request is authorized.
     """
+    return bool(get_valid_request_auth_token(req))
+
+
+def get_valid_request_auth_token(req):
+    """Returns the first valid access token from the variety of tokeen storage
+    mechanisms: Bearer token, cookie, Flask session. If the user is not signed
+    but is inside the intranet, create a token and store it as a cookie, and
+    return this.
+    """
+    def iter_token_candidates():
+        if 'Authorization' in req.headers:
+            match = re.match(r'Bearer (.+)', req.headers['Authorization'])
+            if match:
+                yield match[1]
+        yield req.cookies.get(ACCESS_TOKEN_COOKIE_NAME, None)
+        yield session.get('access_token', None)
+    for token in iter_token_candidates():
+        if is_valid_access_token(token):
+            return token
+
+    access_token = create_access_token()
+
+    @after_this_request
+    def remember_computer(response):
+        response.set_cookie(ACCESS_TOKEN_COOKIE_NAME, access_token, max_age=180 * 24 * 3600)
+
     if request_is_from_inside_intranet(req):
-        access_token = create_access_token()
+        return access_token
 
-        @after_this_request
-        def remember_computer(response):
-            response.set_cookie(ACCESS_TOKEN_COOKIE_NAME, access_token, max_age=180 * 24 * 3600)
-        return True
 
-    if is_valid_access_token(req.cookies.get(ACCESS_TOKEN_COOKIE_NAME)):
-        return True
-    if is_valid_access_token(session.get('access_token', None)):
-        return True
-    if 'Authorization' in req.headers:
-        match = re.match(r'Bearer (.+)', req.headers['Authorization'])
-        return match and is_valid_access_token(match[1])
-    return False
+def get_request_scope(req):
+    if get_valid_request_auth_token(req):
+        return AUTHENTICATED_USER_SCOPE
+    return []
 
 
 def clear_auth_cookie():
