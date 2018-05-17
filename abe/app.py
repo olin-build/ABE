@@ -2,8 +2,9 @@
 import os
 from datetime import datetime
 from urllib.parse import quote_plus as url_quote_plus
+from uuid import uuid4
 
-from flask import Flask, g, jsonify, redirect, render_template, request
+from flask import Flask, g, jsonify, redirect, render_template, request, session
 from flask.json import JSONEncoder
 from flask_cors import CORS
 from flask_restplus import Api
@@ -56,7 +57,11 @@ app.json_encoder = CustomJSONEncoder
 
 # add return representations
 
-api = Api(app, doc="/docs/", version="0.1", title="ABE API")
+api = Api(app, doc="/docs/", version="0.1", title="ABE API",
+          description="View and modify calendar events, event labels, and subscriptions. "
+          "Use /login and /logout to log into ABE, in order to try out methods "
+          "that view public events or modify entities."
+          )
 
 
 @api.representation('application/json')
@@ -94,21 +99,31 @@ def add_event():
 def add_label():
     return render_template('add_label.html')
 
+
 # For debugging:
+
+app.secret_key = uuid4().bytes  # this is only used for debugging
 
 
 @app.route('/login')
 def login():
+    csrf_token = uuid4().hex
+    session['_csrf_token'] = csrf_token
     redirect_uri = 'account/info'
-    return redirect('/oauth/authorize?redirect_uri=' + url_quote_plus(redirect_uri))
+    return redirect('/oauth/authorize' +
+                    '?redirect_uri=' + url_quote_plus(redirect_uri) +
+                    '&state=' + url_quote_plus(csrf_token))
 
 
 @app.route('/logout')
 def logout():
+    session.pop('access_token', None)
     redirect_uri = 'login'
     return redirect('/oauth/deauthorize?redirect_uri=' + url_quote_plus(redirect_uri))
 
 
 @app.route('/account/info')
 def account_info():
+    if request.args['state'] == session.pop('_csrf_token', None):
+        session['access_token'] = request.args['access_token']
     return render_template('account.html', args=request.args)

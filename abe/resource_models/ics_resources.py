@@ -15,10 +15,10 @@ from abe.helper_functions.mongodb_helpers import mongo_resource_errors
 from abe.helper_functions.query_helpers import event_query, get_to_event_search
 from flask_restplus import Namespace, Resource, fields
 
-api = Namespace('ics', description='ICS feeds')
+api = Namespace('ics', description='iCalendar feeds')
 
 # This should be kept in sync with the document model, which drives the format
-ics_model = api.model("ICS_Model", {
+ics_model = api.model("ICS", {
     "url": fields.Url(required=True),
     "labels": fields.List(fields.String, required=True)
 })

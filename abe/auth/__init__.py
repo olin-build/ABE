@@ -3,7 +3,7 @@
 import os
 from functools import wraps
 import re
-from flask import request, abort, g
+from flask import request, abort, g, session
 from netaddr import IPNetwork, IPSet
 from uuid import uuid4
 import time
@@ -23,7 +23,7 @@ INTRANET_CDIRS = (IPSet([IPNetwork(s) for s in os.environ.get('INTRANET_CDIRS', 
                   if 'INTRANET_CDIRS' in os.environ else IPSet(['0.0.0.0/0', '0000:000::/0']))
 
 # For development and testing, default to an instance-specific secret.
-AUTH_TOKEN_SECRET = os.environ.get("AUTH_TOKEN_SECRET", str(uuid4()))
+AUTH_TOKEN_SECRET = os.environ.get("AUTH_TOKEN_SECRET", uuid4().hex)
 
 
 def create_access_token():
@@ -69,7 +69,10 @@ def check_auth(req):
         def remember_computer(response):
             response.set_cookie(ACCESS_TOKEN_COOKIE_NAME, access_token, max_age=180 * 24 * 3600)
         return True
+
     if is_valid_access_token(req.cookies.get(ACCESS_TOKEN_COOKIE_NAME)):
+        return True
+    if is_valid_access_token(session.get('access_token', None)):
         return True
     if 'Authorization' in req.headers:
         match = re.match(r'Bearer (.+)', req.headers['Authorization'])
@@ -81,6 +84,7 @@ def clear_auth_cookie():
     @after_this_request
     def remove_cookie(response):
         response.set_cookie(ACCESS_TOKEN_COOKIE_NAME, '', expires=0)
+        session.pop('access_token', None)
 
 
 def edit_auth_required(f):

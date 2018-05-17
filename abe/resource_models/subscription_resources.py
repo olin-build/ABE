@@ -13,7 +13,7 @@ from abe.helper_functions.ics_helpers import mongo_to_ics
 from abe.helper_functions.query_helpers import event_query, get_to_event_search
 from flask_restplus import Namespace, Resource, fields
 
-api = Namespace('subscriptions', description='Subscription related operations')
+api = Namespace('subscriptions', description='iCalendar subscriptions')
 
 # This should be kept in sync with the document model, which drives the format
 sub_model = api.model('Sub_Model', {
