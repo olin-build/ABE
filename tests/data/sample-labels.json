@@ -28,7 +28,8 @@
     {
         "name": "STAR",
         "description": "Anything you can eat.",
-        "default": true
+        "default": true,
+        "protected": true
     },
     {
         "name": "administration",

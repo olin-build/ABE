@@ -96,6 +96,18 @@ class EventsTestCase(abe_unittest.TestCase):
                 content_type='application/json'
             )
             self.assertEqual(response.status_code, 400)
+        with self.subTest("fails if event has protected label"):
+            event = {
+                'title': 'protected post',
+                'start': isodate.parse_datetime('2018-05-10T09:00:00'),
+                'labels': ["STAR"]
+            }
+            response = self.client.post(
+                '/events/',
+                data=flask.json.dumps(event),
+                content_type='application/json'
+            )
+            self.assertEqual(response.status_code, 401)
 
     def test_post_auth(self):
         event = {
@@ -184,27 +196,9 @@ class EventsTestCase(abe_unittest.TestCase):
             self.assertEqual(response.status_code, 400)
 
         with self.subTest("fails if event is protected"):
-            self.skipTest('Unimplemented test')
-            label1 = {
-                'name': 'protected_label',
-                'protected': True
-            }
-            self.client.post(
-                '/labels/',
-                data=flask.json.dumps(label1),
-                content_type='application/json'
-            )
-            event = {
-                'title': 'test_post',
-                'start': isodate.parse_datetime('2018-05-10T09:00:00'),
-                'labels': ["protected_label"]
-            }
-            response = self.client.post(
-                '/events/',
-                data=flask.json.dumps(event),
-                content_type='application/json'
-            )
-            event_id = flask.json.loads(response.data.decode("utf-8"))['id']
+            response = self.client.get('/events/?start=2018-05-30&end=2018-05-31')
+            self.assertEqual(response.status_code, 200)
+            event_id = flask.json.loads(response.data)[0]['id']
             response = self.client.put(
                 f'/events/{event_id}',
                 data=flask.json.dumps({'title': 'new title'}),
