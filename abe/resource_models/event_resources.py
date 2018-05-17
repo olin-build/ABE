@@ -132,7 +132,7 @@ class EventApi(Resource):
     @api.expect(event_model)
     @api.response(201, 'Created', event_model)
     @api.doc(responses={400: 'Validation Error',
-                        401: 'Unauthorized Acces'})
+                        401: 'Unauthorized Access'})
     def post(self):
         """
         Create new event with parameters passed in through args or form

@@ -18,7 +18,7 @@ from .resource_models.subscription_resources import api as subscription_api
 from .routes.oauth_routes import profile as oauth_blueprint
 
 app = Flask(__name__)
-CORS(app, allow_headers='Authorization', supports_credentials=True)
+CORS(app, allow_headers=['Authorization', 'Content-Type'], supports_credentials=True)
 
 # Redirect HTTP to HTTPS.
 #

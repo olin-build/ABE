@@ -79,10 +79,13 @@ def mongo_to_python_type(field, data):
 
 
 def request_to_dict(request):
-    """Convert incoming flask requests for objects into a dict"""
+    """Convert incoming HTTP requests for objects into a dict"""
 
     req_dict = request.values.to_dict(flat=True)
     if request.is_json:
         req_dict = request.get_json()  # get_dict returns python dictionary object
-    obj_dict = {k: v for k, v in req_dict.items() if v != ""}
+    keyMap = {'all_day': 'allDay'}
+    # FIXME: this test will keep a user from changing a location or description to "".
+    # What is it trying to do?
+    obj_dict = {keyMap.get(k, k): v for k, v in req_dict.items() if v != ""}
     return obj_dict
