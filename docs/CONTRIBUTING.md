@@ -10,7 +10,7 @@ Please check out the [the open issues][issues].
 
 ### Pipenv
 
-ABE uses Pipenv for python management.
+ABE uses [Pipenv][pipenv] for Python management.
 
 First, [install pipenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/#installing-pipenv). Most commonly:
 
@@ -36,7 +36,7 @@ You will also need to export `ABE_PASS` and `ABE_EMAIL`, as [found here](https:/
 
 ### RabbitMQ
 
-Install rabbitmq and any dependencies. Use [these instructions](http://www.rabbitmq.com/download.html). It will likely require a download of [Erlang](https://packages.erlang-solutions.com/erlang/), which must be installed separately.
+Install RabbitMQ and any dependencies. Use [these instructions](http://www.rabbitmq.com/download.html). It will likely require a download of [Erlang](https://packages.erlang-solutions.com/erlang/), which must be installed separately.
 
 ### MongoDB
 
@@ -46,7 +46,7 @@ macOS with [Homebrew](https://brew.sh/) installed, you can instead run `brew ins
 
 #### Load Sample Data
 
-To load [sample data](../abe/sample_data.py) into the database, run
+To load [sample data](../abe/sample_data.py) into the database, run:
 
 ```shell
 python -m abe.sample_data
@@ -64,11 +64,14 @@ python -m abe.sample_data --labels label-data.json
 
 ### Running Locally
 
-In order to launch a local copy of ABE from inside the pipenv shell, run the slightly verbose:
+Launch the API server in debug mode:
 
 ```shell
-$ gunicorn -c guniconf.py abe.app:app
+./scripts/server
 ```
+
+(In debug mode, it will reload files when you edit them. You don't need to
+quit and re-launch the server.)
 
 Visit <http://127.0.0.1:3000>. You should see a top hat.
 
@@ -81,6 +84,8 @@ To run the celery tasks concurrently with a local version of ABE, set
 `ABE_EMAIL_USERNAME` and `ABE_EMAIL_PASSWORD` to credentials for a GMail
 account. (Or, additionally set `ABE_EMAIL_HOST` and `ABE_EMAIL_PORT` to use
 a non-GMail POP3 SSL account.)
+
+In order to launch a local copy of ABE from inside the pipenv shell, run the slightly verbose:
 
 ```shell
 honcho start -f ProcfileHoncho
@@ -162,3 +167,4 @@ The following editor plugins keep code in compliance with markdown-lint:
     beautifies Markdown files.
 
 [issues]: https://github.com/olinlibrary/ABE/issues
+[pipenv]: https://docs.pipenv.org/

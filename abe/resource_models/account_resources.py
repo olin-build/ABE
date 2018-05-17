@@ -1,7 +1,7 @@
 from flask import request
 from flask_restplus import Namespace, Resource, fields
 
-from abe.auth import check_auth, request_is_from_inside_intranet
+from abe.auth import check_auth, get_request_scope, request_is_from_inside_intranet
 
 api = Namespace('account', description='Account info')
 
@@ -14,7 +14,10 @@ resource_model = api.model("Account", {
         description="The client is inside the intranet."),
     "permissions": fields.List(
         fields.String, required=True,
-        description="A list of strings that name granted permissions.")
+        description="A list of strings that name granted permissions."),
+    "scope": fields.List(
+        fields.String, required=True,
+        description="The OAuth scope."),
 })
 
 
@@ -31,6 +34,7 @@ class AccountApi(Resource):
             'authenticated': auth,
             'inside_intranet': request_is_from_inside_intranet(request),
             'permissions': permissions,
+            'scope': get_request_scope(request)
         }
 
 
