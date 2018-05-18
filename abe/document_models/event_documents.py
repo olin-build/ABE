@@ -165,7 +165,7 @@ class RecurringEventExc(EmbeddedDocument):  # TODO: get a better name
 
     labels          Labels for the events. Optional
                     Takes a list of strings which choice from the labels database
-                    Example: ["Library", "STAR"]
+                    Example: ["library", "StAR"]
 
     start           Start datetime of the event. Optional
                     Takes a datetime object

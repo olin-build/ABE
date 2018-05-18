@@ -100,7 +100,7 @@ class EventsTestCase(abe_unittest.TestCase):
             event = {
                 'title': 'protected post',
                 'start': isodate.parse_datetime('2018-05-10T09:00:00'),
-                'labels': ["STAR"]
+                'labels': ["StAR"]
             }
             response = self.client.post(
                 '/events/',
