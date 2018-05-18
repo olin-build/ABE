@@ -18,7 +18,7 @@ class OAuthTestCase(unittest.TestCase):
 
         with self.subTest("returns HTML with a link"):
             html = response.data.decode()
-            href_re = r'<a id="slack-oauth-link"(?:[^>]+)href="(.+?)">'
+            href_re = r'<a id="slack-oauth-link"\s+(?:[^>]*)\bhref="(.+?)">'
             self.assertRegexpMatches(html, href_re)
             slack_url = urllib.parse.urlparse(re.search(href_re, html)[1])
             self.assertEqual(slack_url.netloc, 'slack.com')
