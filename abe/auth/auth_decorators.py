@@ -2,14 +2,16 @@ from functools import wraps
 
 from flask import abort, request
 
-from .auth_requests import check_auth
+from .auth_requests import request_has_scope
 
 
-def edit_auth_required(f):
-    "Decorates f to raise an HTTP UNAUTHORIZED exception if the auth check fails."
-    @wraps(f)
-    def wrapped(*args, **kwargs):
-        if not check_auth(request):
-            abort(401)
-        return f(*args, **kwargs)
-    return wrapped
+def require_scope(scope):
+    "Decorates f to raise an HTTP Unauthorized exception if the auth check fails."
+    def wrapper(f):
+        @wraps(f)
+        def wrapped(*args, **kwargs):
+            if not request_has_scope(request, scope):
+                abort(401)
+            return f(*args, **kwargs)
+        return wrapped
+    return wrapper

@@ -11,7 +11,7 @@ from flask_restplus import Namespace, Resource, fields
 
 from abe import database as db
 from abe.resource_models import label_resources
-from abe.auth import check_auth, edit_auth_required
+from abe.auth import request_has_scope, require_scope
 from abe.helper_functions.converting_helpers import mongo_to_dict, request_to_dict
 from abe.helper_functions.mongodb_helpers import mongo_resource_errors
 from abe.helper_functions.query_helpers import event_query, get_to_event_search
@@ -52,82 +52,81 @@ def check_protected_labels(label_list):
 class EventApi(Resource):
     """API for interacting with events"""
 
-    @api.doc(params={'event_id': 'the id of the mongoDB event requested to be found',
-                     'rec_id': 'the rec_id of the sub_event information requested to be retrieved'})
+    @api.doc(params={'event_id': 'The optional event id',
+                     'rec_id': 'The optional sub-event id'})
     @api.response(200, 'Success', events_model)
     @mongo_resource_errors
     def get(self, event_id=None, rec_id=None):
-        """
-        Retrieve events from mongoDB
+        if event_id:
+            return self.get_event_by_id(event_id, rec_id)
+        else:
+            return self.get_events()
 
-        event_id        the id of the mongoDB event requested to be found
+    def get_event_by_id(self, event_id, rec_id):
+        # This doesn't check the scope for viewing non-public events. These
+        # events are protected by the obscurity of their ids: the event id is as
+        # well-protected as the rest of its data.
+        logging.debug('Event requested: %s', event_id)
+        result = db.Event.objects(id=event_id).first()
 
-        rec_id          the rec_id of the sub_event information requested to be retrieved
-        """
+        if not result:  # if there are no events with the event_id given
+            # search for sub_events with that id and save the parent event
+            cur_parent_event = db.Event.objects(__raw__={'sub_events._id': objectid.ObjectId(event_id)}).first()
 
-        if event_id:  # use event id if present
-            logging.debug('Event requested: %s', event_id)
-            result = db.Event.objects(id=event_id).first()
-
-            if not result:  # if there are no events with the event_id given
-                # search for sub_events with that id and save the parent event
-                cur_parent_event = db.Event.objects(__raw__={'sub_events._id': objectid.ObjectId(event_id)}).first()
-
-                if cur_parent_event:  # if a sub_event was found
-                    # access the information of the sub_event
-                    cur_sub_event = access_sub_event(mongo_to_dict(cur_parent_event), objectid.ObjectId(event_id))
-                    # expand the sub_event to inherit from the parent event
-                    return sub_event_to_full(cur_sub_event, cur_parent_event)
-                else:
-                    logging.debug("No sub_event found")
-                    abort(404)
-            # if an event was found and there is a rec_id given, a sub_event needs to be returned
-            elif rec_id:
-                # the json response will be used to display the information of the sub_event before it is edited
-                logging.debug('Sub_event requested: %s', rec_id)
-                # return a json response with the parent event information filled in with
-                # the start and end datetimes updated from the rec_id
-                result = placeholder_recurring_creation(rec_id, [], result, True)
-                if not result:
-                    return "Subevent not found with identifier '{}'".format(rec_id), 404
-                return result
-
+            if cur_parent_event:  # if a sub_event was found
+                # access the information of the sub_event
+                cur_sub_event = access_sub_event(mongo_to_dict(cur_parent_event), objectid.ObjectId(event_id))
+                # expand the sub_event to inherit from the parent event
+                return sub_event_to_full(cur_sub_event, cur_parent_event)
+            else:
+                logging.debug("No sub_event found")
+                abort(404)
+        # if an event was found and there is a rec_id given, a sub_event needs to be returned
+        elif rec_id:
+            # the json response will be used to display the information of the sub_event before it is edited
+            logging.debug('Sub_event requested: %s', rec_id)
+            # return a json response with the parent event information filled in with
+            # the start and end datetimes updated from the rec_id
+            result = placeholder_recurring_creation(rec_id, [], result, True)
             if not result:
-                return "Event not found with identifier '{}'".format(event_id), 404
-            return mongo_to_dict(result)
+                return f"Subevent not found with identifier '{rec_id}'", 404
+            return result
 
-        else:  # search database based on parameters
-            # make a query to the database
-            query_dict = get_to_event_search(request)
+        if not result:
+            return f"Event not found with identifier '{event_id}'", 404
+        return mongo_to_dict(result)
 
-            query_time_period = query_dict['end'] - query_dict['start']
-            if query_time_period > timedelta(days=366):
-                return "Too wide of date range in query. Max date range of 1 year allowed.", 404
+    def get_events(self):
+        query_dict = get_to_event_search(request)
 
-            if not check_auth(request):
-                query_dict['visibility'] = 'public'
+        query_time_period = query_dict['end'] - query_dict['start']
+        if query_time_period > timedelta(days=366):
+            return "Too wide of date range in query. Max date range of 1 year allowed.", 404
 
-            query = event_query(query_dict)
-            results = db.Event.objects(__raw__=query)  # {'start': new Date('2017-06-14')})
-            logging.debug('found %s events for query', len(results))
+        if not request_has_scope(request, 'read:all_events'):
+            query_dict['visibility'] = 'public'
 
-            if not results:  # if no results were found
-                return []
+        query = event_query(query_dict)
+        results = db.Event.objects(__raw__=query)  # {'start': new Date('2017-06-14')})
+        logging.debug('found %s events for query', len(results))
 
-            # date range for query
-            start = query_dict['start']
-            end = query_dict['end']
+        if not results:  # if no results were found
+            return []
 
-            events_list = []
-            for event in results:
-                if 'recurrence' in event:  # checks for recurrent events
-                    # expands a recurring event defintion into a json response with individual events
-                    events_list = recurring_to_full(event, events_list, start, end)
-                else:  # appends the event information as a dictionary
-                    events_list.append(mongo_to_dict(event))
-            return events_list
+        # date range for query
+        start = query_dict['start']
+        end = query_dict['end']
 
-    @edit_auth_required
+        events_list = []
+        for event in results:
+            if 'recurrence' in event:  # checks for recurrent events
+                # expands a recurring event defintion into a json response with individual events
+                events_list = recurring_to_full(event, events_list, start, end)
+            else:  # appends the event information as a dictionary
+                events_list.append(mongo_to_dict(event))
+        return events_list
+
+    @require_scope('create:events')
     @mongo_resource_errors
     @api.expect(event_model)
     @api.response(201, 'Created', event_model)
@@ -151,7 +150,7 @@ class EventApi(Resource):
         new_event.save()
         return mongo_to_dict(new_event), 201
 
-    @edit_auth_required
+    @require_scope('edit:events')
     @mongo_resource_errors
     @api.expect(event_model)
     def put(self, event_id):
@@ -185,7 +184,7 @@ class EventApi(Resource):
                 result.reload()
         return mongo_to_dict(result)
 
-    @edit_auth_required
+    @require_scope('delete:events')
     @mongo_resource_errors
     def delete(self, event_id, rec_id=None):
         """

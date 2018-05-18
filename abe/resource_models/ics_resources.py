@@ -8,7 +8,7 @@ from flask import Response,  request
 from icalendar import Calendar
 
 from abe import database as db
-from abe.auth import edit_auth_required
+from abe.auth import require_scope
 from abe.helper_functions.converting_helpers import request_to_dict
 from abe.helper_functions.ics_helpers import extract_ics, mongo_to_ics
 from abe.helper_functions.mongodb_helpers import mongo_resource_errors
@@ -25,7 +25,7 @@ ics_model = api.model("ICS", {
 
 
 class ICSApi(Resource):
-    """API for interacting with ics feeds"""
+    """API for interacting with ICS feeds"""
 
     @api.deprecated
     @mongo_resource_errors
@@ -45,12 +45,12 @@ class ICSApi(Resource):
                         mimetype="text/calendar",
                         headers={"Content-Disposition": cd})
 
-    @edit_auth_required
+    @require_scope('create:ics')
     @mongo_resource_errors
     @api.expect(ics_model)
     def post(self):
         """
-        Converts an ICS feed input to mongoDB objects
+        Converts an ICS feed input to MongoDB objects.
         """
         # reads outside ics feed
         url = request_to_dict(request)

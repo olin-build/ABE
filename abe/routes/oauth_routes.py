@@ -17,7 +17,7 @@ from flask import Blueprint, flash, redirect, render_template, request
 # auth token secret. The auth token and secret and the email token secret are
 # never used to encrypt the same plaintext, so this shouldn't enable any
 # differential cryptoanalysis.
-from abe.auth import AUTH_TOKEN_SECRET, clear_auth_cookie, create_access_token
+from abe.auth import AUTH_TOKEN_SECRET, clear_auth_cookie, create_auth_token
 from abe.helper_functions.email_helpers import smtp_connect
 from abe.helper_functions.url_helpers import url_add_query_params
 from flask_wtf import FlaskForm
@@ -84,7 +84,7 @@ def slack_auth():
         return redirect(url_add_query_params(redirect_uri, error=request.args['error']))
     else:
         redirect_uri = url_add_query_params(redirect_uri,
-                                            access_token=create_access_token(),
+                                            access_token=create_auth_token(),
                                             expires_in=str(6 * 30 * 24 * 3600),  # ignored by server
                                             state=state['state'],
                                             token_type='bearer',

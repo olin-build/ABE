@@ -45,11 +45,11 @@ class AuthTestCase(unittest.TestCase):
         assert auth.ip_inside_intranet('2001:0db8:85a3:0000:0000:8a2e:0370:7334')
         assert not auth.ip_inside_intranet('2001:0db9:85a3:0000:0000:8a2e:0370:7334')
 
-    def test_edit_auth_required(self):
+    def test_require_scope(self):
         os.environ['INTRANET_CDIRS'] = '127.0.0.1/24'
         auth.reload_env_vars()
 
-        @auth.edit_auth_required
+        @auth.require_scope('edit:events')
         def route():
             return 'ok'
 
@@ -91,7 +91,7 @@ class AuthTestCase(unittest.TestCase):
                 self.assertEqual(http_error.exception.code, 401)
 
         with self.subTest("off-whitelist IP, correct cookie"):
-            with app.test_request_context('/', headers={"COOKIE": f"access_token={auth.create_access_token()}"},
+            with app.test_request_context('/', headers={"COOKIE": f"access_token={auth.create_auth_token()}"},
                                           environ_base={'REMOTE_ADDR': '127.0.1.1'}):
                 assert route() == 'ok'
 
@@ -103,7 +103,7 @@ class AuthTestCase(unittest.TestCase):
                 self.assertEqual(http_error.exception.code, 401)
 
         with self.subTest("off-whitelist IP, authorization header"):
-            with app.test_request_context('/', headers={"Authorization": f"Bearer {auth.create_access_token()}"},
+            with app.test_request_context('/', headers={"Authorization": f"Bearer {auth.create_auth_token()}"},
                                           environ_base={'REMOTE_ADDR': '127.0.1.1'}):
                 assert route() == 'ok'
 

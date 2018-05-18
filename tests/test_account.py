@@ -45,4 +45,7 @@ class AccountTestCase(abe_unittest.TestCase):
         account = flask.json.loads(response.data)
         self.assertEqual(account['authenticated'], True)
         self.assertEqual(set(account['permissions']), {'add_events', 'edit_events', 'view_all_events'})
-        self.assertEqual(set(account['scope']), {'events:create', 'events:edit', 'community_events:read'})
+        scope = set(account['scope'])
+        self.assertGreaterEqual(scope, {'events:create', 'events:edit', 'community_events:read'})
+        self.assertGreaterEqual(scope, {'create:events', 'edit:events', 'delete:events'})
+        self.assertGreaterEqual(scope, {'read:all_events'})

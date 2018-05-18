@@ -4,7 +4,7 @@ import re
 from flask import g, session
 from netaddr import IPNetwork, IPSet
 
-from .auth_tokens import AUTHENTICATED_USER_SCOPE, create_access_token, is_valid_access_token
+from .auth_tokens import create_auth_token, get_auth_token_scope, is_valid_token
 
 ACCESS_TOKEN_COOKIE_NAME = 'access_token'
 
@@ -73,10 +73,10 @@ def get_valid_request_auth_token(req):
         yield req.cookies.get(ACCESS_TOKEN_COOKIE_NAME, None)
         yield session.get('access_token', None)
     for token in iter_token_candidates():
-        if is_valid_access_token(token):
+        if is_valid_token(token):
             return token
 
-    access_token = create_access_token()
+    access_token = create_auth_token()
 
     @after_this_request
     def remember_computer(response):
@@ -87,9 +87,14 @@ def get_valid_request_auth_token(req):
 
 
 def get_request_scope(req):
-    if get_valid_request_auth_token(req):
-        return AUTHENTICATED_USER_SCOPE
+    token = get_valid_request_auth_token(req)
+    if token:
+        return get_auth_token_scope(token)
     return []
+
+
+def request_has_scope(req, scope):
+    return scope in get_request_scope(req)
 
 
 def clear_auth_cookie():
