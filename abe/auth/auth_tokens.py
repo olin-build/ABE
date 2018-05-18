@@ -4,7 +4,9 @@ from uuid import uuid4
 
 import jwt
 
-# For development and testing, default to an instance-specific secret.
+ADMIN_EMAILS = os.environ.get('ADMIN_EMAILS', '').split(',')
+
+# Default to an instance-specific secret for development and testing.
 AUTH_TOKEN_SECRET = os.environ.get("AUTH_TOKEN_SECRET", uuid4().hex)
 
 AUTHENTICATED_USER_SCOPE = [
@@ -21,18 +23,34 @@ ADMIN_USER_SCOPE = AUTHENTICATED_USER_SCOPE + [
 ]
 
 
-def create_auth_token(role='user'):
-    payload = {'iat': int(time.time()), 'role': role}
-    return jwt.encode(payload, AUTH_TOKEN_SECRET, algorithm='HS256').decode()
+def create_access_token(**params):
+    payload = {}
+    payload.update(params)
+    payload.update({'iat': int(time.time())})
+    token = jwt.encode(payload, AUTH_TOKEN_SECRET, algorithm='HS256').decode()
+    return token
 
 
-def get_auth_token_scope(token):
+def get_access_token_provider(token):
+    if is_valid_token(token):
+        payload = jwt.decode(token.encode(), AUTH_TOKEN_SECRET, algorithms='HS256')
+        return payload.get('provider')
+    return None
+
+
+def get_access_token_role(token):
+    if is_valid_token(token):
+        payload = jwt.decode(token.encode(), AUTH_TOKEN_SECRET, algorithms='HS256')
+        return 'admin' if payload.get('email') in ADMIN_EMAILS else 'email'
+    return None
+
+
+def get_access_token_scope(token):
     # The scope is computed based on the token's role, so that tokens stay
     # valid if the role -> scope map changes.
     scope = []
     if is_valid_token(token):
-        dec = jwt.decode(token.encode(), AUTH_TOKEN_SECRET, algorithms='HS256')
-        role = dec.get('role', 'user')
+        role = get_access_token_role(token)
         scope = ADMIN_USER_SCOPE if role == 'admin' else AUTHENTICATED_USER_SCOPE
     return scope
 

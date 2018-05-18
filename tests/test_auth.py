@@ -4,12 +4,12 @@
 import os
 import unittest
 
-import flask
 from werkzeug.exceptions import HTTPException
 
-from abe import auth  # noqa: F401
+from . import app  # noqa: F401
 
-app = flask.Flask(__name__)
+# This import must occur after .context sets the environment variables
+from abe import auth   # isort:skip
 
 
 class AuthTestCase(unittest.TestCase):
@@ -91,7 +91,7 @@ class AuthTestCase(unittest.TestCase):
                 self.assertEqual(http_error.exception.code, 401)
 
         with self.subTest("off-whitelist IP, correct cookie"):
-            with app.test_request_context('/', headers={"COOKIE": f"access_token={auth.create_auth_token()}"},
+            with app.test_request_context('/', headers={"COOKIE": f"access_token={auth.create_access_token()}"},
                                           environ_base={'REMOTE_ADDR': '127.0.1.1'}):
                 assert route() == 'ok'
 
@@ -103,7 +103,7 @@ class AuthTestCase(unittest.TestCase):
                 self.assertEqual(http_error.exception.code, 401)
 
         with self.subTest("off-whitelist IP, authorization header"):
-            with app.test_request_context('/', headers={"Authorization": f"Bearer {auth.create_auth_token()}"},
+            with app.test_request_context('/', headers={"Authorization": f"Bearer {auth.create_access_token()}"},
                                           environ_base={'REMOTE_ADDR': '127.0.1.1'}):
                 assert route() == 'ok'
 

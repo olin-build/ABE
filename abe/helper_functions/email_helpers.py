@@ -4,11 +4,11 @@ import logging
 import os
 import poplib
 import smtplib
+from datetime import datetime as dt
+from email.message import EmailMessage
 
 import icalendar as ic
 from mongoengine import ValidationError
-from datetime import datetime as dt
-from email.message import EmailMessage
 
 from abe import database as db
 from abe.helper_functions.converting_helpers import mongo_to_dict
@@ -144,8 +144,9 @@ def smtp_connect():
     """
     username = ABE_EMAIL_USERNAME
     if not username:
-        logging.info("ABE_EMAIL_USERNAME is not defined. Not fetching messages.")
-        return
+        logging.error("ABE_EMAIL_USERNAME is not defined. Not fetching messages.")
+        return None, None
+    logging.info("Connecting to %s@%s:%s", ABE_EMAIL_USERNAME, ABE_EMAIL_HOST, ABE_EMAIL_PORT)
     try:
         server = smtplib.SMTP_SSL(ABE_EMAIL_HOST, ABE_EMAIL_PORT)
         server.ehlo()
@@ -154,31 +155,37 @@ def smtp_connect():
         logging.error('Connecting to %s failed: %s', ABE_EMAIL_HOST, e)
         # FIXME: callers do not handle a `None` return, and will error
         # on upacking this.
-        return
+        return None, None
     return server, username
 
 
-def error_reply(to, error):
-    """ Given the error, sends an email with the errors that
-    occured to the original sender. """
+def send_message(msg):
+    """Sets msg['From'], and sends the message."""
     server, sent_from = smtp_connect()
+    if not server:
+        # smtp_connect has already logged the error
+        return False
+    msg['From'] = sent_from
+    server.send_message(msg)
+    server.close()
+    return True
+
+
+def error_reply(to, error):
+    """Given the error, sends an email with the errors that occured to the original sender."""
     msg = EmailMessage()
     body = "ABE didn't manage to add the event, sorry. Here's what went wrong: \n"
     for err in error.errors:
         body = body + str(err) + '\n'
     body = body + "Final error message: " + error.message
     msg['Subject'] = 'Event Failed to Add'
-    msg['From'] = sent_from
     msg['To'] = [to]
     msg.set_content(body)
-    server.send_message(msg)
-    server.close()
+    send_message(msg)
 
 
 def reply_email(to, event_dict):
-    """ Responds after a successful posting with
-    the tags under which the event was saved. """
-    server, sent_from = smtp_connect()
+    """Responds after a successful posting with the tags under which the event was saved."""
     tags = ', '.join(event_dict['labels']).strip()
     start = dt.strptime(event_dict['start'][:16], '%Y-%m-%d %H:%M').strftime('%I:%M %m/%d')
     end = dt.strptime(event_dict['end'][:16], '%Y-%m-%d %H:%M').strftime('%I:%M %m/%d')
@@ -190,15 +197,13 @@ def reply_email(to, event_dict):
     """
     msg = EmailMessage()
     msg['Subject'] = f"{event_dict['title']} added to ABE!"
-    msg['From'] = sent_from
     msg['To'] = [to]
     msg.set_content(body)
-    server.send_message(msg)
-    server.close()
+    send_message(msg)
 
 
 def scrape():
-    """ Scrapes emails and parses them into events """
+    """Scrapes emails and parses them into events"""
     try:
         msgs = get_messages_from_email()
     except poplib.error_proto as err:
@@ -207,7 +212,4 @@ def scrape():
         return []
     cals = get_calendars_from_messages(msgs)
     logging.info("Scraped %s from %s", len(cals), ABE_EMAIL_USERNAME)
-    completed = []
-    for cal in cals:
-        completed.append(cal_to_event(cal))
-    return completed
+    return [cal_to_event(cal) for cal in cals]

@@ -5,10 +5,7 @@ database named "abe-unittest" for testing.
 """
 import flask
 
-from . import abe_unittest, app, sample_data
-
-# This imports must occur .context sets the environment variables
-from abe.auth import create_auth_token  # isort:skip
+from . import abe_unittest, admin_access_token, app, sample_data
 
 
 class AbeTestCase(abe_unittest.TestCase):
@@ -47,6 +44,6 @@ class AbeTestCase(abe_unittest.TestCase):
                 '/labels/',
                 data=flask.json.dumps(event),
                 content_type='application/json',
-                headers={'Authorization': f"Bearer {create_auth_token(role='admin')}"}
+                headers={'Authorization': f"Bearer {admin_access_token}"}
             )
             self.assertEqual(response.status_code, 201)

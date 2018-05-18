@@ -124,6 +124,7 @@ def logout():
 
 @app.route('/account/info')
 def account_info():
-    if request.args['state'] == session.pop('_csrf_token', None):
+    if 'access_token' in request.args:
+        # if request.args['state'] == session.pop('_csrf_token', None):
         session['access_token'] = request.args['access_token']
     return render_template('account.html', args=request.args)

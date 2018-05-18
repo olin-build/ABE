@@ -9,7 +9,7 @@
 <body>
     <h1>Sign into ABE</h1>
     <div class="subtitle">
-        (Exprimental) Sign in with an email link.
+        (Experimental) Sign in with an email link.
     </div>
     {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -21,9 +21,8 @@
         {% endif %}
     {% endwith %}
     {% if email_sent %}
-        <div>A sign-in link has been sent to {{ email }}. With token {{ token }}.
-            And link {{ email_auth_link }}.
-        </div>
+        <p>A sign-in link has been sent to {{ email }}.</p>
+        <p>When this link arrives, click on it to sign into ABE.</p>
     {% else %}
         <div class="warning">{{ message }}</div>
         <div>

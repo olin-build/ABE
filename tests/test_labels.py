@@ -1,8 +1,6 @@
 import flask
 
-from . import abe_unittest, app, sample_data
-
-from abe.auth import create_auth_token  # isort:skip
+from . import abe_unittest, admin_access_token, app, sample_data, user_access_token
 
 
 class LabelsTestCase(abe_unittest.TestCase):
@@ -11,8 +9,7 @@ class LabelsTestCase(abe_unittest.TestCase):
         super().setUp()
         self.client = app.test_client()
         sample_data.load_data(self.db)
-        token = create_auth_token(role='admin')
-        self.headers = {'Authorization': f'Bearer {token}'}
+        self.headers = {'Authorization': f'Bearer {admin_access_token}'}
 
     def get_label_by_id(self, id):
         response = self.client.get('/labels/')
@@ -90,7 +87,7 @@ class LabelsTestCase(abe_unittest.TestCase):
                 '/labels/',
                 data=flask.json.dumps(label_noauth),
                 content_type='application/json',
-                headers={'Authorization': f'Bearer {create_auth_token()}'}
+                headers={'Authorization': f'Bearer {user_access_token}'}
             )
             self.assertEqual(response.status_code, 401)
 
