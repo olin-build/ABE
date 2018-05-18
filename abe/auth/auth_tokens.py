@@ -9,7 +9,6 @@ AUTH_TOKEN_SECRET = os.environ.get("AUTH_TOKEN_SECRET", uuid4().hex)
 
 AUTHENTICATED_USER_SCOPE = [
     'create:events', 'edit:events', 'delete:events',
-    'create:labels', 'edit:labels', 'delete:labels',
     'create:ics',
     'read:all_events',
     # deprecated:
@@ -18,20 +17,24 @@ AUTHENTICATED_USER_SCOPE = [
 
 ADMIN_USER_SCOPE = AUTHENTICATED_USER_SCOPE + [
     'create:protected_events', 'edit:protected_events', 'delete:protected_events',
+    'create:labels', 'edit:labels', 'delete:labels',
 ]
 
 
-def create_auth_token():
-    return jwt.encode({'iat': int(time.time())}, AUTH_TOKEN_SECRET, algorithm='HS256').decode()
+def create_auth_token(role='user'):
+    payload = {'iat': int(time.time()), 'role': role}
+    return jwt.encode(payload, AUTH_TOKEN_SECRET, algorithm='HS256').decode()
 
 
 def get_auth_token_scope(token):
     # The scope is computed based on the token's role, so that tokens stay
     # valid if the role -> scope map changes.
+    scope = []
     if is_valid_token(token):
-        # TODO: use ADMIN_USER_SCOPE for authenticated admin users
-        return AUTHENTICATED_USER_SCOPE
-    return []
+        dec = jwt.decode(token.encode(), AUTH_TOKEN_SECRET, algorithms='HS256')
+        role = dec.get('role', 'user')
+        scope = ADMIN_USER_SCOPE if role == 'admin' else AUTHENTICATED_USER_SCOPE
+    return scope
 
 
 def is_valid_token(token):

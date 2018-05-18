@@ -63,7 +63,7 @@ class AuthTestCase(unittest.TestCase):
                     route()
                 self.assertEqual(http_error.exception.code, 401)
 
-        with self.subTest("read the client IP instead of the proxy"):
+        with self.subTest("reads the client IP instead of the proxy"):
             with app.test_request_context('/', headers={'X-Forwarded-For': '127.0.0.1'}):
                 assert route() == 'ok'
             with app.test_request_context('/', headers={'X-Forwarded-For': '127.0.0.255'}):
