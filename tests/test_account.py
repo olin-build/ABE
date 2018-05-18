@@ -1,5 +1,4 @@
 import os
-from importlib import reload
 
 import flask
 
@@ -14,11 +13,14 @@ from abe import auth  # isort:skip # noqa: F401
 class AccountTestCase(abe_unittest.TestCase):
 
     def setUp(self):
-        global auth
         super().setUp()
-        # self.app = app.test_client(use_cookies=False)
+        self.intranet_cdirs = os.environ["INTRANET_CDIRS"]
         os.environ['INTRANET_CDIRS'] = "127.0.0.1/24"
-        reload(auth)
+        auth.reload_env_vars()
+
+    def tearDown(self):
+        os.environ["INTRANET_CDIRS"] = self.intranet_cdirs
+        auth.reload_env_vars()
 
     def test_unauthorized_client(self):
         client = app.test_client()
