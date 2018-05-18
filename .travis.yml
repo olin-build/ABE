@@ -19,7 +19,7 @@ install:
 
 script:
   - pipenv run flake8 abe tests *.py
-  - pipenv run pytest --cov=. --cov-report html:htmlcov
+  - pipenv run pytest --cov=. --cov-report html:htmlcov -v
 
 after_success:
   - pipenv run codecov
