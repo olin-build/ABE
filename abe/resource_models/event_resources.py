@@ -66,7 +66,7 @@ class EventApi(Resource):
         """
 
         if event_id:  # use event id if present
-            logging.debug('Event requested: ' + event_id)
+            logging.debug('Event requested: %s', event_id)
             result = db.Event.objects(id=event_id).first()
 
             if not result:  # if there are no events with the event_id given
@@ -84,7 +84,7 @@ class EventApi(Resource):
             # if an event was found and there is a rec_id given, a sub_event needs to be returned
             elif rec_id:
                 # the json response will be used to display the information of the sub_event before it is edited
-                logging.debug('Sub_event requested: ' + rec_id)
+                logging.debug('Sub_event requested: %s', rec_id)
                 # return a json response with the parent event information filled in with
                 # the start and end datetimes updated from the rec_id
                 result = placeholder_recurring_creation(rec_id, [], result, True)

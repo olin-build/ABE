@@ -100,7 +100,7 @@ def insert_data(db, event_data=None, label_data=None, ics_data=None):
             if 'recurrence' in new_event:
                 if not new_event.recurrence.forever:
                     new_event.recurrence_end = find_recurrence_end(new_event)
-                    logging.debug("made some end recurrences: {}".format(new_event.recurrence_end))
+                    logging.debug("made some end recurrences: %s", new_event.recurrence_end)
             new_event.save()
     if label_data:
         logging.debug("Inserting sample label data")

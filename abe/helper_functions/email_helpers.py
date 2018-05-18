@@ -151,7 +151,7 @@ def smtp_connect():
         server.ehlo()
         server.login(ABE_EMAIL_USERNAME, ABE_EMAIL_PASSWORD)
     except (smtplib.SMTPException, ConnectionRefusedError) as e:
-        logging.error(f'Connecting to {ABE_EMAIL_HOST} failed: {e}')
+        logging.error('Connecting to %s failed: %s', ABE_EMAIL_HOST, e)
         # FIXME: callers do not handle a `None` return, and will error
         # on upacking this.
         return
@@ -202,10 +202,11 @@ def scrape():
     try:
         msgs = get_messages_from_email()
     except poplib.error_proto as err:
-        logging.error(f"Couldn't connect to {ABE_EMAIL_HOST} as {ABE_EMAIL_USERNAME}. Error: {err}")
+        logging.error("Couldn't connect to %s as %s. Error: %s",
+                      ABE_EMAIL_HOST, ABE_EMAIL_USERNAME, err)
         return []
     cals = get_calendars_from_messages(msgs)
-    logging.info(f"Scraped {len(cals)} from {ABE_EMAIL_USERNAME}")
+    logging.info("Scraped %s from %s", len(cals), ABE_EMAIL_USERNAME)
     completed = []
     for cal in cals:
         completed.append(cal_to_event(cal))
