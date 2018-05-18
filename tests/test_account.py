@@ -2,11 +2,9 @@ import os
 
 import flask
 
-from . import abe_unittest
-from .context import abe  # noqa: F401
+from . import app, abe_unittest
 
-# These imports have to happen after .context sets the environment variables
-from abe.app import app  # isort:skip
+# This import must occur after .context sets the environment variables
 from abe import auth  # isort:skip # noqa: F401
 
 

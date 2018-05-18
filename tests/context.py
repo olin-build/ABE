@@ -16,9 +16,3 @@ os.environ['SLACK_OAUTH_CLIENT_ID'] = 'slack-oauth-client-id'
 os.environ['ABE_EMAIL_USERNAME'] = 'email-test-user'
 os.environ['ABE_EMAIL_PASSWORD'] = 'email-test-password'
 os.environ['ABE_EMAIL_HOST'] = 'pop.test.com'
-
-# These imports have to go after the environment variables are set
-import abe  # isort:skip # noqa: E402 F401
-from abe.app import app  # isort:skip # noqa: E402 F401
-from abe import database as db  # isort:skip # noqa: E402 F401
-from abe import sample_data  # isort:skip # noqa: E402 F401

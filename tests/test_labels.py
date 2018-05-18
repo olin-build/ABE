@@ -1,7 +1,6 @@
 import flask
 
-from . import abe_unittest
-from .context import app, sample_data
+from . import abe_unittest, app, sample_data
 
 from abe.auth import create_auth_token  # isort:skip
 

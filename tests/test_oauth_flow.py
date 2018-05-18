@@ -4,9 +4,7 @@ import urllib.parse
 
 import flask
 
-from . import context  # noqa: F401
-
-from abe.app import app  # isort:skip
+from . import app
 
 
 class OAuthTestCase(unittest.TestCase):

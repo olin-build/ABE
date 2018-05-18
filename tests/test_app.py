@@ -5,11 +5,9 @@ database named "abe-unittest" for testing.
 """
 import flask
 
-from . import abe_unittest
-from .context import app
+from . import abe_unittest, app, sample_data
 
-# These imports have to happen after .context sets the environment variables
-from abe import sample_data  # isort:skip
+# This imports must occur .context sets the environment variables
 from abe.auth import create_auth_token  # isort:skip
 
 
