@@ -139,9 +139,7 @@ class EventApi(Resource):
         received_data = request_to_dict(request)
         logging.debug("Received POST data: %s", received_data)  # combines args and form
         new_event = db.Event(**received_data)
-        if new_event.labels == []:  # if no labels were given
-            new_event.labels = ['unlabeled']
-        else:
+        if not request_has_scope(request, 'create:protected_events'):
             check_protected_labels(new_event.labels)
         if 'recurrence' in new_event:  # if this is a recurring event
             if not new_event.recurrence.forever:  # if it doesn't recur forever
@@ -170,11 +168,11 @@ class EventApi(Resource):
             else:
                 abort(404)
         else:  # if event was found
-            # abort if event is protected
-            check_protected_labels(result.labels)
+            if not request_has_scope(request, 'edit:protected_events'):
+                check_protected_labels(result.labels)
+                # TODO: also check the new labels
             # if the received data is a new sub_event
             if 'sid' in received_data and received_data['sid'] is not None:
-
                 # create a new sub_event document
                 if 'rec_id' in received_data and received_data['rec_id'] is not None:
                     received_data['rec_id'] = dateutil.parser.parse(str(received_data['rec_id']))
@@ -194,6 +192,8 @@ class EventApi(Resource):
 
         rec_id          the rec_id of a sub_event to be deleted
         """
+        # TODO: call check_protected_labels(result.labels)
+        # if not request_has_scope(request, 'delete:protected_events')
         logging.debug('Event requested: %s', event_id)
         result = db.Event.objects(id=event_id).first()
         if not result:  # if no event is found with the id given

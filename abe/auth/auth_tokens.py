@@ -11,10 +11,13 @@ AUTHENTICATED_USER_SCOPE = [
     'create:events', 'edit:events', 'delete:events',
     'create:labels', 'edit:labels', 'delete:labels',
     'create:ics',
-    'edit:protected_events',  # also stands for create:… and delete:…
     'read:all_events',
     # deprecated:
     'events:create', 'events:edit', 'community_events:read',
+]
+
+ADMIN_USER_SCOPE = AUTHENTICATED_USER_SCOPE + [
+    'create:protected_events', 'edit:protected_events', 'delete:protected_events',
 ]
 
 
@@ -23,7 +26,10 @@ def create_auth_token():
 
 
 def get_auth_token_scope(token):
+    # The scope is computed based on the token's role, so that tokens stay
+    # valid if the role -> scope map changes.
     if is_valid_token(token):
+        # TODO: use ADMIN_USER_SCOPE for authenticated admin users
         return AUTHENTICATED_USER_SCOPE
     return []
 
