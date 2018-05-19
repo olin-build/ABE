@@ -1,8 +1,7 @@
 # ABE
 
-Dev: [![Build Status](https://travis-ci.org/olinlibrary/ABE.svg?branch=dev)](https://travis-ci.org/olinlibrary/ABE/branches)
-[![Coverage](https://codecov.io/gh/olinlibrary/abe/branch/dev/graph/badge.svg)](https://codecov.io/gh/olinlibrary/abe)
-Master: [![Build Status](https://travis-ci.org/olinlibrary/ABE.svg?branch=master)](https://travis-ci.org/olinlibrary/ABE/branches)
+[![Build Status](https://travis-ci.org/olin-build/ABE.svg?branch=dev)](https://travis-ci.org/olin-build/ABE)
+[![Coverage](https://codecov.io/gh/olinlibrary/ABE/branch/dev/graph/badge.svg)](https://codecov.io/gh/olin-build/ABE)
 
 **ABE** (Amorphous Blob of Events) is Olin's student-built store of information
 about Olin events. It enables the creation of digital experiences that share
@@ -34,5 +33,5 @@ ABE is a platform. Some online experiences that use the data in ABE include:
 
 [abe-web]: https://github.com/olinlibrary/abe-web
 [contributing]: ./docs/CONTRIBUTING.md
-[good-first-issue]: https://github.com/olinlibrary/ABE/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22
-[issues]: https://github.com/olinlibrary/ABE/issues
+[good-first-issue]: https://github.com/olin-build/ABE/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22
+[issues]: https://github.com/olin-build/ABE/issues

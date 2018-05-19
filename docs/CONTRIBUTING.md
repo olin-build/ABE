@@ -141,7 +141,7 @@ The test suite will print some `DeprecationWarning`s from files in `…/site-pac
 $ flake8 abe tests *.py
 ```
 
-[issues]: https://github.com/olinlibrary/ABE/issues
+[issues]: https://github.com/olin-build/ABE/issues
 
 ## Style Guides
 
@@ -165,5 +165,5 @@ The following editor plugins keep code in compliance with markdown-lint:
   * [remark](https://marketplace.visualstudio.com/items?itemName=mrmlnc.vscode-remark)
     beautifies Markdown files.
 
-[issues]: https://github.com/olinlibrary/ABE/issues
+[issues]: https://github.com/olin-build/ABE/issues
 [pipenv]: https://docs.pipenv.org/
