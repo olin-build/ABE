@@ -2,17 +2,17 @@
 import os
 from datetime import datetime
 
-from flask import Flask, g, jsonify,  render_template
+from flask import Flask, g, jsonify, render_template
 from flask.json import JSONEncoder
 from flask_cors import CORS
 from flask_restplus import Api
 from flask_sslify import SSLify  # redirect to https
 
-from .resource_models.account_resources import api as account_api
 from .resource_models.event_resources import api as event_api
 from .resource_models.ics_resources import api as ics_api
 from .resource_models.label_resources import api as label_api
 from .resource_models.subscription_resources import api as subscription_api
+from .resource_models.user_resources import api as user_api
 from .routes.admin_routes import profile as admin_blueprint
 from .routes.oauth_routes import profile as oauth_blueprint
 
@@ -81,11 +81,11 @@ def call_after_request_callbacks(response):  # For deferred callbacks
 
 
 # Route resources
-api.add_namespace(account_api)
 api.add_namespace(event_api)
-api.add_namespace(label_api)
 api.add_namespace(ics_api)
+api.add_namespace(label_api)
 api.add_namespace(subscription_api)
+api.add_namespace(user_api)
 
 # Routes
 app.register_blueprint(admin_blueprint)

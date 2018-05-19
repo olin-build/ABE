@@ -9,15 +9,13 @@ ADMIN_EMAILS = os.environ.get('ADMIN_EMAILS', '').split(',')
 # Default to an instance-specific secret for development and testing.
 AUTH_TOKEN_SECRET = os.environ.get("AUTH_TOKEN_SECRET", uuid4().hex)
 
-AUTHENTICATED_USER_SCOPE = [
+AUTHENTICATED_USER_CLAIMS = [
     'create:events', 'edit:events', 'delete:events',
     'create:ics',
     'read:all_events',
-    # deprecated:
-    'events:create', 'events:edit', 'community_events:read',
 ]
 
-ADMIN_USER_SCOPE = AUTHENTICATED_USER_SCOPE + [
+ADMIN_USER_CLAIMS = AUTHENTICATED_USER_CLAIMS + [
     'create:protected_events', 'edit:protected_events', 'delete:protected_events',
     'create:labels', 'edit:labels', 'delete:labels',
 ]
@@ -41,7 +39,7 @@ def get_access_token_provider(token):
 def get_access_token_role(token):
     if is_valid_token(token):
         payload = jwt.decode(token.encode(), AUTH_TOKEN_SECRET, algorithms='HS256')
-        return 'admin' if payload.get('email') in ADMIN_EMAILS else 'email'
+        return 'admin' if payload.get('email') in ADMIN_EMAILS else 'user'
     return None
 
 
@@ -51,7 +49,7 @@ def get_access_token_scope(token):
     scope = []
     if is_valid_token(token):
         role = get_access_token_role(token)
-        scope = ADMIN_USER_SCOPE if role == 'admin' else AUTHENTICATED_USER_SCOPE
+        scope = ADMIN_USER_CLAIMS if role == 'admin' else AUTHENTICATED_USER_CLAIMS
     return scope
 
 
