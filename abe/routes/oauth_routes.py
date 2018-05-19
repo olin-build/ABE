@@ -8,6 +8,7 @@ from uuid import uuid4
 
 import flask
 import jwt
+from flask import current_app as app
 from flask import Blueprint, flash, redirect, render_template, request
 
 # This is a *different* secret from the auth token, so that email tokens can't
@@ -18,7 +19,7 @@ from flask import Blueprint, flash, redirect, render_template, request
 # auth token secret. The auth token and secret and the email token secret are
 # never used to encrypt the same plaintext, so this shouldn't enable any
 # differential cryptoanalysis.
-from abe.auth import AUTH_TOKEN_SECRET, clear_auth_cookies, create_access_token
+from abe.auth import clear_auth_cookies, create_access_token
 from abe.helper_functions.email_helpers import send_message
 from abe.helper_functions.url_helpers import url_add_query_params
 from flask_wtf import FlaskForm
@@ -93,9 +94,6 @@ def slack_auth():
     return redirect(redirect_uri)
 
 
-EMAIL_TOKEN_SECRET = 'email:' + AUTH_TOKEN_SECRET
-
-
 class EmailForm(FlaskForm):
     email = StringField('Email', validators=[
         DataRequired(),
@@ -121,7 +119,7 @@ def auth_send_email():
             'redirect_uri': request.args.get('redirect_uri'),
             'state': request.args.get('state'),
         }
-        token = jwt.encode(payload, EMAIL_TOKEN_SECRET, algorithm='HS256').decode()
+        token = jwt.encode(payload, app.secret_key, algorithm='HS256').decode()
         msg = MIMEMultipart('alternative')
         msg['Subject'] = 'Sign into ABE'
         msg['To'] = email
@@ -140,7 +138,7 @@ def auth_send_email():
 
 @profile.route('/oauth/email')
 def email_auth():
-    payload = jwt.decode(request.args['token'].encode(), EMAIL_TOKEN_SECRET, algorithm='HS256')
+    payload = jwt.decode(request.args['token'].encode(), app.secret_key, algorithm='HS256')
     access_token = create_access_token(provider='email', email=payload['email'])
     redirect_uri = url_add_query_params(payload['redirect_uri'],
                                         access_token=access_token,
