@@ -9,7 +9,7 @@ from uuid import uuid4
 import flask
 import jwt
 from flask import current_app as app
-from flask import Blueprint, abort, flash, redirect, render_template, request
+from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 
 # This is a *different* secret from the auth token, so that email tokens can't
 # be used to sign in. This could also be accomplished by using the *same*
@@ -21,7 +21,7 @@ from flask import Blueprint, abort, flash, redirect, render_template, request
 # differential cryptoanalysis.
 from abe.auth import clear_auth_cookies, create_access_token
 from abe.helper_functions.email_helpers import send_message
-from abe.helper_functions.url_helpers import url_add_query_params, url_add_fragment_params
+from abe.helper_functions.url_helpers import url_add_fragment_params, url_add_query_params
 from flask_wtf import FlaskForm
 from wtforms import HiddenField, StringField, SubmitField, validators
 from wtforms.validators import DataRequired, Email
@@ -42,7 +42,7 @@ def authorize():
         abort(400, 'missing redirect_uri')
     response_mode = request.args.get('response_mode', 'fragment')
     downstream_redirect_uri = request.args['redirect_uri']
-    upstream_redirect_uri = request.url_root + 'oauth/slack'
+    upstream_redirect_uri = request.url_root.rstrip('/') + url_for('.slack_oauth')
     state = {
         'response_mode': response_mode,
         'state': request.args.get('state'),
@@ -82,7 +82,7 @@ def deauthorize():
 
 
 @profile.route('/oauth/slack')
-def slack_auth():
+def slack_oauth():
     state = flask.json.loads(request.args['state'])
     redirect_uri = state.get('redirect_uri') or request.args['redirect_uri']
     if state['validation_code'] != SLACK_OAUTH_VALIDATION_CODE:
@@ -139,7 +139,7 @@ def auth_send_email():
         msg = MIMEMultipart('alternative')
         msg['Subject'] = 'Sign into ABE'
         msg['To'] = email
-        email_auth_link = url_add_query_params(request.url_root + 'oauth/email', token=token)
+        email_auth_link = request.url_root.rstrip('/') + url_for('.email_auth', token=token)
         body = render_template('oauth_email_body.html', email_auth_link=email_auth_link)
         msg.attach(MIMEText(body, 'html', 'utf-8'))
         if send_message(msg):

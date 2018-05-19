@@ -18,11 +18,11 @@ def login():
     redirect_uri = url_for('admin.login_auth')
     iat = int(time.time())
     sig = signer().sign(str(iat).encode())
-    return redirect('/oauth/authorize' +
-                    '?redirect_uri=' + url_quote_plus(redirect_uri) +
-                    '&response_mode=query' +
-                    '&response_type=token' +
-                    '&state=' + url_quote_plus(sig.decode()))
+    return redirect(url_for('oauth.authorize',
+                            redirect_uri=redirect_uri,
+                            response_mode='query',
+                            response_type='token',
+                            state=sig.decode()))
 
 
 @profile.route('/logout')
