@@ -12,11 +12,21 @@
     <div>
         <h1>Sign into ABE</h1>
         <div class="subtitle">
-            Use your Olin Slack account to sign into ABE.
+            Sign into ABE with your Olin Slack account, or by email.
         </div>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <dev class="flash">{{ message }}</dev>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
         <p>
             If you have an account on the <a href="https://olin.slack.com">Olin
-            College Slack account</a>, you can use that to sign in here:
+            College Slack account</a>, you can use that to sign in here. You can
+            also sign in with your email address. We'll send you a activation
+            link that will sign you in on the computer that you use to visit it.
+            (You won't be asked to create an account or password.)
         </p>
         {% if slack_oauth_url %}
         <a id="slack-oauth-link" href="{{ slack_oauth_url }}">
@@ -25,36 +35,37 @@
         {% endif %}
         {% if email_oauth_url %}
             <a id="email-oauth-link" href="{{ email_oauth_url }}">
-                Sign in with email
+                Sign in with <b>email</b>
             </a>
         {% endif %}
-
-        <h2>I Don't Have an Olin Slack Account</h2>
-        <p>
-            If you have a <code>@olin.edu</code> or <code>@student.olin.edu</code>
-            email address, you can use that to create a Slack account, and use
-            that to sign in here. Visit <a href="https://olin.slack.com">olin.slack.com</a>
-            to create an account.
-        </p>
-        <p>
-            You can also sign in by email (experimental).
-        </p>
 
         <h2>Why Do I Need to Sign In?</h2>
         <p>
             This lets us know that you're in the Olin Community. We'll show you
-            Olin community events, and we'll trust you to add and edit events on
-            the calendar.
+            Olin community events, and we'll trust you to add and edit calendar
+            events.
         </p>
         <p>
-            You don't need to sign in (a) if you're on campus, or (b) to view
-            only public events.
+            You don't need to sign in: if you're on campus; if this browser
+            visited ABE recently from on campus; or, to view only public events.
         </p>
 
         <h2>Privacy</h2>
         <p>Here's what we currently store about you:</p>
-        <p>Nothing.</p>
-
+        <dl>
+            <dt>On your computer</dt>
+            <dd>
+                That you're authorized to view and edit events. Your email
+                address. (But this is only used to check whether you have
+                administrative access — it's not stored on the server.)
+            </dd>
+            <dt>On Google's analytics server</dt>
+            <dd>How many people tried different things, and when. But not
+            who. We use this to figure out what's worth keeping, and what
+            to work on.</dd>
+            <dt>On our server</dt>
+            <dd>Nothing.</dd>
+        </dl>
     </div>
 </body>
 </html>

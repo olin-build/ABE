@@ -50,7 +50,7 @@ def authorize():
     email_oauth_url = url_add_query_params(
         '/oauth/send_email',
         redirect_uri=downstream_redirect_uri,
-        state=flask.json.dumps(request.args.get('state')),
+        state=request.args.get('state'),
     )
     slack_oauth_url = url_add_query_params(
         "https://slack.com/oauth/authorize",

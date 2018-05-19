@@ -1,14 +1,15 @@
 """Main flask app"""
 import os
+import time
 from datetime import datetime
 from urllib.parse import quote_plus as url_quote_plus
-from uuid import uuid4
 
-from flask import Flask, g, jsonify, redirect, render_template, request, session
+from flask import Flask, flash, g, jsonify, redirect, render_template, request, session, url_for
 from flask.json import JSONEncoder
 from flask_cors import CORS
 from flask_restplus import Api
 from flask_sslify import SSLify  # redirect to https
+from itsdangerous import Signer
 
 from .resource_models.account_resources import api as account_api
 from .resource_models.event_resources import api as event_api
@@ -19,6 +20,8 @@ from .routes.oauth_routes import profile as oauth_blueprint
 
 app = Flask(__name__)
 CORS(app, allow_headers=['Authorization', 'Content-Type'], supports_credentials=True)
+if 'APP_SECRET_KEY' in os.environ:
+    app.secret_key = os.environ['APP_SECRET_KEY'].encode()
 
 # Redirect HTTP to HTTPS.
 #
@@ -100,19 +103,22 @@ def add_label():
     return render_template('add_label.html')
 
 
-# For debugging:
+# For debugging, and signing in to try out the interactive /docs:
 
-app.secret_key = uuid4().bytes  # this is only used for debugging
+
+signer = Signer(app.secret_key)
 
 
 @app.route('/login')
 def login():
-    csrf_token = uuid4().hex
-    session['_csrf_token'] = csrf_token
-    redirect_uri = 'account/info'
+    # This is a roundabout way of logging in, but it exercises the same OAuth
+    # flow that client apps use, so it doubles as testing that flow.
+    redirect_uri = url_for('login_auth')
+    iat = int(time.time())
+    sig = signer.sign(str(iat).encode())
     return redirect('/oauth/authorize' +
                     '?redirect_uri=' + url_quote_plus(redirect_uri) +
-                    '&state=' + url_quote_plus(csrf_token))
+                    '&state=' + url_quote_plus(sig.decode()))
 
 
 @app.route('/logout')
@@ -123,8 +129,13 @@ def logout():
 
 
 @app.route('/account/info')
-def account_info():
-    if 'access_token' in request.args:
-        # if request.args['state'] == session.pop('_csrf_token', None):
-        session['access_token'] = request.args['access_token']
-    return render_template('account.html', args=request.args)
+def login_auth():
+    iat = signer.unsign(request.args['state'])
+    age = int(time.time()) - int(iat)
+    # Allow this many minutes to use a link. This is unlikely for sign in with
+    # slack, but reasonable for email if the user comes back to it later.
+    if age > 30 * 60:
+        flash('This link has expired. Please try again.')
+        return redirect(url_for('login'))
+    session['access_token'] = request.args['access_token']
+    return render_template('account.html', args=request.args, age=age)
