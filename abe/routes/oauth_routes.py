@@ -19,6 +19,7 @@ from flask_wtf import FlaskForm
 from wtforms import HiddenField, StringField, SubmitField, validators
 from wtforms.validators import DataRequired, Email
 
+OAUTH_REQUIRES_CLIENT_ID = os.environ.get('OAUTH_REQUIRES_CLIENT_ID')
 SLACK_OAUTH_CLIENT_ID = os.environ.get('SLACK_OAUTH_CLIENT_ID')
 
 profile = Blueprint('oauth', __name__)
@@ -42,7 +43,7 @@ def authorize():
         abort(400, 'invalid response_type')
     if 'redirect_uri' not in request.args:
         abort(400, 'missing redirect_uri')
-    if 'client_id' not in request.args and os.environ.get('OAUTH_REQUIRES_CLIENT_ID'):
+    if 'client_id' not in request.args and OAUTH_REQUIRES_CLIENT_ID:
         abort(400, 'missing client_id')
 
     redirect_uri = request.args['redirect_uri']
@@ -63,6 +64,7 @@ def authorize():
 
     upstream_redirect_uri = request.url_root.rstrip('/') + url_for('.slack_oauth')
     callback_params = {
+        'client_id': request.args['client_id'],
         'response_mode': response_mode,
         'state': request.args.get('state'),
     }
@@ -116,8 +118,9 @@ def slack_oauth():
     elif 'error' in request.args:
         redirect_uri = url_add_query_params(redirect_uri, error=request.args['error'])
     else:
+        token = create_access_token(provider='slack', client_id=callback_params.pop('client_id'))
         redirect_uri = implicit_grant_uri(redirect_uri,
-                                          access_token=create_access_token(provider='slack'),
+                                          access_token=token,
                                           **callback_params)
     return redirect(redirect_uri)
 
@@ -177,8 +180,11 @@ def auth_send_email():
 @profile.route('/oauth/email')
 def email_auth():
     payload = jwt.decode(request.args['token'].encode(), app.secret_key, algorithm='HS256')
-    access_token = create_access_token(provider='email', email=payload['email'])
     callback_params = unsign_json(payload['state'])
+    access_token = create_access_token(
+        client_id=callback_params.pop('client_id'),
+        provider='email',
+        email=payload['email'])
     redirect_uri = implicit_grant_uri(payload['redirect_uri'],
                                       access_token=access_token,
                                       **callback_params)

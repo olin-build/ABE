@@ -4,7 +4,10 @@ from uuid import uuid4
 
 import jwt
 
+from abe import database as db
+
 ADMIN_EMAILS = os.environ.get('ADMIN_EMAILS', '').split(',')
+OAUTH_REQUIRES_CLIENT_ID = os.environ.get('OAUTH_REQUIRES_CLIENT_ID')
 
 # Default to an instance-specific secret for development and testing.
 AUTH_TOKEN_SECRET = os.environ.get("AUTH_TOKEN_SECRET", uuid4().hex)
@@ -50,8 +53,15 @@ def get_access_token_scope(token):
     # valid if the role -> scope map changes.
     scope = []
     if is_valid_token(token):
+        payload = jwt.decode(token.encode(), AUTH_TOKEN_SECRET, algorithms='HS256')
+        app = None
+        if 'client_id' in payload:
+            app = db.App.objects(client_id=payload['client_id']).first()
+        if not app and OAUTH_REQUIRES_CLIENT_ID:
+            return scope
         role = get_access_token_role(token)
-        # TODO: limit claims by app scope
+        if app and 'admin:*' not in app.scopes:
+            role == 'user'
         scope = ADMIN_USER_CLAIMS if role == 'admin' else AUTHENTICATED_USER_CLAIMS
     return scope
 
