@@ -9,7 +9,7 @@ from uuid import uuid4
 import flask
 import jwt
 from flask import current_app as app
-from flask import Blueprint, flash, redirect, render_template, request
+from flask import Blueprint, abort, flash, redirect, render_template, request
 
 # This is a *different* secret from the auth token, so that email tokens can't
 # be used to sign in. This could also be accomplished by using the *same*
@@ -21,7 +21,7 @@ from flask import Blueprint, flash, redirect, render_template, request
 # differential cryptoanalysis.
 from abe.auth import clear_auth_cookies, create_access_token
 from abe.helper_functions.email_helpers import send_message
-from abe.helper_functions.url_helpers import url_add_query_params
+from abe.helper_functions.url_helpers import url_add_query_params, url_add_fragment_params
 from flask_wtf import FlaskForm
 from wtforms import HiddenField, StringField, SubmitField, validators
 from wtforms.validators import DataRequired, Email
@@ -34,9 +34,17 @@ profile = Blueprint('oauth', __name__)
 
 @profile.route('/oauth/authorize')
 def authorize():
+    if 'response_type' not in request.args:
+        abort(400, 'missing response_type')
+    if request.args['response_type'] != 'token':
+        abort(400, 'invalid response_type')
+    if 'redirect_uri' not in request.args:
+        abort(400, 'missing redirect_uri')
+    response_mode = request.args.get('response_mode', 'fragment')
     downstream_redirect_uri = request.args['redirect_uri']
     upstream_redirect_uri = request.url_root + 'oauth/slack'
     state = {
+        'response_mode': response_mode,
         'state': request.args.get('state'),
         'validation_code': SLACK_OAUTH_VALIDATION_CODE,
     }
@@ -85,13 +93,21 @@ def slack_auth():
     elif 'error' in request.args:
         redirect_uri = url_add_query_params(redirect_uri, error=request.args['error'])
     else:
-        redirect_uri = url_add_query_params(redirect_uri,
-                                            access_token=create_access_token(provider='slack'),
-                                            expires_in=str(6 * 30 * 24 * 3600),  # ignored by server
-                                            state=state['state'],
-                                            token_type='bearer',
-                                            )
+        state.pop('validation_code')
+        redirect_uri = implicit_grant_uri(redirect_uri,
+                                          access_token=create_access_token(provider='slack'),
+                                          **state)
     return redirect(redirect_uri)
+
+
+def implicit_grant_uri(redirect_uri, *, access_token, response_mode, state):
+    add_params = url_add_fragment_params if response_mode == 'fragment' else url_add_query_params
+    return add_params(redirect_uri,
+                      access_token=access_token,
+                      expires_in=str(6 * 30 * 24 * 3600),
+                      state=state,
+                      token_type='bearer',
+                      )
 
 
 class EmailForm(FlaskForm):
@@ -140,10 +156,7 @@ def auth_send_email():
 def email_auth():
     payload = jwt.decode(request.args['token'].encode(), app.secret_key, algorithm='HS256')
     access_token = create_access_token(provider='email', email=payload['email'])
-    redirect_uri = url_add_query_params(payload['redirect_uri'],
-                                        access_token=access_token,
-                                        expires_in=str(6 * 30 * 24 * 3600),  # ignored by server
-                                        state=payload['state'],
-                                        token_type='bearer',
-                                        )
+    redirect_uri = implicit_grant_uri(payload['redirect_uri'],
+                                      access_token=access_token,
+                                      **payload['state'])
     return redirect(redirect_uri)
