@@ -4,7 +4,7 @@ import re
 from flask import g, session
 from netaddr import IPNetwork, IPSet
 
-from .auth_tokens import create_access_token, get_access_token_scope, is_valid_token
+from .access_tokens import create_access_token, get_access_token_scope, is_valid_token
 
 ACCESS_TOKEN_COOKIE_NAME = 'access_token'
 
