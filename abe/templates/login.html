@@ -23,7 +23,7 @@
             {% endif %}
         {% endwith %}
 
-        {% if app %}
+        {% if app.role != 'fallback' %}
             <p>
                 Signing in allows you to use the {{ app.name }} application to
                 access ABE data.

@@ -1,27 +1,12 @@
 [
     {
-        "name": "ABE Admin",
-        "short_description": "ABE administrative interface",
-        "url": "https://abe.olin.build",
-        "client_id": "b1f9b21021be4204a17b62ba319576a5",
-        "redirect_uris": [],
-        "scopes": [
-            "admin:*"
-        ],
-        "admin": true
-    }
-{
         "name": "ABE Web Calendar",
         "short_description": "ABE, the Olin Community calendar",
-        "long_description": "The Olin Community calendar is an olin.build project that collects and presents events from the Olin community.",
+        "long_description":
+            "The Olin Community calendar is an olin.build project that collects and presents events from the Olin community.",
         "url": "https://events.olin.build",
         "client_id": "5bbf864ff1274dea9ca739030a37df28",
-        "redirect_uris": [
-            "http://127.0.0.1:8080/",
-            "http://localhost:8080/"
-        ],
-        "scopes": [
-            "admin:*"
-        ]
+        "redirect_uris": ["http://127.0.0.1:8080/", "http://localhost:8080/"],
+        "scopes": ["admin:*"]
     }
 ]

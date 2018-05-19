@@ -13,7 +13,7 @@ class App(Document):
     long_description = StringField()
     url = URLField()
     client_id = StringField()
-    admin = BooleanField()
+    role = StringField()
 
     # OAuth Access Token
     redirect_uris = ListField(URLField())
@@ -21,11 +21,23 @@ class App(Document):
 
     @classmethod
     def admin_app(cls):
-        app = cls.objects(admin=True).first()
+        return cls.force_client(role='admin')
+
+    @classmethod
+    def force_client(cls, role):
+        app = cls.objects(role=role).first()
         if not app:
-            data_path = Path(__file__).parent / '../data/admin-app.json'
+            data_path = Path(__file__).parent / f'../data/{role}-app.json'
             with open(data_path) as fp:
                 data = flask.json.load(fp)
             app = cls(**data)
             app.save()
         return app
+
+    def validate_redirect_uri(self, redirect_uri):
+        redirect_uris = self.redirect_uris
+        if self.role == 'admin':
+            redirect_uris += ['/']
+        if self.role == 'fallback':
+            redirect_uris += ['/', 'http://', 'https://']
+        return any(redirect_uri.startswith(uri) for uri in redirect_uris)

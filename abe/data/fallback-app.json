@@ -1,0 +1,7 @@
+{
+    "name": "Fallback",
+    "client_id": "6df323299e514ee69017a3e6cc7bf7b7",
+    "redirect_uris": [],
+    "scopes": ["admin:*"],
+    "role": "fallback"
+}

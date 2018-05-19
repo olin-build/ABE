@@ -43,28 +43,24 @@ def authorize():
         abort(400, 'invalid response_type')
     if 'redirect_uri' not in request.args:
         abort(400, 'missing redirect_uri')
-    if 'client_id' not in request.args and OAUTH_REQUIRES_CLIENT_ID:
-        abort(400, 'missing client_id')
 
     redirect_uri = request.args['redirect_uri']
     response_mode = request.args.get('response_mode', 'fragment')
 
-    app = None
-    if 'client_id' in request.args:
-        app = db.App.objects(client_id=request.args['client_id']).first()
-        if app:
-            redirect_uris = app.redirect_uris
-            if app.admin:
-                redirect_uris += [request.url_root, '/']
-            print('check', redirect_uri, 'against', redirect_uris, 'in', app.name)
-            if not any(redirect_uri.startswith(uri) for uri in redirect_uris):
-                return abort(400, 'invalid redirect_uri')
-        else:
-            return abort(400, 'invalid client_id')
+    client_id = request.args.get('client_id')
+    if not client_id:
+        if OAUTH_REQUIRES_CLIENT_ID:
+            abort(400, 'missing client_id')
+        client_id = db.App.force_client(role='fallback').client_id
+    app = db.App.objects(client_id=client_id).first()
+    if not app:
+        return abort(400, 'invalid client_id')
+    if not app.validate_redirect_uri(redirect_uri):
+        return abort(400, 'invalid redirect_uri')
 
     upstream_redirect_uri = request.url_root.rstrip('/') + url_for('.slack_oauth')
     callback_params = {
-        'client_id': request.args['client_id'],
+        'client_id': client_id,
         'response_mode': response_mode,
         'state': request.args.get('state'),
     }

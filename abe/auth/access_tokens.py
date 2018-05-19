@@ -58,10 +58,10 @@ def get_access_token_scope(token):
         if 'client_id' in payload:
             app = db.App.objects(client_id=payload['client_id']).first()
         if not app and OAUTH_REQUIRES_CLIENT_ID:
-            return scope
+            pass  # return scope
         role = get_access_token_role(token)
         if app and 'admin:*' not in app.scopes:
-            role == 'user'
+            pass  # role == 'user'
         scope = ADMIN_USER_CLAIMS if role == 'admin' else AUTHENTICATED_USER_CLAIMS
     return scope
 
