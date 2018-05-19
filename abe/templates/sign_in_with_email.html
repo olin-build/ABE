@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="description" content="Sign into ABE">
     <title>ABE : Sign In</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/static/style.css" />
    </head>
 <body>
     <h1>Sign into ABE</h1>
@@ -13,11 +15,11 @@
     </div>
     {% with messages = get_flashed_messages() %}
         {% if messages %}
-        <ul class=flashes>
-        {% for message in messages %}
-            <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
+            <ul class=flashes>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
         {% endif %}
     {% endwith %}
     {% if email_sent %}

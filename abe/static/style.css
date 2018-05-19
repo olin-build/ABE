@@ -1,0 +1,35 @@
+body {
+    font-family: 'Century';
+    font-size: 18px;
+    line-height: 1.6em;
+    color: #5d6063;
+    max-width: 780px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 10px;
+}
+
+h1,
+h2 {
+    font-family: 'Roboto Slab', serif;
+}
+
+.subtitle {
+    font-style: italic;
+}
+
+.flashes {
+    background: yellow;
+    border-radius: 2px;
+}
+
+#email-oauth-link {
+    border-radius: 5px;
+    border: 1px solid #aaa;
+    color: #444;
+    font-weight: bold;
+    margin-left: 10px;
+    padding: 8px;
+    position: relative;
+    top: -14px;
+}

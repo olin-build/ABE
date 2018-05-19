@@ -129,13 +129,13 @@ def auth_send_email():
         body = render_template('oauth_email_body.html', email_auth_link=email_auth_link)
         msg.attach(MIMEText(body, 'html', 'utf-8'))
         if send_message(msg):
-            return render_template('email_sign_in.html', email_sent=True, email=email)
+            return render_template('sign_in_with_email.html', email_sent=True, email=email)
         else:
             flash("Failed to send email. Check the server log.")
     for field, errors in form.errors.items():
         for error in errors:
             flash(f"Error in the {getattr(form, field).label.text} field - {error}")
-    return render_template('email_sign_in.html', form=form)
+    return render_template('sign_in_with_email.html', form=form)
 
 
 @profile.route('/oauth/email')

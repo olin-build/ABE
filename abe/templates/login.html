@@ -6,39 +6,7 @@
     <meta name="description" content="Sign into ABE">
     <title>ABE : Sign In</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
-    <style type="text/css">
-        body {
-            font-family: 'Century';
-            font-size: 18px;
-            line-height: 1.6em;
-            color: #5D6063;
-            max-width: 780px;
-            margin-left: auto;
-            margin-right: auto;
-            padding: 0 10px;
-      }
-        h1, h2 {
-            font-family: 'Roboto Slab', serif;
-        }
-        .subtitle {
-            font-style: italic;
-        }
-        .center {
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        #email-oauth-link {
-            border-radius: 5px;
-            border: 1px solid #aaa;
-            color: #444;
-            font-weight: bold;
-            margin-left: 10px;
-            padding: 8px;
-            position: relative;
-            top: -14px;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="/static/style.css" />
 </head>
 <body>
     <div>
@@ -50,9 +18,11 @@
             If you have an account on the <a href="https://olin.slack.com">Olin
             College Slack account</a>, you can use that to sign in here:
         </p>
+        {% if slack_oauth_url %}
         <a id="slack-oauth-link" href="{{ slack_oauth_url }}">
             <img src="https://api.slack.com/img/sign_in_with_slack.png" />
         </a>
+        {% endif %}
         {% if email_oauth_url %}
             <a id="email-oauth-link" href="{{ email_oauth_url }}">
                 Sign in with email
@@ -67,7 +37,7 @@
             to create an account.
         </p>
         <p>
-            Otherwise, ask someone in the Olin community to add you to Slack.
+            You can also sign in by email (experimental).
         </p>
 
         <h2>Why Do I Need to Sign In?</h2>
@@ -79,16 +49,6 @@
         <p>
             You don't need to sign in (a) if you're on campus, or (b) to view
             only public events.
-        </p>
-
-        <h2>Why Slack?</h2>
-        <p>
-            We may add other means for signing into ABE, that don't require a
-            Slack account.
-        </p>
-        <p>
-            For example, Olin IT has a Single Sign-On system, that may become
-            available for student projects.
         </p>
 
         <h2>Privacy</h2>
