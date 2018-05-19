@@ -24,6 +24,7 @@ dt {
     font-style: italic;
 }
 
+.alert,
 .flashes,
 .flash {
     background: yellow;

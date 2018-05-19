@@ -33,8 +33,8 @@ class UserApi(Resource):
         return {
             'authenticated': bool(access_token),
             # 'inside_intranet': request_is_from_inside_intranet(request),
-            'provider': get_access_token_provider(access_token) if access_token else None,
-            'role': get_access_token_role(access_token) if access_token else None,
+            'provider': get_access_token_provider(access_token),
+            'role': get_access_token_role(access_token),
             'scope': get_access_token_scope(access_token),
         }
 

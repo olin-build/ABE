@@ -1,0 +1,9 @@
+{
+    "name": "ABE Admin",
+    "short_description": "ABE administrative interface",
+    "url": "http://127.0.0.1:3000",
+    "client_id": "b1f9b21021be4204a17b62ba319576a5",
+    "redirect_uris": [],
+    "scopes": ["admin:*"],
+    "admin": true
+}

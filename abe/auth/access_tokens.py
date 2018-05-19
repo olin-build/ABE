@@ -13,11 +13,13 @@ AUTHENTICATED_USER_CLAIMS = [
     'create:events', 'edit:events', 'delete:events',
     'create:ics',
     'read:all_events',
+    'read:labels',
 ]
 
 ADMIN_USER_CLAIMS = AUTHENTICATED_USER_CLAIMS + [
     'create:protected_events', 'edit:protected_events', 'delete:protected_events',
     'create:labels', 'edit:labels', 'delete:labels',
+    'admin:apps',
 ]
 
 
@@ -49,6 +51,7 @@ def get_access_token_scope(token):
     scope = []
     if is_valid_token(token):
         role = get_access_token_role(token)
+        # TODO: limit claims by app scope
         scope = ADMIN_USER_CLAIMS if role == 'admin' else AUTHENTICATED_USER_CLAIMS
     return scope
 

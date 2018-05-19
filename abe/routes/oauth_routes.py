@@ -11,14 +11,7 @@ from flask import current_app as app
 from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 from itsdangerous import Signer
 
-# This is a *different* secret from the auth token, so that email tokens can't
-# be used to sign in. This could also be accomplished by using the *same*
-# secret, with different properties in the payload.
-#
-# In order to simplify credential management, this secret is derived from the
-# auth token secret. The auth token and secret and the email token secret are
-# never used to encrypt the same plaintext, so this shouldn't enable any
-# differential cryptoanalysis.
+from abe import database as db
 from abe.auth import clear_auth_cookies, create_access_token
 from abe.helper_functions.email_helpers import send_message
 from abe.helper_functions.url_helpers import url_add_fragment_params, url_add_query_params
@@ -49,8 +42,25 @@ def authorize():
         abort(400, 'invalid response_type')
     if 'redirect_uri' not in request.args:
         abort(400, 'missing redirect_uri')
+    if 'client_id' not in request.args and os.environ.get('OAUTH_REQUIRES_CLIENT_ID'):
+        abort(400, 'missing client_id')
+
+    redirect_uri = request.args['redirect_uri']
     response_mode = request.args.get('response_mode', 'fragment')
-    downstream_redirect_uri = request.args['redirect_uri']
+
+    app = None
+    if 'client_id' in request.args:
+        app = db.App.objects(client_id=request.args['client_id']).first()
+        if app:
+            redirect_uris = app.redirect_uris
+            if app.admin:
+                redirect_uris += [request.url_root, '/']
+            print('check', redirect_uri, 'against', redirect_uris, 'in', app.name)
+            if not any(redirect_uri.startswith(uri) for uri in redirect_uris):
+                return abort(400, 'invalid redirect_uri')
+        else:
+            return abort(400, 'invalid client_id')
+
     upstream_redirect_uri = request.url_root.rstrip('/') + url_for('.slack_oauth')
     callback_params = {
         'response_mode': response_mode,
@@ -61,13 +71,13 @@ def authorize():
     # from being present in the callback (maybe because it is too large?), so
     # place it in the redirect instead.
     if False:
-        callback_params['redirect_uri'] = downstream_redirect_uri
+        callback_params['redirect_uri'] = redirect_uri
     else:
-        upstream_redirect_uri += '?redirect_uri=' + url_quote_plus(downstream_redirect_uri)
+        upstream_redirect_uri += '?redirect_uri=' + url_quote_plus(redirect_uri)
     state = sign_json(callback_params)
     email_oauth_url = url_add_query_params(
         '/oauth/send_email',
-        redirect_uri=downstream_redirect_uri,
+        redirect_uri=redirect_uri,
         state=state,
     )
     slack_oauth_url = url_add_query_params(
@@ -80,7 +90,11 @@ def authorize():
     if not SLACK_OAUTH_CLIENT_ID:
         logging.warning("SLACK_OAUTH_CLIENT_ID isn't set")
         slack_oauth_url = "javascript:alert('Set SLACK_OAUTH_CLIENT_ID to enable this feature')"
-    return render_template('login.html', slack_oauth_url=slack_oauth_url, email_oauth_url=email_oauth_url)
+    return render_template('login.html',
+                           app=app,
+                           email_oauth_url=email_oauth_url,
+                           slack_oauth_url=slack_oauth_url,
+                           )
 
 
 @profile.route('/oauth/deauthorize')

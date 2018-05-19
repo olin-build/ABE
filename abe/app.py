@@ -8,6 +8,7 @@ from flask_cors import CORS
 from flask_restplus import Api
 from flask_sslify import SSLify  # redirect to https
 
+from .resource_models.app_resources import api as app_api
 from .resource_models.event_resources import api as event_api
 from .resource_models.ics_resources import api as ics_api
 from .resource_models.label_resources import api as label_api
@@ -81,6 +82,7 @@ def call_after_request_callbacks(response):  # For deferred callbacks
 
 
 # Route resources
+api.add_namespace(app_api)
 api.add_namespace(event_api)
 api.add_namespace(ics_api)
 api.add_namespace(label_api)

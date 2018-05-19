@@ -1,11 +1,9 @@
-#!/usr/bin/env python3
 """Label Resource models for flask"""
 
 import logging
 
 from flask import request
 from flask_restplus import Namespace, Resource, fields
-from mongoengine import ValidationError
 
 from abe import database as db
 from abe.auth import require_scope
@@ -16,7 +14,7 @@ from abe.helper_functions.query_helpers import multi_search
 api = Namespace('labels', description='Label related operations')
 
 # This should be kept in sync with the document model, which drives the format
-label_model = api.model("Label_Model", {
+label_model = api.model("Label", {
     "name": fields.String(required=True),
     "description": fields.String,
     "url": fields.Url,
@@ -45,27 +43,17 @@ class LabelApi(Resource):
         else:  # search database based on parameters
             # TODO: search based on terms
             results = db.Label.objects()
-            if not results:
-                return []
-            else:
-                return [mongo_to_dict(result) for result in results]
+            return [mongo_to_dict(result) for result in results]
 
-    @require_scope('edit:labels')
+    @require_scope('create:labels')
     @mongo_resource_errors
     @api.expect(label_model)
     def post(self):
         """Create a new label"""
         received_data = request_to_dict(request)
         logging.debug("Received POST data: %s", received_data)
-        # TODO: replace this try:except: by just the try: block, after PR #229 is merged
-        try:
-            new_label = db.Label(**received_data)
-            new_label.save()
-        except ValidationError as error:
-            return {'error_type': 'validation',
-                    'validation_errors': str(error),  # [str(err) for err in error.errors or [error]],
-                    'error_message': error.message,
-                    }, 400
+        new_label = db.Label(**received_data)
+        new_label.save()
         return mongo_to_dict(new_label), 201
 
     @require_scope('edit:labels')
@@ -93,7 +81,7 @@ class LabelApi(Resource):
 
         return mongo_to_dict(result)
 
-    @require_scope('edit:labels')
+    @require_scope('delete:labels')
     @mongo_resource_errors
     def delete(self, id):
         """Delete a label"""
@@ -115,4 +103,4 @@ class LabelApi(Resource):
 api.add_resource(LabelApi, '/', methods=['GET', 'POST'], endpoint='label')
 api.add_resource(LabelApi, '/<string:id>',
                  methods=['GET', 'PUT', 'PATCH', 'DELETE'],
-                 endpoint='id')
+                 endpoint='label_id')

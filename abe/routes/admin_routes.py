@@ -1,8 +1,10 @@
 import time
 from urllib.parse import quote_plus as url_quote_plus
 
-from flask import Blueprint, flash, redirect, request, render_template, current_app, session, url_for
+from flask import Blueprint, current_app, flash, redirect, render_template, request, session, url_for
 from itsdangerous import Signer
+
+from abe import database as db
 
 profile = Blueprint('admin', __name__)
 
@@ -19,6 +21,7 @@ def login():
     iat = int(time.time())
     sig = signer().sign(str(iat).encode())
     return redirect(url_for('oauth.authorize',
+                            client_id=db.App.admin_app().client_id,
                             redirect_uri=redirect_uri,
                             response_mode='query',
                             response_type='token',
