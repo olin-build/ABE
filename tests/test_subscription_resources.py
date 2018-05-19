@@ -1,9 +1,8 @@
 from unittest import skip
 
 from . import abe_unittest
-from .context import abe  # noqa: F401
 
-# This import has to happen after .context sets the environment variables
+# This import must occur after .context sets the environment variables
 from abe.resource_models import subscription_resources  # isort:skip
 
 

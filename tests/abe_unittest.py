@@ -2,7 +2,7 @@ import unittest
 
 from pymongo import MongoClient
 
-from .context import MONGODB_TEST_DB_NAME, db
+from . import MONGODB_TEST_DB_NAME, db
 
 
 class TestCase(unittest.TestCase):

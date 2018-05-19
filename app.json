@@ -5,8 +5,16 @@
     "pr-predestroy": "python -m abe.pr-predestroy"
   },
   "env": {
+    "ADMIN_EMAILS": {
+      "description": "Comma-separated list of admin emails.",
+      "required": false
+    },
+    "APP_SECRET_KEY": {
+      "description": "Secret key for sessions and CSRF.",
+      "generator": "secret"
+    },
     "AUTH_TOKEN_SECRET": {
-      "description": "A secret for encoding authorization tokens.",
+      "description": "A secret for encoding authentication tokens.",
       "generator": "secret"
     },
     "BINDING_HOST": {
@@ -15,7 +23,7 @@
       "required": true
     },
     "ENABLE_HSTS": {
-      "description": "Enforce SSL via HSTS",
+      "description": "Enforce SSL via HSTS.",
       "required": false
     },
     "MONGODB_URI": {
@@ -35,9 +43,6 @@
       "required": false
     }
   },
-  "formation": {
-  },
-  "addons": [],
   "buildpacks": [
     {
       "url": "heroku/python"

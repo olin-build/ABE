@@ -3,16 +3,15 @@ from unittest.mock import Mock, patch
 
 from icalendar import Calendar
 
-from . import abe_unittest
-from .context import abe  # noqa: F401
+from . import abe_unittest, db
 
-# This import has to happen after .context sets the environment variables
+# This import must occur after .context sets the environment variables
 from abe.helper_functions import email_helpers  # isort:skip
 
-with open('./tests/email_script.txt', 'r') as email_file:
+with open('./tests/data/email_script.txt', 'r') as email_file:
     message = email.message_from_string(email_file.read())
 
-with open('./tests/cal_script.txt', 'r') as cal_file:
+with open('./tests/data/cal_script.txt', 'r') as cal_file:
     cal = Calendar.from_ical(cal_file.read())
 
 serv = Mock()
@@ -59,7 +58,7 @@ class EmailHelpersTestCase(abe_unittest.TestCase):
     @patch('abe.helper_functions.email_helpers.reply_email', return_value=None)
     def test_cal_to_event(self, email_error, email_reply):
         event_dict, exit_code = email_helpers.cal_to_event(cal)
-        event = abe.database.Event.objects(id=event_dict['id']).first()
+        event = db.Event.objects(id=event_dict['id']).first()
 
         self.assertIsNotNone(event)
         self.assertEqual(exit_code, 201)

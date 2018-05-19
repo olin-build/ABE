@@ -8,7 +8,7 @@ from flask_restplus import Namespace, Resource, fields
 from mongoengine import ValidationError
 
 from abe import database as db
-from abe.auth import edit_auth_required
+from abe.auth import require_scope
 from abe.helper_functions.converting_helpers import mongo_to_dict, request_to_dict
 from abe.helper_functions.mongodb_helpers import mongo_resource_errors
 from abe.helper_functions.query_helpers import multi_search
@@ -50,7 +50,7 @@ class LabelApi(Resource):
             else:
                 return [mongo_to_dict(result) for result in results]
 
-    @edit_auth_required
+    @require_scope('edit:labels')
     @mongo_resource_errors
     @api.expect(label_model)
     def post(self):
@@ -68,7 +68,7 @@ class LabelApi(Resource):
                     }, 400
         return mongo_to_dict(new_label), 201
 
-    @edit_auth_required
+    @require_scope('edit:labels')
     @mongo_resource_errors
     @api.expect(label_model)
     def put(self, id):
@@ -93,7 +93,7 @@ class LabelApi(Resource):
 
         return mongo_to_dict(result)
 
-    @edit_auth_required
+    @require_scope('edit:labels')
     @mongo_resource_errors
     def delete(self, id):
         """Delete a label"""

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="Sign into ABE">
+    <title>ABE : Sign In</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/static/style.css" />
+   </head>
+<body>
+    <h1>Sign into ABE</h1>
+    <div class="subtitle">
+        (Experimental) Sign in with an email link.
+    </div>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+    {% if email_sent %}
+        <p>A sign-in link has been sent to {{ email }}.</p>
+        <p>When this link arrives, click on it to sign into ABE.</p>
+    {% else %}
+        <div class="warning">{{ message }}</div>
+        <div>
+            ABE will email a link to your Olin email address. Click on this link
+            to sign into ABE.
+        </div>
+        <form action="{{ email_oauth_url }}" method="post">
+            {{ form.email.label }}: {{ form.email(placeholder='yourname@olin.edu') }}
+            {{ form.hidden_tag() }}
+            {{ form.submit() }}
+        </form>
+    {% endif %}
+</body>
+</html>

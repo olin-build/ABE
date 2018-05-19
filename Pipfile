@@ -42,6 +42,9 @@ gunicorn = "*"
 flask-restplus = "*"
 netaddr = "*"
 pyjwt = "*"
+flask-wtf = "*"
+pytest = "*"
+pytest-cov = "*"
 
 [dev-packages]
 "flake8" = ">=3.3.0"

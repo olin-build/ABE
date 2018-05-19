@@ -107,12 +107,12 @@ also run these separately:
 
 #### Testing
 
-`python -m unittest`
+`pipenv run pytest`
 
 This should print `OK` at the end:
 
 ```shell
-$ python -m unittest
+$ pipenv run pytest
 …
 ----------------------------------------------------------------------
 Ran 4 tests in 1.124s
@@ -123,14 +123,13 @@ OK
 Test a specific test:
 
 ```shell
-$ python -m unittest tests/test_recurrences.py
+$ pipenv run pytest tests/test_recurrences.py
 ```
 
 View code coverage:
 
 ```shell
-$ coverage run --source abe -m unittest
-$ coverage html
+$ pipenv run pytest --cov=. --cov-report html:htmlcov
 $ open htmlcov/index.html
 ```
 

@@ -23,17 +23,18 @@
     {
         "name": "academic",
         "description": "Events from the academic calendar",
-        "default": true
+        "default": true,
+        "protected": true,
+        "visibility": "public"
     },
     {
-        "name": "STAR",
-        "description": "Anything you can eat.",
+        "name": "StAR",
+        "description": "Student Affairs and Resources",
         "default": true,
         "protected": true
     },
     {
         "name": "administration",
-        "description": "Anything you can eat.",
         "default": true
     },
     {

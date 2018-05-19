@@ -248,7 +248,7 @@ def extract_ics(cal, ics_url, labels=None):
     labels      labels to assign to the events
     """
     results = db.ICS.objects(url=ics_url).first()
-    logging.debug("ics feeds: {}".format(mongo_to_dict(results)))
+    logging.debug("ics feeds: %s", mongo_to_dict(results))
 
     if results:  # if this feed has already been inputted
         for component in cal.walk():
@@ -282,14 +282,14 @@ def extract_ics(cal, ics_url, labels=None):
                     try:
                         new_event = db.Event(**com_dict).save()
                     except:  # FIXME: bare except # noqa: E722
-                        logging.exception("com_dict: {}".format(com_dict))
+                        logging.exception("com_dict: %s", com_dict)
                         continue
                     if not new_event.labels:  # if the event has no labels
                         new_event.labels = ['unlabeled']
                     if 'recurrence' in new_event:  # if the event has no recurrence_end
                         if not new_event.recurrence.forever:
                             new_event.recurrence_end = find_recurrence_end(new_event)
-                            logging.debug("made end_recurrence: {}".format(new_event.recurrence_end))
+                            logging.debug("made end_recurrence: %s", new_event.recurrence_end)
                     new_event.save()
 
         # cycle through all the events in the temporary list

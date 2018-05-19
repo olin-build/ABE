@@ -3,8 +3,16 @@
   <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>ABE : Account Info</title>
     <meta name="description" content="Sign into ABE">
+    <title>ABE : Account Info</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/static/style.css" />
+    <style type="text/css">
+        table { font-family: monospace; }
+        th { text-align: left; }
+        td { max-width: 500px; font-size: 9pt; overflow-x: hidden; text-overflow: ellipsis; }
+        td:hover { overflow-x: scroll; text-overflow: inherit; }
+    </style>
 </head>
 <body>
     <div>
@@ -12,16 +20,17 @@
         <p>
             This page is for debugging OAuth.
         </p>
+
+        <a href="/logout">Sign Out</a>
+
         <table>
             {% for k in args %}
                 <tr>
-                    <th style="font-family:monospace;text-align:left">{{ k }}</th>
+                    <th>{{ k }}</th>
                     <td>{{ args[k] }}</td>
                 </tr>
             {% endfor %}
         </table>
     </div>
-
-    <a href="/logout">Sign Out</a>
 </body>
 </html>
