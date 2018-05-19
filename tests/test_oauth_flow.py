@@ -2,8 +2,6 @@ import re
 import unittest
 from urllib.parse import parse_qsl, quote_plus, unquote_plus, urlparse
 
-import flask
-
 from abe.helper_functions import url_parse_fragment_params
 
 from . import app
@@ -33,10 +31,6 @@ class OAuthTestCase(unittest.TestCase):
             self.assertEqual(query['client_id'], 'slack-oauth-client-id')
             self.assertEqual(unquote_plus(query['redirect_uri']),
                              'http://localhost/oauth/slack?redirect_uri=https://client/callback')
-
-        with self.subTest("and a valid state"):
-            state = flask.json.loads(query['state'])
-            self.assertRegex(state['validation_code'], r'[0-9a-z-]+')
 
         with self.subTest("calling the Slack callback URI"):
             response = client.get('/oauth/slack' +
