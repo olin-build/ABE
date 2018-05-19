@@ -1,24 +1,24 @@
 import os
-from importlib import reload
 
 import flask
 
-from . import abe_unittest
-from .context import abe  # noqa: F401
+from . import app, abe_unittest
 
-# These imports have to happen after .context sets the environment variables
-from abe.app import app  # isort:skip
+# This import must occur after .context sets the environment variables
 from abe import auth  # isort:skip # noqa: F401
 
 
 class AccountTestCase(abe_unittest.TestCase):
 
     def setUp(self):
-        global auth
         super().setUp()
-        # self.app = app.test_client(use_cookies=False)
+        self.intranet_cdirs = os.environ["INTRANET_CDIRS"]
         os.environ['INTRANET_CDIRS'] = "127.0.0.1/24"
-        reload(auth)
+        auth.reload_env_vars()
+
+    def tearDown(self):
+        os.environ["INTRANET_CDIRS"] = self.intranet_cdirs
+        auth.reload_env_vars()
 
     def test_unauthorized_client(self):
         client = app.test_client()
@@ -43,4 +43,7 @@ class AccountTestCase(abe_unittest.TestCase):
         account = flask.json.loads(response.data)
         self.assertEqual(account['authenticated'], True)
         self.assertEqual(set(account['permissions']), {'add_events', 'edit_events', 'view_all_events'})
-        self.assertEqual(set(account['scope']), {'events:create', 'events:edit', 'community_events:read'})
+        scope = set(account['scope'])
+        self.assertGreaterEqual(scope, {'events:create', 'events:edit', 'community_events:read'})
+        self.assertGreaterEqual(scope, {'create:events', 'edit:events', 'delete:events'})
+        self.assertGreaterEqual(scope, {'read:all_events'})

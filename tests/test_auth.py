@@ -3,50 +3,53 @@
 """
 import os
 import unittest
-from importlib import reload
 
-import flask
 from werkzeug.exceptions import HTTPException
 
-from abe import auth  # noqa: F401
+from . import app  # noqa: F401
 
-app = flask.Flask(__name__)
+# This import must occur after .context sets the environment variables
+from abe import auth   # isort:skip
 
 
 class AuthTestCase(unittest.TestCase):
 
+    def setUp(self):
+        self.intranet_cdirs = os.environ["INTRANET_CDIRS"]
+
+    def tearDown(self):
+        os.environ["INTRANET_CDIRS"] = self.intranet_cdirs
+        auth.reload_env_vars()
+
     def test_intranet_ips(self):
-        global auth
         os.environ['INTRANET_CDIRS'] = '127.0.0.1/24'
-        auth = reload(auth)
-        assert '127.0.0.1' in auth.INTRANET_CDIRS
-        assert '127.0.0.10' in auth.INTRANET_CDIRS
-        assert '127.0.1.0' not in auth.INTRANET_CDIRS
-        assert '192.0.0.1' not in auth.INTRANET_CDIRS
+        auth.reload_env_vars()
+        assert auth.ip_inside_intranet('127.0.0.1')
+        assert auth.ip_inside_intranet('127.0.0.10')
+        assert not auth.ip_inside_intranet('127.0.1.0')
+        assert not auth.ip_inside_intranet('192.0.0.1')
 
         os.environ['INTRANET_CDIRS'] = '127.0.0.1,192.0.0.1/16'
-        auth = reload(auth)
-        assert '127.0.0.1' in auth.INTRANET_CDIRS
-        assert '127.0.0.10' not in auth.INTRANET_CDIRS
-        assert '192.0.0.1' in auth.INTRANET_CDIRS
-        assert '192.0.1.1' in auth.INTRANET_CDIRS
-        assert '192.0.255.1' in auth.INTRANET_CDIRS
-        assert '192.1.0.1' not in auth.INTRANET_CDIRS
+        auth.reload_env_vars()
+        assert auth.ip_inside_intranet('127.0.0.1')
+        assert not auth.ip_inside_intranet('127.0.0.10')
+        assert auth.ip_inside_intranet('192.0.0.1')
+        assert auth.ip_inside_intranet('192.0.1.1')
+        assert auth.ip_inside_intranet('192.0.255.1')
+        assert not auth.ip_inside_intranet('192.1.0.1')
 
     def test_intranet_ips_v5(self):
-        global auth
         os.environ['INTRANET_CDIRS'] = '127.0.0.1/24,2001:0db8::/32'
-        auth = reload(auth)
-        assert '127.0.0.1' in auth.INTRANET_CDIRS
-        assert '2001:0db8:85a3:0000:0000:8a2e:0370:7334' in auth.INTRANET_CDIRS
-        assert '2001:0db9:85a3:0000:0000:8a2e:0370:7334' not in auth.INTRANET_CDIRS
+        auth.reload_env_vars()
+        assert auth.ip_inside_intranet('127.0.0.1')
+        assert auth.ip_inside_intranet('2001:0db8:85a3:0000:0000:8a2e:0370:7334')
+        assert not auth.ip_inside_intranet('2001:0db9:85a3:0000:0000:8a2e:0370:7334')
 
-    def test_edit_auth_required(self):
-        global auth
+    def test_require_scope(self):
         os.environ['INTRANET_CDIRS'] = '127.0.0.1/24'
-        auth = reload(auth)
+        auth.reload_env_vars()
 
-        @auth.edit_auth_required
+        @auth.require_scope('edit:events')
         def route():
             return 'ok'
 
@@ -60,7 +63,7 @@ class AuthTestCase(unittest.TestCase):
                     route()
                 self.assertEqual(http_error.exception.code, 401)
 
-        with self.subTest("read the client IP instead of the proxy"):
+        with self.subTest("reads the client IP instead of the proxy"):
             with app.test_request_context('/', headers={'X-Forwarded-For': '127.0.0.1'}):
                 assert route() == 'ok'
             with app.test_request_context('/', headers={'X-Forwarded-For': '127.0.0.255'}):
@@ -79,8 +82,6 @@ class AuthTestCase(unittest.TestCase):
                     route()
 
         # Test auth cookie
-        os.environ['SHARED_SECRET'] = 'valid-secret'
-        auth = reload(auth)
         with self.subTest("off-whitelist IP, no cookie"):
             with app.test_request_context('/', environ_base={'REMOTE_ADDR': '127.0.1.1'}):
                 with self.assertRaises(HTTPException) as http_error:

@@ -4,9 +4,7 @@ from unittest import skip
 import icalendar
 from icalendar import Calendar
 
-from abe import sample_data
-from . import abe_unittest
-from .context import abe  # noqa: F401
+from . import abe_unittest, sample_data
 
 # This import has to happen after .context sets the environment variables
 from abe.helper_functions import ics_helpers  # isort:skip

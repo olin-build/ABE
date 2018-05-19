@@ -3,19 +3,14 @@ from unittest import skip
 import flask
 import isodate
 
-from . import abe_unittest
-from .context import abe  # noqa: F401
-
-# These imports have to happen after .context sets the environment variables
-import abe.app  # isort:skip
-from abe import sample_data  # isort:skip
+from . import abe_unittest, app, sample_data
 
 
 class EventsTestCase(abe_unittest.TestCase):
 
     def setUp(self):
         super().setUp()
-        self.client = abe.app.app.test_client()
+        self.client = app.test_client()
         sample_data.load_data(self.db)
 
     def test_get_events(self):
@@ -100,7 +95,7 @@ class EventsTestCase(abe_unittest.TestCase):
             event = {
                 'title': 'protected post',
                 'start': isodate.parse_datetime('2018-05-10T09:00:00'),
-                'labels': ["STAR"]
+                'labels': ["StAR"]
             }
             response = self.client.post(
                 '/events/',

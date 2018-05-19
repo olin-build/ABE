@@ -36,7 +36,7 @@ class SubscriptionAPI(Resource):
         Returns information about the subscription feed with the provided ID
         """
 
-        logging.debug("Subscription information requested: " + subscription_id)
+        logging.debug("Subscription information requested: %s", subscription_id)
 
         subscription = db.Subscription.objects(sid=subscription_id).first()
 
@@ -65,7 +65,7 @@ class SubscriptionAPI(Resource):
             raise ValueError('labels must be a list or comma-separated string')
 
         subscription.save()
-        logging.debug("Subscription {} saved to the database".format(subscription.sid))
+        logging.debug("Subscription %s saved to the database", subscription.sid)
 
         return subscription_to_dict(subscription)
 
@@ -75,7 +75,7 @@ class SubscriptionAPI(Resource):
         """Modify an existing subscription"""
 
         data = request_to_dict(request)
-        logging.debug("Received Subscription PUT data: {}".format(data))
+        logging.debug("Received Subscription PUT data: %s", data)
 
         subscription = db.Subscription.objects(sid=subscription_id).first()
 
@@ -120,7 +120,7 @@ class SubscriptionICS(Resource):
 
         # converts mongoDB objects to an ICS format
         response = mongo_to_ics(results, sub=sub)
-        logging.debug("ics feed created for Subscription {}".format(sub.id))
+        logging.debug("ics feed created for Subscription %s", sub.id)
         cd = "attachment;filename=abe.ics"
         return Response(response,
                         mimetype="text/calendar",
