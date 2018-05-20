@@ -1,0 +1,16 @@
+[
+    {
+        "name": "ABE Admin",
+        "short_description": "ABE administrative interface",
+        "url": "http://127.0.0.1:3000",
+        "scopes": ["admin:*"],
+        "role": "admin",
+        "redirect_prefixes": ["/"]
+    },
+    {
+        "name": "Fallback",
+        "scopes": ["admin:*"],
+        "role": "fallback",
+        "redirect_prefixes": ["http://", "https://", "/"]
+    }
+]

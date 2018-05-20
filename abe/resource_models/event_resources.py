@@ -110,9 +110,6 @@ class EventApi(Resource):
         results = db.Event.objects(__raw__=query)  # {'start': new Date('2017-06-14')})
         logging.debug('found %s events for query', len(results))
 
-        if not results:  # if no results were found
-            return []
-
         # date range for query
         start = query_dict['start']
         end = query_dict['end']

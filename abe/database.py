@@ -8,6 +8,7 @@ from mongoengine import connect
 
 # These imports are for effect. They define the document types, that mongodb
 # uses to unserialize.
+from .document_models.app_documents import App  # noqa: F401
 from .document_models.event_documents import Event, RecurringEventExc  # noqa: F401
 from .document_models.ics_documents import ICS  # noqa: F401
 from .document_models.label_documents import Label  # noqa: F401
