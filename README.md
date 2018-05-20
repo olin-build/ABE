@@ -9,10 +9,20 @@ information about past, present, and upcoming events.
 
 ## Using
 
-As a user, the main interface to ABE is ABE's web calendar front end,
-[abe-web][abe-web].
+### As a Calendar User
 
-Interactive API documentation can be found at`/docs/`, e.g. for local development: <http://127.0.0.1:3000/docs/>.
+You want ABE's web calendar front end, [abe-web][abe-web].
+
+## As a Developer
+
+The ABE API lets an application read and modify events, labels, and calendar
+subscriptions. Read about ABE's API documentation
+[here](https://github.com/olin-build/ABE/wiki/ABE-API).
+
+ABE can also be used to verify that a user is inside the Olin intranet, and/or
+is a member of the Olin community (as demonstrated by possession of an
+`olin.edu` email address). See the documentation on [Sign in with
+ABE](https://github.com/olin-build/ABE/wiki/Sign-in-with-ABE).
 
 ## Contributing
 

@@ -68,9 +68,8 @@ def get_access_token_scope(token):
 def is_valid_token(token):
     if not token:
         return False
-    enc = token.encode()
     try:
-        jwt.decode(enc, ACCESS_TOKEN_SECRET, algorithms='HS256')  # for effect
+        jwt.decode(token.encode(), ACCESS_TOKEN_SECRET, algorithms='HS256')  # for effect
     except Exception:
         return False
     return True

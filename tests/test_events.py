@@ -91,6 +91,7 @@ class EventsTestCase(abe_unittest.TestCase):
                 content_type='application/json'
             )
             self.assertEqual(response.status_code, 400)
+
         with self.subTest("fails if event has protected label"):
             event = {
                 'title': 'protected post',

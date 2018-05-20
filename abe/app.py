@@ -2,7 +2,7 @@
 import os
 from datetime import datetime
 
-from flask import Flask, g, jsonify, render_template
+from flask import Flask, g, jsonify, render_template, json
 from flask.json import JSONEncoder
 from flask_cors import CORS
 from flask_restplus import Api
@@ -58,10 +58,29 @@ app.json_encoder = CustomJSONEncoder
 
 # add return representations
 
-api = Api(app, doc="/docs/", version="0.1", title="ABE API",
-          description="View and modify calendar events, event labels, and subscriptions. "
-          "Use /login and /logout to log into ABE, in order to try out methods "
-          "that view public events or modify entities."
+authorizationUrl = '/oauth/authorize?redirect_uri=/login/token%3Fredirect_uri%3D%2Fdocs&response_mode=query'
+
+api = Api(app, doc="/docs/", title="ABE API", version="0.1",
+          description="""View and modify calendar events, event labels, and subscriptions.
+          Click on a resource row ("events", "labels", etc.) to see its methods. \
+          Click on a method to see its description. \
+          Click on “Models” to see documentation for each of the models.
+          See the [wiki page](https://github.com/olin-build/ABE/wiki/ABE-API) for information about working \
+          with the ABE API. \
+          Use [this link](/docs/postman.json) to download a collection file for use with \
+          [Postman](https://www.getpostman.com).""",
+          security=[{'oauth2': 'read'}],
+          authorizations={
+              'oauth2': {
+                  'type': 'oauth2',
+                  'authorizationUrl': authorizationUrl,
+                  'scopes': {
+                      'admin': 'Administrative access',
+                      'read': 'Read access to non-public events',
+                      'write': 'Write access to non-locked events',
+                  }
+              }
+          }
           )
 
 
@@ -91,3 +110,11 @@ api.add_namespace(user_api)
 # Routes
 app.register_blueprint(admin_blueprint)
 app.register_blueprint(oauth_blueprint)
+
+
+@app.route('/docs/postman.json')
+def postman_docs():
+    urlvars = False  # Build query strings in URLs
+    swagger = True  # Export Swagger specifications
+    data = api.as_postman(urlvars=urlvars, swagger=swagger)
+    return (json.dumps(data, indent=2)), 200, {'Content-Type': 'application/json; charset=utf-8'}

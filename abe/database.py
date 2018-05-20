@@ -6,13 +6,9 @@ import re
 
 from mongoengine import connect
 
-# These imports are for effect. They define the document types, that mongodb
+# This import is for effect. It defines the document types, that mongodb
 # uses to unserialize.
-from .document_models.app_documents import App  # noqa: F401
-from .document_models.event_documents import Event, RecurringEventExc  # noqa: F401
-from .document_models.ics_documents import ICS  # noqa: F401
-from .document_models.label_documents import Label  # noqa: F401
-from .document_models.subscription_documents import Subscription  # noqa: F401
+from .document_models import *  # noqa: F401,F403
 
 
 # Support legacy environment variable names

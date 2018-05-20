@@ -17,15 +17,16 @@ class AdminTestCase(unittest.TestCase):
             self.assertEqual(response.status_code, 302)
             self.assertEqual(re.sub(r'\?.*', '', response.location), 'http://localhost/oauth/authorize')
             params = dict(parse_qsl(urlparse(response.location).query))
-            self.assertEqual(params['redirect_uri'], '/account/info')
+            self.assertEqual(params['redirect_uri'], '/login/token')
             self.assertEqual(params['response_type'], 'token')
-            self.assertRegex(params['state'], r'(?i)\d+\.[_0-9a-z]+')
+            self.assertRegex(params['state'], r'[^.]+.[^.]+')
 
         with self.subTest("handles redirection from oauth"):
             token = user_access_token
             url = f"{params['redirect_uri']}?state={params['state']}&access_token={token}"
             response = client.get(url)
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response.location, 'http://localhost/account/info')
 
         with self.subTest("sets authorization"):
             response = client.get('/user/',

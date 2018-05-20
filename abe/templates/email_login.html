@@ -23,8 +23,16 @@
         {% endif %}
     {% endwith %}
     {% if email_sent %}
-        <p>A sign-in link has been sent to {{ email }}.</p>
+        <p>A sign-in link has been sent to <code>{{ email }}</code>.</p>
         <p>When this link arrives, click on it to sign into ABE.</p>
+        <h2>Security Tips</h2>
+        <ul>
+        <li>The link will begin with “<code>{{link_prefix }}</code>”. That's the
+        same hostname as this page.</li>
+        <li>You will <em>not</em> be asked to enter any information into the
+        page that the link takes you to.</li>
+        </ul>
+
     {% else %}
         <div class="warning">{{ message }}</div>
         <div>
