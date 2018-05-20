@@ -5,16 +5,16 @@
     "pr-predestroy": "python -m abe.pr-predestroy"
   },
   "env": {
+    "ACCESS_TOKEN_SECRET": {
+      "description": "A secret for encoding authentication tokens.",
+      "generator": "secret"
+    },
     "ADMIN_EMAILS": {
       "description": "Comma-separated list of admin emails.",
       "required": false
     },
     "APP_SECRET_KEY": {
       "description": "Secret key for sessions and CSRF.",
-      "generator": "secret"
-    },
-    "AUTH_TOKEN_SECRET": {
-      "description": "A secret for encoding authentication tokens.",
       "generator": "secret"
     },
     "BINDING_HOST": {
@@ -26,14 +26,10 @@
       "description": "Enforce SSL via HSTS.",
       "required": false
     },
-    "MONGODB_URI": {
-      "description": "The MongoDB connection URI.",
-      "required": true
-    },
     "FLASK_DEBUG": {
       "description": "Disable Flask debug mode.",
-      "value": "False",
-      "required": true
+      "required": true,
+      "value": false
     },
     "HEROKU_APP_NAME": {
       "required": false
@@ -41,6 +37,15 @@
     "INTRANET_CDIRS": {
       "description": "Whitelisted CDIRs don't require auth.",
       "required": false
+    },
+    "MONGODB_URI": {
+      "description": "The MongoDB connection URI.",
+      "required": true
+    },
+    "OAUTH_REQUIRES_CLIENT_ID": {
+      "description": "Calls to /oauth/authorize require a client_id parameter",
+      "required": false,
+      "value": true
     }
   },
   "buildpacks": [

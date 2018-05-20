@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import flask.json
-from mongoengine import BooleanField, Document, ListField, StringField, URLField
+from mongoengine import Document, ListField, StringField, URLField
 
 
 class App(Document):
