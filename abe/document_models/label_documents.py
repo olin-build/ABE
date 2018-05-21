@@ -27,7 +27,7 @@ class Label(Document):
     parent_labels 	Indicates which under which labels this label lives under. Optional
                                 Takes a list of strings with choice from the Labels database
 
-    color 			Suggested color for the lable. Optional
+    color 			Suggested color for the label. Optional
                                 Takes a string (hex string currently works)
 
     visibility 		Indicates who can see the label. Optional
@@ -38,8 +38,8 @@ class Label(Document):
     name = StringField(required=True, unique=True)
     description = StringField()
     url = URLField()
-    default = BooleanField(required=True, default=False)  # suggested to display by default
     parent_labels = ListField(StringField())  # rudimentary hierarchy of labels
     color = StringField(regex=r'#[0-9a-zA-Z]{6}')  # suggested color for label
+    default = BooleanField(required=True, default=False)  # suggested to display by default
+    protected = BooleanField(default=False)
     visibility = StringField()  # suggested visibility
-    protected = BooleanField()

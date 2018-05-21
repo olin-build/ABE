@@ -17,9 +17,6 @@ class TestCase(unittest.TestCase):
 
     def setUp(self):
         super().setUp()
-        # This import needs to happen after setting the environment variables
-        # above
-        self.db = db
         assert db.mongo_db_name == MONGODB_TEST_DB_NAME, \
             f"{__name__} must be imported before abe.database"
 

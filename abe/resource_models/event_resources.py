@@ -19,25 +19,29 @@ from abe.helper_functions.recurring_helpers import placeholder_recurring_creatio
 from abe.helper_functions.sub_event_helpers import (access_sub_event, create_sub_event, find_recurrence_end,
                                                     sub_event_to_full, update_sub_event)
 
-api = Namespace('events', description='Events related operations')
+api = Namespace(
+    'events', description="iCalendar events. [RFC 5545](https://tools.ietf.org/html/rfc5545) describes the fields.")
 
 # This should be kept in sync with the document model, which drives the format
-event_model = api.model('Event_Model', {
+model = api.model('Event', {
     'title': fields.String(example="Tea time"),
     'start': fields.DateTime(dt_format='iso8601'),
     'end': fields.DateTime(dt_format='iso8601'),
     'location': fields.String(example="EH4L"),
-    'description': fields.String(example="Time for tea"),
+    'description': fields.String(example="Time for tea", documentation="The Markdown event description."),
     'visibility': fields.String(enum=['public', 'olin', 'students']),
-    'labels': fields.List(fields.String, description="One of the labels in the DB"),
+    'labels': fields.List(fields.String, description="A list of Labels"),
     'allDay': fields.Boolean
 })
 
 
-events_model = api.schema_model('Events_Model', {
-    'type': 'array',
-    'items': {'$ref': 'Event_Model'}}
-)
+# TODO: document that get() returns a single event OR a list. The following is
+# apparently not how to do this: the generated /doc page contains a number of
+# "Resolver error" warnings.
+#
+# model_list = api.schema_model('Event list', {'type': 'array', 'items':
+#     {'$ref': 'Event'}}
+# )
 
 
 def check_protected_labels(label_list):
@@ -50,11 +54,12 @@ def check_protected_labels(label_list):
 
 @api.route('/<event_id>/<rec_id>')
 class EventApi(Resource):
-    """API for interacting with events"""
+    """Calendar events"""
 
     @api.doc(params={'event_id': 'The optional event id',
                      'rec_id': 'The optional sub-event id'})
-    @api.response(200, 'Success', events_model)
+    @api.response(200, 'Success', model)
+    @api.doc(security=[])
     @mongo_resource_errors
     def get(self, event_id=None, rec_id=None):
         if event_id:
@@ -110,9 +115,6 @@ class EventApi(Resource):
         results = db.Event.objects(__raw__=query)  # {'start': new Date('2017-06-14')})
         logging.debug('found %s events for query', len(results))
 
-        if not results:  # if no results were found
-            return []
-
         # date range for query
         start = query_dict['start']
         end = query_dict['end']
@@ -128,8 +130,8 @@ class EventApi(Resource):
 
     @require_scope('create:events')
     @mongo_resource_errors
-    @api.expect(event_model)
-    @api.response(201, 'Created', event_model)
+    @api.expect(model)
+    @api.response(201, 'Created', model)
     @api.doc(responses={400: 'Validation Error',
                         401: 'Unauthorized Access'})
     def post(self):
@@ -150,7 +152,7 @@ class EventApi(Resource):
 
     @require_scope('edit:events')
     @mongo_resource_errors
-    @api.expect(event_model)
+    @api.expect(model)
     def put(self, event_id):
         """
         Modify individual event
@@ -217,10 +219,9 @@ class EventApi(Resource):
 
 
 api.add_resource(EventApi, '/', methods=['GET', 'POST'], endpoint='event')
-# TODO: add route for string/gphycat links
 api.add_resource(EventApi, '/<string:event_id>',
                  methods=['GET', 'PUT', 'PATCH', 'DELETE'],
                  endpoint='event_id')
-api.add_resource(EventApi, '/<string:event_id>/<string:rec_id>',
-                 methods=['GET', 'PUT', 'PATCH', 'DELETE'],
-                 endpoint='rec_id')  # TODO: add route for string/gphycat links
+# api.add_resource(EventApi, '/<string:event_id>/<string:rec_id>',
+#                  methods=['GET', 'PUT', 'PATCH', 'DELETE'],
+#                  endpoint='rec_id')  # TODO: add route for string/gphycat links

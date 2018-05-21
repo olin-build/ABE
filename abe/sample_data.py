@@ -144,7 +144,7 @@ def load_data(db):
 def main(events=None, labels=None):
     """Load the database with sample data.
 
-    With no options, uses samples from this source file."""
+    With no options, loads the data from ./tests/data file."""
 
     from . import database as db
     event_data = load_event_data(events) if events else None

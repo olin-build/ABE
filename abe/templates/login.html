@@ -12,7 +12,8 @@
     <div>
         <h1>Sign into ABE</h1>
         <div class="subtitle">
-            Sign into ABE with your Olin Slack account, or by email.
+            Sign into ABE with your email address, or with your Olin College
+            Slack account.
         </div>
         {% with messages = get_flashed_messages() %}
             {% if messages %}
@@ -21,21 +22,40 @@
                 {% endfor %}
             {% endif %}
         {% endwith %}
+
+        {% if app.role != 'fallback' %}
+            <p>
+                Signing in allows you to use the {{ app.name }} application to
+                access ABE data.
+            </p>
+            {% if app.description %}
+                <p>{{ app.description }}</p>
+            {% endif %}
+        {% else %}
+            <p class="alert">
+                You are signing in with an unregistered application. This
+                application will have access to ABE data on your behalf. Proceed
+                with caution!
+            </p>
+        {% endif %}
+
         <p>
-            If you have an account on the <a href="https://olin.slack.com">Olin
-            College Slack account</a>, you can use that to sign in here. You can
-            also sign in with your email address. We'll send you a activation
+            Sign in with your Olin email address. We'll send you an activation
             link that will sign you in on the computer that you use to visit it.
             (You won't be asked to create an account or password.)
         </p>
-        {% if slack_oauth_url %}
-        <a id="slack-oauth-link" href="{{ slack_oauth_url }}">
-            <img src="https://api.slack.com/img/sign_in_with_slack.png" />
-        </a>
-        {% endif %}
+        <p>
+            If you have an account on the <a href="https://olin.slack.com">Olin
+            College Slack account</a>, you can also use Slack to sign in here.
+        </p>
         {% if email_oauth_url %}
             <a id="email-oauth-link" href="{{ email_oauth_url }}">
                 Sign in with <b>email</b>
+            </a>
+        {% endif %}
+        {% if slack_oauth_url %}
+            <a id="slack-oauth-link" href="{{ slack_oauth_url }}">
+                <img src="https://api.slack.com/img/sign_in_with_slack.png" />
             </a>
         {% endif %}
 

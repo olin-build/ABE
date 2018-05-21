@@ -16,7 +16,7 @@ from flask_restplus import Namespace, Resource, fields
 api = Namespace('subscriptions', description='iCalendar subscriptions')
 
 # This should be kept in sync with the document model, which drives the format
-sub_model = api.model('Sub_Model', {
+model = api.model('Subscription', {
     "labels": fields.List(fields.String)
 })
 
@@ -46,7 +46,7 @@ class SubscriptionAPI(Resource):
         return subscription_to_dict(subscription)
 
     @mongo_resource_errors
-    @api.expect(sub_model)
+    @api.expect(model)
     def post(self, subscription_id: str = ''):
         """
         Creates a subscription object with a list of labels, returning it with an ID
@@ -70,7 +70,7 @@ class SubscriptionAPI(Resource):
         return subscription_to_dict(subscription)
 
     @mongo_resource_errors
-    @api.expect(sub_model)
+    @api.expect(model)
     def put(self, subscription_id: str):
         """Modify an existing subscription"""
 
@@ -96,6 +96,7 @@ class SubscriptionICS(Resource):
     """Retrieves data from the given subscription as an ICS feed"""
 
     @mongo_resource_errors
+    @api.doc(security=[])
     def get(self, subscription_id: str):
         """
         Returns an ICS feed when requested.
@@ -131,6 +132,5 @@ api.add_resource(SubscriptionAPI, '/', methods=['POST'],
                  endpoint='subscription')
 api.add_resource(SubscriptionAPI, '/<string:subscription_id>',
                  methods=['GET', 'PUT', 'POST'], endpoint='subscription_id')
-
 api.add_resource(SubscriptionICS, '/<string:subscription_id>/ics',
                  methods=['GET'], endpoint='subscription_ics')

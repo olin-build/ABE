@@ -4,7 +4,7 @@ import re
 from flask import g, session
 from netaddr import IPNetwork, IPSet
 
-from .access_tokens import create_access_token, get_access_token_scope, is_valid_token
+from .access_tokens import create_access_token, access_token_scopes, is_valid_token
 
 ACCESS_TOKEN_COOKIE_NAME = 'access_token'
 
@@ -76,15 +76,15 @@ def request_access_token(req):
         return token
 
 
-def get_request_scope(req):
+def request_scopes(req):
     token = request_access_token(req)
     if token:
-        return get_access_token_scope(token)
+        return access_token_scopes(token)
     return []
 
 
 def request_has_scope(req, scope):
-    return scope in get_request_scope(req)
+    return scope in request_scopes(req)
 
 
 def clear_auth_cookies():

@@ -1,8 +1,7 @@
 # ABE
 
-Dev: [![Build Status](https://travis-ci.org/olinlibrary/ABE.svg?branch=dev)](https://travis-ci.org/olinlibrary/ABE/branches)
-[![Coverage](https://codecov.io/gh/olinlibrary/abe/branch/dev/graph/badge.svg)](https://codecov.io/gh/olinlibrary/abe)
-Master: [![Build Status](https://travis-ci.org/olinlibrary/ABE.svg?branch=master)](https://travis-ci.org/olinlibrary/ABE/branches)
+[![Build Status](https://travis-ci.org/olin-build/ABE.svg?branch=dev)](https://travis-ci.org/olin-build/ABE)
+[![Coverage](https://codecov.io/gh/olinlibrary/ABE/branch/dev/graph/badge.svg)](https://codecov.io/gh/olin-build/ABE)
 
 **ABE** (Amorphous Blob of Events) is Olin's student-built store of information
 about Olin events. It enables the creation of digital experiences that share
@@ -10,10 +9,20 @@ information about past, present, and upcoming events.
 
 ## Using
 
-As a user, the main interface to ABE is ABE's web calendar front end,
-[abe-web][abe-web].
+### As a Calendar User
 
-Interactive API documentation can be found at`/docs/`, e.g. for local development: <http://127.0.0.1:3000/docs/>.
+You want ABE's web calendar front end, [abe-web][abe-web].
+
+## As a Developer
+
+The ABE API lets an application read and modify events, labels, and calendar
+subscriptions. Read about ABE's API documentation
+[here](https://github.com/olin-build/ABE/wiki/ABE-API).
+
+ABE can also be used to verify that a user is inside the Olin intranet, and/or
+is a member of the Olin community (as demonstrated by possession of an
+`olin.edu` email address). See the documentation on [Sign in with
+ABE](https://github.com/olin-build/ABE/wiki/Sign-in-with-ABE).
 
 ## Contributing
 
@@ -34,5 +43,5 @@ ABE is a platform. Some online experiences that use the data in ABE include:
 
 [abe-web]: https://github.com/olinlibrary/abe-web
 [contributing]: ./docs/CONTRIBUTING.md
-[good-first-issue]: https://github.com/olinlibrary/ABE/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22
-[issues]: https://github.com/olinlibrary/ABE/issues
+[good-first-issue]: https://github.com/olin-build/ABE/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22
+[issues]: https://github.com/olin-build/ABE/issues

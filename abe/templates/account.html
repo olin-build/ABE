@@ -16,18 +16,19 @@
 </head>
 <body>
     <div>
-        <h1>Account Info</h1>
+        <h1>User Info</h1>
         <p>
             This page is for debugging OAuth.
         </p>
 
         <a href="/logout">Sign Out</a>
 
+        <hr/>
         <table>
-            {% for k in args %}
+            {% for k in info %}
                 <tr>
                     <th>{{ k }}</th>
-                    <td>{{ args[k] }}</td>
+                    <td>{{ info[k] }}</td>
                 </tr>
             {% endfor %}
         </table>

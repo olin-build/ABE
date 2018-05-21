@@ -4,9 +4,9 @@ from unittest import skip
 import icalendar
 from icalendar import Calendar
 
-from . import abe_unittest, sample_data
+from . import abe_unittest, db, sample_data
 
-# This import has to happen after .context sets the environment variables
+# This import must occur after `from . import` sets the environment variables
 from abe.helper_functions import ics_helpers  # isort:skip
 
 testEvents = dict(
@@ -74,7 +74,6 @@ class IcsHelpersTestCase(abe_unittest.TestCase):
 
     # TODO: DRY w/ method in RecurrenceTestCase
     def get_test_event(self, key):
-        db = self.db
         assert key in key
         event = testEvents[key]
         return db.Event(**event)

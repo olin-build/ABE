@@ -1,27 +1,25 @@
 """Main flask app"""
 import os
-import time
 from datetime import datetime
-from urllib.parse import quote_plus as url_quote_plus
 
-from flask import Flask, flash, g, jsonify, redirect, render_template, request, session, url_for
+from flask import Flask, g, jsonify, render_template, json
 from flask.json import JSONEncoder
 from flask_cors import CORS
 from flask_restplus import Api
 from flask_sslify import SSLify  # redirect to https
-from itsdangerous import Signer
 
-from .resource_models.account_resources import api as account_api
+from .resource_models.app_resources import api as app_api
 from .resource_models.event_resources import api as event_api
 from .resource_models.ics_resources import api as ics_api
 from .resource_models.label_resources import api as label_api
 from .resource_models.subscription_resources import api as subscription_api
+from .resource_models.user_resources import api as user_api
+from .routes.admin_routes import profile as admin_blueprint
 from .routes.oauth_routes import profile as oauth_blueprint
 
 app = Flask(__name__)
 CORS(app, allow_headers=['Authorization', 'Content-Type'], supports_credentials=True)
-if 'APP_SECRET_KEY' in os.environ:
-    app.secret_key = os.environ['APP_SECRET_KEY'].encode()
+app.secret_key = os.environ['APP_SECRET_KEY'].encode() if 'APP_SECRET_KEY' in os.environ else os.urandom(32)
 
 # Redirect HTTP to HTTPS.
 #
@@ -60,10 +58,29 @@ app.json_encoder = CustomJSONEncoder
 
 # add return representations
 
-api = Api(app, doc="/docs/", version="0.1", title="ABE API",
-          description="View and modify calendar events, event labels, and subscriptions. "
-          "Use /login and /logout to log into ABE, in order to try out methods "
-          "that view public events or modify entities."
+authorizationUrl = '/oauth/authorize?redirect_uri=/login/token%3Fredirect_uri%3D%2Fdocs&response_mode=query'
+
+api = Api(app, doc="/docs/", title="ABE API", version="0.1",
+          description="""View and modify calendar events, event labels, and subscriptions.
+          Click on a resource row ("events", "labels", etc.) to see its methods. \
+          Click on a method to see its description. \
+          Click on “Models” to see documentation for each of the models.
+          See the [wiki page](https://github.com/olin-build/ABE/wiki/ABE-API) for information about working \
+          with the ABE API. \
+          Use [this link](/docs/postman.json) to download a collection file for use with \
+          [Postman](https://www.getpostman.com).""",
+          security=[{'oauth2': 'read'}],
+          authorizations={
+              'oauth2': {
+                  'type': 'oauth2',
+                  'authorizationUrl': authorizationUrl,
+                  'scopes': {
+                      'admin': 'Administrative access',
+                      'read': 'Read access to non-public events',
+                      'write': 'Write access to non-locked events',
+                  }
+              }
+          }
           )
 
 
@@ -83,59 +100,21 @@ def call_after_request_callbacks(response):  # For deferred callbacks
 
 
 # Route resources
-api.add_namespace(account_api)
+api.add_namespace(app_api)
 api.add_namespace(event_api)
-api.add_namespace(label_api)
 api.add_namespace(ics_api)
+api.add_namespace(label_api)
 api.add_namespace(subscription_api)
+api.add_namespace(user_api)
 
 # Routes
+app.register_blueprint(admin_blueprint)
 app.register_blueprint(oauth_blueprint)
 
 
-@app.route('/add_event')
-def add_event():
-    return render_template('add_event.html')
-
-
-@app.route('/add_label')
-def add_label():
-    return render_template('add_label.html')
-
-
-# For debugging, and signing in to try out the interactive /docs:
-
-
-signer = Signer(app.secret_key)
-
-
-@app.route('/login')
-def login():
-    # This is a roundabout way of logging in, but it exercises the same OAuth
-    # flow that client apps use, so it doubles as testing that flow.
-    redirect_uri = url_for('login_auth')
-    iat = int(time.time())
-    sig = signer.sign(str(iat).encode())
-    return redirect('/oauth/authorize' +
-                    '?redirect_uri=' + url_quote_plus(redirect_uri) +
-                    '&state=' + url_quote_plus(sig.decode()))
-
-
-@app.route('/logout')
-def logout():
-    session.pop('access_token', None)
-    redirect_uri = 'login'
-    return redirect('/oauth/deauthorize?redirect_uri=' + url_quote_plus(redirect_uri))
-
-
-@app.route('/account/info')
-def login_auth():
-    iat = signer.unsign(request.args['state'])
-    age = int(time.time()) - int(iat)
-    # Allow this many minutes to use a link. This is unlikely for sign in with
-    # slack, but reasonable for email if the user comes back to it later.
-    if age > 30 * 60:
-        flash('This link has expired. Please try again.')
-        return redirect(url_for('login'))
-    session['access_token'] = request.args['access_token']
-    return render_template('account.html', args=request.args, age=age)
+@app.route('/docs/postman.json')
+def postman_docs():
+    urlvars = False  # Build query strings in URLs
+    swagger = True  # Export Swagger specifications
+    data = api.as_postman(urlvars=urlvars, swagger=swagger)
+    return (json.dumps(data, indent=2)), 200, {'Content-Type': 'application/json; charset=utf-8'}

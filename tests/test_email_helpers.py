@@ -5,7 +5,7 @@ from icalendar import Calendar
 
 from . import abe_unittest, db
 
-# This import must occur after .context sets the environment variables
+# This import must occur after `from . import` sets the environment variables
 from abe.helper_functions import email_helpers  # isort:skip
 
 with open('./tests/data/email_script.txt', 'r') as email_file:

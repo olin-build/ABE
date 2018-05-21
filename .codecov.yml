@@ -1,0 +1,16 @@
+# See https://docs.codecov.io/docs/commit-status
+coverage:
+  status:
+    project:
+      default: false
+      tests:
+        target: 96%
+        threshold: 1
+        paths: tests/
+      app:
+        threshold: 1
+        paths: "!tests/"
+    patch:
+      app:
+        threshold: 1
+        paths: "!tests/"

@@ -1,0 +1,11 @@
+[
+    {
+        "name": "ABE Web Calendar",
+        "short_description": "ABE, the Olin Community calendar",
+        "long_description":
+            "The Olin Community calendar is an olin.build project that collects and presents events from the Olin community.",
+        "url": "https://events.olin.build",
+        "redirect_uris": ["http://127.0.0.1:8080/", "http://localhost:8080/"],
+        "scopes": ["admin:*"]
+    }
+]

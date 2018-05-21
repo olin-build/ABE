@@ -1,30 +1,44 @@
-#!/usr/bin/env python3
 """Label Resource models for flask"""
 
 import logging
 
 from flask import request
 from flask_restplus import Namespace, Resource, fields
-from mongoengine import ValidationError
 
 from abe import database as db
 from abe.auth import require_scope
-from abe.helper_functions.converting_helpers import mongo_to_dict, request_to_dict
+from abe.helper_functions.converting_helpers import request_to_dict
 from abe.helper_functions.mongodb_helpers import mongo_resource_errors
 from abe.helper_functions.query_helpers import multi_search
 
-api = Namespace('labels', description='Label related operations')
+api = Namespace('labels', description='Event labels')
 
 # This should be kept in sync with the document model, which drives the format
-label_model = api.model("Label_Model", {
-    "name": fields.String(required=True),
-    "description": fields.String,
-    "url": fields.Url,
-    "default":  fields.Boolean,
-    "parent_labels": fields.List(fields.String),
-    "color": fields.String,
-    "visibility": fields.String(enum=['public', 'olin', 'students']),
-    "protected": fields.Boolean
+model = api.model("Label", {
+    "id": fields.String(readonly=True),
+    "name": fields.String(example="library"),
+    "description": fields.String(
+        description="Description of the label",
+        example="Any event that has to do with the library",
+    ),
+    "url": fields.String(description="Not currently used."),
+    # "parent_labels": fields.List(fields.String),
+    "color": fields.String(
+        description="Color for calendar display.",
+        example="#aaccff",
+    ),
+    "default":  fields.Boolean(
+        default=False,
+        description="If true, appears in the default calendar view.",
+    ),
+    "protected": fields.Boolean(
+        default=False,
+        description="If true, requires the admin role to create and edit labeled events."
+    ),
+    "visibility": fields.String(
+        enum=['public', 'olin', 'students'],
+        description="Who can see events with this label.",
+    ),
 })
 
 
@@ -32,6 +46,8 @@ class LabelApi(Resource):
     """API for interacting with all labels (searching, creating)"""
 
     @mongo_resource_errors
+    @api.doc(security=[])
+    @api.marshal_with(model)
     def get(self, id=None):
         """Retrieve a list of labels"""
         if id:  # use label name/object id if present
@@ -40,37 +56,25 @@ class LabelApi(Resource):
             result = multi_search(db.Label, id, search_fields)
             if not result:
                 return "Label not found with identifier '{}'".format(id), 404
-            else:
-                return mongo_to_dict(result)
-        else:  # search database based on parameters
-            # TODO: search based on terms
-            results = db.Label.objects()
-            if not results:
-                return []
-            else:
-                return [mongo_to_dict(result) for result in results]
+            return result
+        return list(db.Label.objects())
 
-    @require_scope('edit:labels')
+    @require_scope('create:labels')
     @mongo_resource_errors
-    @api.expect(label_model)
+    @api.expect(model)
+    @api.marshal_with(model)
     def post(self):
         """Create a new label"""
         received_data = request_to_dict(request)
         logging.debug("Received POST data: %s", received_data)
-        # TODO: replace this try:except: by just the try: block, after PR #229 is merged
-        try:
-            new_label = db.Label(**received_data)
-            new_label.save()
-        except ValidationError as error:
-            return {'error_type': 'validation',
-                    'validation_errors': str(error),  # [str(err) for err in error.errors or [error]],
-                    'error_message': error.message,
-                    }, 400
-        return mongo_to_dict(new_label), 201
+        new_label = db.Label(**received_data)
+        new_label.save()
+        return new_label, 201
 
     @require_scope('edit:labels')
     @mongo_resource_errors
-    @api.expect(label_model)
+    @api.expect(model)
+    @api.marshal_with(model)
     def put(self, id):
         """Modify a label's properties"""
         received_data = request_to_dict(request)
@@ -91,10 +95,11 @@ class LabelApi(Resource):
             db.ICS.objects(labels=previous_name).update(labels__S=new_name)
             db.Subscription.objects(labels=previous_name).update(labels__S=new_name)
 
-        return mongo_to_dict(result)
+        return result
 
-    @require_scope('edit:labels')
+    @require_scope('delete:labels')
     @mongo_resource_errors
+    @api.marshal_with(model)
     def delete(self, id):
         """Delete a label"""
         logging.debug('Label requested: %s', id)
@@ -109,10 +114,10 @@ class LabelApi(Resource):
 
         # TODO: this should also remove the label from tagged events
         # TODO: should this operation fail if it would leave events untagged?
-        return mongo_to_dict(result)
+        return result
 
 
 api.add_resource(LabelApi, '/', methods=['GET', 'POST'], endpoint='label')
 api.add_resource(LabelApi, '/<string:id>',
                  methods=['GET', 'PUT', 'PATCH', 'DELETE'],
-                 endpoint='id')
+                 endpoint='label_id')

@@ -1,33 +1,48 @@
 import re
 import unittest
-import urllib.parse
+from urllib.parse import parse_qsl, quote_plus, unquote_plus, urlparse
 
-import flask
+from abe.helper_functions import url_parse_fragment_params
 
 from . import app
 
 
 class OAuthTestCase(unittest.TestCase):
 
-    def test_oauth_flow(self):
+    def test_implicit_grant(self):
         client = app.test_client()
-        response = client.get('/oauth/authorize?redirect_uri=https://client/callback')
+        response = client.get('/oauth/authorize' +
+                              '?redirect_uri=' + quote_plus('https://client/callback') +
+                              '&response_type=token' +
+                              '&state=initial-state',
+                              )
         self.assertEqual(response.status_code, 200)
 
-        with self.subTest("returns HTML with a link"):
+        with self.subTest("responds with a link"):
             html = response.data.decode()
             href_re = r'<a id="slack-oauth-link"\s+(?:[^>]*)\bhref="(.+?)">'
             self.assertRegex(html, href_re)
-            slack_url = urllib.parse.urlparse(re.search(href_re, html)[1])
+            slack_url = urlparse(re.search(href_re, html)[1])
             self.assertEqual(slack_url.netloc, 'slack.com')
             self.assertEqual(slack_url.path, '/oauth/authorize')
 
-        with self.subTest("…and valid query parameters"):
-            query = dict(urllib.parse.parse_qsl(slack_url.query))
+        with self.subTest("…with valid query parameters"):
+            query = dict(parse_qsl(slack_url.query))
             self.assertEqual(query['client_id'], 'slack-oauth-client-id')
-            self.assertEqual(urllib.parse.unquote_plus(query['redirect_uri']),
+            self.assertEqual(unquote_plus(query['redirect_uri']),
                              'http://localhost/oauth/slack?redirect_uri=https://client/callback')
 
-        with self.subTest("…that contain a valid state"):
-            state = flask.json.loads(query['state'])
-            self.assertRegex(state['validation_code'], r'[0-9a-z-]+')
+        with self.subTest("calling the Slack callback URI"):
+            response = client.get('/oauth/slack' +
+                                  '?redirect_uri=https://client/callback'
+                                  '&state=' + quote_plus(query['state'])
+                                  )
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(re.sub(r'#.*', '', response.location), 'https://client/callback')
+            # redirect_uri = urlparse(response.location)
+            # params = dict(s.split('=', 2) for s in redirect_uri.fragment.split('&'))
+            params = url_parse_fragment_params(response.location)
+            self.assertEqual(params['token_type'], 'bearer')
+            self.assertEqual(params['state'], 'initial-state')
+            self.assertRegex(params['access_token'], r'.+')
+            self.assertRegex(params['expires_in'], r'\d+')
