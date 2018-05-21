@@ -15,7 +15,7 @@ api = Namespace('labels', description='Event labels')
 
 # This should be kept in sync with the document model, which drives the format
 model = api.model("Label", {
-    "id": fields.String(readOnly=True),
+    "id": fields.String(readonly=True),
     "name": fields.String(example="library"),
     "description": fields.String(
         description="Description of the label",

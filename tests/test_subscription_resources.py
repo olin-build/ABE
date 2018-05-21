@@ -2,7 +2,7 @@ from unittest import skip
 
 from . import abe_unittest
 
-# This import must occur after .context sets the environment variables
+# This import must occur after `from . import` sets the environment variables
 from abe.resource_models import subscription_resources  # isort:skip
 
 

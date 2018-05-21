@@ -4,7 +4,7 @@ import flask
 
 from . import app, abe_unittest
 
-# This import must occur after .context sets the environment variables
+# This import must occur after `from . import` sets the environment variables
 from abe import auth  # isort:skip # noqa: F401
 
 

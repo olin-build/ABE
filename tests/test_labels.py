@@ -1,6 +1,6 @@
 import flask
 
-from . import abe_unittest, admin_access_token, app, sample_data, user_access_token
+from . import abe_unittest, admin_access_token, app, db, sample_data, user_access_token
 
 
 class LabelsTestCase(abe_unittest.TestCase):
@@ -8,7 +8,7 @@ class LabelsTestCase(abe_unittest.TestCase):
     def setUp(self):
         super().setUp()
         self.client = app.test_client()
-        sample_data.load_data(self.db)
+        sample_data.load_data(db)
         self.headers = {'Authorization': f'Bearer {admin_access_token}'}
 
     def get_label_by_id(self, id):

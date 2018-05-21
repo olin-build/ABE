@@ -1,11 +1,9 @@
 from datetime import datetime
 
+from . import abe_unittest, db
 
-from . import abe_unittest
-
-# These imports must occur after .context sets the environment variables
-from abe.helper_functions import recurring_helpers
-from abe.helper_functions import sub_event_helpers  # isort:skip
+# This imports must occur after `from . import` sets the environment variables
+from abe.helper_functions import recurring_helpers, sub_event_helpers  # isort:skip
 
 # TODO: add test cases for YEARLY frequency (are there others)?
 # TODO: add test cases for by_month, by_month_day
@@ -63,7 +61,6 @@ class RecurrenceTestCase(abe_unittest.TestCase):
 
     # TODO: DRY w/ method in IcsHelpersTestCase
     def get_test_event(self, key):
-        db = self.db
         assert key in key
         event = recurringEvents[key]
         return db.Event(**event)

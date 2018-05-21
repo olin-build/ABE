@@ -8,7 +8,7 @@ from werkzeug.exceptions import HTTPException
 
 from . import app  # noqa: F401
 
-# This import must occur after .context sets the environment variables
+# This import must occur after `from . import` sets the environment variables
 from abe import auth   # isort:skip
 
 
