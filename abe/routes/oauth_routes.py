@@ -37,9 +37,8 @@ def unsign_json(param):
 
 @profile.route('/oauth/authorize')
 def authorize():
-    if 'response_type' not in request.args:
-        abort(400, 'missing response_type')
-    if request.args['response_type'] != 'token':
+    # TODO: document and validate with swagger
+    if request.args.get('response_type', 'token') != 'token':
         abort(400, 'invalid response_type')
     if 'redirect_uri' not in request.args:
         abort(400, 'missing redirect_uri')
@@ -164,7 +163,11 @@ def auth_send_email():
         body = render_template('oauth_email_body.html', email_auth_link=email_auth_link)
         msg.attach(MIMEText(body, 'html', 'utf-8'))
         if send_message(msg):
-            return render_template('email_login.html', email_sent=True, email=email)
+            return render_template('email_login.html',
+                                   email_sent=True,
+                                   email=email,
+                                   link_prefix=request.url_root,
+                                   )
         else:
             flash("Failed to send email. Check the server log.")
     for field, errors in form.errors.items():

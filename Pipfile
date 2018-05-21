@@ -27,6 +27,7 @@ requests = ">=2.18.1"
 # Are these necessary?:
 eventlet = "*"
 greenlet = "*"
+blinker = "*"
 
 [dev-packages]
 codecov = "*"

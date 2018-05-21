@@ -5,7 +5,6 @@
         "long_description":
             "The Olin Community calendar is an olin.build project that collects and presents events from the Olin community.",
         "url": "https://events.olin.build",
-        "client_id": "5bbf864ff1274dea9ca739030a37df28",
         "redirect_uris": ["http://127.0.0.1:8080/", "http://localhost:8080/"],
         "scopes": ["admin:*"]
     }
