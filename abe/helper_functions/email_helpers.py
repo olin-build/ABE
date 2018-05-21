@@ -15,10 +15,10 @@ from abe.helper_functions.converting_helpers import mongo_to_dict
 from abe.helper_functions.ics_helpers import ics_to_dict
 from abe.helper_functions.sub_event_helpers import find_recurrence_end
 
-ABE_EMAIL_USERNAME = os.environ.get('ABE_EMAIL_USERNAME', None)
-ABE_EMAIL_PASSWORD = os.environ.get('ABE_EMAIL_PASSWORD', None)
-ABE_EMAIL_HOST = os.environ.get('ABE_EMAIL_HOST', 'mail.privateemail.com')
-ABE_EMAIL_PORT = int(os.environ.get('ABE_EMAIL_PORT', 465))
+EMAIL_USERNAME = os.environ.get('EMAIL_USERNAME', None)
+EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD', None)
+EMAIL_HOST = os.environ.get('EMAIL_HOST', None)
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 465))
 APP_URL = os.environ.get('APP_URL', 'events.olin.build')
 
 
@@ -75,18 +75,18 @@ def ical_to_dict(cal):
 
 def get_messages_from_email():
     """ Fetches unread emails from the email address
-    specified by the environmental variable ABE_EMAIL_USERNAME
-    (password given by env var ABE_EMAIL_PASSWORD). Returns a
+    specified by the environmental variable EMAIL_USERNAME
+    (password given by env var EMAIL_PASSWORD). Returns a
     list of messages.
 
     :return: List of email message objects
     """
-    if not ABE_EMAIL_USERNAME:
-        logging.info("ABE_EMAIL_USERNAME is not defined. Not fetching messages.")
+    if not EMAIL_USERNAME:
+        logging.info("EMAIL_USERNAME is not defined. Not fetching messages.")
         return []
-    pop_conn = poplib.POP3_SSL(ABE_EMAIL_HOST)
-    pop_conn.user(ABE_EMAIL_USERNAME)
-    pop_conn.pass_(ABE_EMAIL_PASSWORD)
+    pop_conn = poplib.POP3_SSL(EMAIL_HOST)
+    pop_conn.user(EMAIL_USERNAME)
+    pop_conn.pass_(EMAIL_PASSWORD)
 
     resp, items, octets = pop_conn.list()
 
@@ -142,17 +142,17 @@ def smtp_connect():
     """ Connects to the smtp server
     :return: server instance, gmail to send
     """
-    username = ABE_EMAIL_USERNAME
+    username = EMAIL_USERNAME
     if not username:
-        logging.error("ABE_EMAIL_USERNAME is not defined. Not fetching messages.")
+        logging.error("EMAIL_USERNAME is not defined. Not fetching messages.")
         return None, None
-    logging.info("Connecting to %s@%s:%s", ABE_EMAIL_USERNAME, ABE_EMAIL_HOST, ABE_EMAIL_PORT)
+    logging.info("Connecting to %s@%s:%s", EMAIL_USERNAME, EMAIL_HOST, EMAIL_PORT)
     try:
-        server = smtplib.SMTP_SSL(ABE_EMAIL_HOST, ABE_EMAIL_PORT)
+        server = smtplib.SMTP_SSL(EMAIL_HOST, EMAIL_PORT)
         server.ehlo()
-        server.login(ABE_EMAIL_USERNAME, ABE_EMAIL_PASSWORD)
+        server.login(EMAIL_USERNAME, EMAIL_PASSWORD)
     except (smtplib.SMTPException, ConnectionRefusedError) as e:
-        logging.error('Connecting to %s failed: %s', ABE_EMAIL_HOST, e)
+        logging.error('Connecting to %s failed: %s', EMAIL_HOST, e)
         # FIXME: callers do not handle a `None` return, and will error
         # on upacking this.
         return None, None
@@ -208,8 +208,8 @@ def scrape():
         msgs = get_messages_from_email()
     except poplib.error_proto as err:
         logging.error("Couldn't connect to %s as %s. Error: %s",
-                      ABE_EMAIL_HOST, ABE_EMAIL_USERNAME, err)
+                      EMAIL_HOST, EMAIL_USERNAME, err)
         return []
     cals = get_calendars_from_messages(msgs)
-    logging.info("Scraped %s from %s", len(cals), ABE_EMAIL_USERNAME)
+    logging.info("Scraped %s from %s", len(cals), EMAIL_USERNAME)
     return [cal_to_event(cal) for cal in cals]

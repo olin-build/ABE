@@ -81,8 +81,8 @@ JSON list of events.)
 ### Running the celery tasks
 
 To run the celery tasks concurrently with a local version of ABE, set
-`ABE_EMAIL_USERNAME` and `ABE_EMAIL_PASSWORD` to credentials for a GMail
-account. (Or, additionally set `ABE_EMAIL_HOST` and `ABE_EMAIL_PORT` to use
+`EMAIL_USERNAME` and `EMAIL_PASSWORD` to credentials for a GMail
+account. (Or, additionally set `EMAIL_HOST` and `EMAIL_PORT` to use
 a non-GMail POP3 SSL account.)
 
 In order to launch a local copy of ABE from inside the pipenv shell, run the slightly verbose:
