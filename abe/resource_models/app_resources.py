@@ -1,5 +1,5 @@
 from uuid import uuid4
-from flask import request
+from flask import abort, request
 from flask_restplus import Namespace, Resource, fields
 
 from abe import database as db
@@ -15,25 +15,25 @@ api = Namespace('apps',
                 )
 
 # This should be kept in sync with the document model, which drives the format
-model = api.model("App", {
-    "client_id": fields.String(
-        readOnly=True,
+model = api.model('App', {
+    'client_id': fields.String(
+        readonly=True,
         description="The API server creates this. Use it in the "
         "[OAuth flow](https://github.com/olin-build/ABE/wiki/User-Authentication)."
     ),
-    "name": fields.String(example="Awesome App"),
-    "short_description": fields.String(
+    'name': fields.String(example="Awesome App"),
+    'short_description': fields.String(
         description="A short description. Not currently used."),
-    "long_description": fields.String(
+    'long_description': fields.String(
         description="A few lines that are displayed in the sign in form."),
-    "url": fields.String(
+    'url': fields.String(
         description="Your app's home page. Not currently used.",
         example="https://awesome.olin.build"),
-    "redirect_uris": fields.List(
+    'redirect_uris': fields.List(
         fields.String,
         description="The OAuth 2.0 `redirect_uri` must begin with one of these.",
         example=["http://127.0.0.1:3000/"]),
-    "scopes": fields.List(
+    'scopes': fields.List(
         fields.String,
         description="Ignore this, for now",
         example=["read"]),
@@ -48,7 +48,7 @@ class AppApi(Resource):
     @api.marshal_with(model)
     def get(self, client_id=None):
         """Retrieve a single application by id, or a list of apps"""
-        if id:
+        if client_id:
             result = db.App.objects(client_id=client_id).first()
             if not result:
                 return "App not found with identifier '{}'".format(client_id), 404
@@ -66,6 +66,8 @@ class AppApi(Resource):
         Use it in the [authentication flow](https://github.com/olin-build/ABE/wiki/User-Authentication).
         """
         data = request_to_dict(request)
+        if 'client_id' in data:
+            abort(400)
         data['client_id'] = uuid4().hex
         app = db.App(**data)
         app.save()
@@ -78,10 +80,12 @@ class AppApi(Resource):
     def put(self, client_id):
         """Update an app"""
         data = request_to_dict(request)
+        if 'client_id' in data:
+            abort(400)
         result = db.App.objects(client_id=client_id).first()
         if not result:
             return "App not found with identifier '{}'".format(client_id), 404
-        result.update(**data)
+        result.modify(**data)
         return result
 
     @require_scope('admin:apps')

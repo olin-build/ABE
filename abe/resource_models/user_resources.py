@@ -1,7 +1,7 @@
 from flask import request
 from flask_restplus import Namespace, Resource, fields
 
-from abe.auth import (get_access_token_provider, get_access_token_role, get_access_token_scope, request_access_token,
+from abe.auth import (get_access_token_provider, get_access_token_role, access_token_scopes, request_access_token,
                       request_is_from_inside_intranet)
 
 api = Namespace('user', description="User information and authorization.")
@@ -48,7 +48,7 @@ class UserApi(Resource):
             'inside_intranet': request_is_from_inside_intranet(request),
             'provider': get_access_token_provider(access_token),
             'role': get_access_token_role(access_token),
-            'scope': get_access_token_scope(access_token),
+            'scope': access_token_scopes(access_token),
         }
 
 

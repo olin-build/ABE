@@ -3,7 +3,7 @@ from unittest import skip
 import flask
 import isodate
 
-from . import abe_unittest, app, sample_data
+from . import abe_unittest, app, db, sample_data
 
 
 class EventsTestCase(abe_unittest.TestCase):
@@ -11,7 +11,7 @@ class EventsTestCase(abe_unittest.TestCase):
     def setUp(self):
         super().setUp()
         self.client = app.test_client()
-        sample_data.load_data(self.db)
+        sample_data.load_data(db)
 
     def test_get_events(self):
         with self.subTest("a six-month query returns some events"):

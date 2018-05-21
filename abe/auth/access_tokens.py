@@ -47,7 +47,7 @@ def get_access_token_role(token):
     return None
 
 
-def get_access_token_scope(token):
+def access_token_scopes(token):
     # The scope is computed based on the token's role, so that tokens stay
     # valid if the role -> scope map changes.
     scope = []
