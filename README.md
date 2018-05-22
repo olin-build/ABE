@@ -1,7 +1,7 @@
 # ABE
 
 [![Build Status](https://travis-ci.org/olin-build/ABE.svg?branch=dev)](https://travis-ci.org/olin-build/ABE)
-[![Coverage](https://codecov.io/gh/olinlibrary/ABE/branch/dev/graph/badge.svg)](https://codecov.io/gh/olin-build/ABE)
+[![Coverage](https://codecov.io/gh/olin-build/ABE/branch/dev/graph/badge.svg)](https://codecov.io/gh/olin-build/ABE)
 
 **ABE** (Amorphous Blob of Events) is Olin's student-built store of information
 about Olin events. It enables the creation of digital experiences that share
@@ -41,7 +41,7 @@ ABE is a platform. Some online experiences that use the data in ABE include:
 * [ABE Event Schedule](https://github.com/osteele/abe-event-schedule) is an
   experiment in deriving a conference-track-style schedule from ABE events.
 
-[abe-web]: https://github.com/olinlibrary/abe-web
+[abe-web]: https://github.com/olin-build/abe-web
 [contributing]: ./docs/CONTRIBUTING.md
 [good-first-issue]: https://github.com/olin-build/ABE/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22
 [issues]: https://github.com/olin-build/ABE/issues

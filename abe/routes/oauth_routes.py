@@ -20,7 +20,7 @@ from wtforms import HiddenField, StringField, SubmitField, validators
 from wtforms.validators import DataRequired, Email
 
 OAUTH_REQUIRES_CLIENT_ID = os.environ.get('OAUTH_REQUIRES_CLIENT_ID')
-SLACK_OAUTH_CLIENT_ID = os.environ.get('SLACK_OAUTH_CLIENT_ID')
+SLACK_CLIENT_ID = os.environ.get('SLACK_CLIENT_ID')
 
 profile = Blueprint('oauth', __name__)
 
@@ -79,14 +79,14 @@ def authorize():
     )
     slack_oauth_url = url_add_query_params(
         "https://slack.com/oauth/authorize",
-        client_id=SLACK_OAUTH_CLIENT_ID,
+        client_id=SLACK_CLIENT_ID,
         redirect_uri=upstream_redirect_uri,
         scope='identity.basic',
         state=state,
     )
-    if not SLACK_OAUTH_CLIENT_ID:
-        logging.warning("SLACK_OAUTH_CLIENT_ID isn't set")
-        slack_oauth_url = "javascript:alert('Set SLACK_OAUTH_CLIENT_ID to enable this feature')"
+    if not SLACK_CLIENT_ID:
+        logging.warning("SLACK_CLIENT_ID isn't set")
+        slack_oauth_url = "javascript:alert('Set SLACK_CLIENT_ID to enable this feature')"
     return render_template('login.html',
                            app=app,
                            email_oauth_url=email_oauth_url,
