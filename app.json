@@ -1,56 +1,71 @@
 {
-  "name": "ABE",
-  "scripts": {
-    "postdeploy": "python -m abe.postdeploy",
-    "pr-predestroy": "python -m abe.pr-predestroy"
-  },
-  "env": {
-    "ACCESS_TOKEN_SECRET": {
-      "description": "A secret for encoding authentication tokens.",
-      "generator": "secret"
+    "name": "ABE",
+    "scripts": {
+        "postdeploy": "python -m abe.postdeploy",
+        "pr-predestroy": "python -m abe.pr-predestroy"
     },
-    "ADMIN_EMAILS": {
-      "description": "Comma-separated list of admin emails.",
-      "required": false
+    "env": {
+        "ACCESS_TOKEN_SECRET": {
+            "description": "A secret for encoding authentication tokens.",
+            "generator": "secret"
+        },
+        "ADMIN_EMAILS": {
+            "description": "Comma-separated list of admin emails.",
+            "required": false
+        },
+        "SECRET_KEY": {
+            "description": "Secret key for sessions and CSRF.",
+            "generator": "secret"
+        },
+        "BINDING_HOST": {
+            "description": "The hostname for gunicorn to bind to.",
+            "value": "0.0.0.0",
+            "required": true
+        },
+        "EMAIL_USERNAME": {
+            "required": false
+        },
+        "EMAIL_PASSWORD": {
+            "required": false
+        },
+        "EMAIL_HOST": {
+            "required": false
+        },
+        "ENABLE_HSTS": {
+            "description": "Enforce SSL via HSTS.",
+            "required": false
+        },
+        "FLASK_DEBUG": {
+            "description": "Disable Flask debug mode.",
+            "required": true,
+            "value": false
+        },
+        "HEROKU_APP_NAME": {
+            "required": false
+        },
+        "INTRANET_CDIRS": {
+            "description": "Whitelisted CDIRs don't require auth.",
+            "required": false
+        },
+        "MONGODB_URI": {
+            "description": "The MongoDB connection URI.",
+            "required": true
+        },
+        "SLACK_OAUTH_CLIENT_ID": {
+            "description":
+                "Slack application client ID, for Sign in with Slack",
+            "required": false
+        },
+        "OAUTH_REQUIRES_CLIENT_ID": {
+            "description":
+                "Calls to /oauth/authorize require a client_id parameter",
+            "required": false,
+            "value": true
+        }
     },
-    "APP_SECRET_KEY": {
-      "description": "Secret key for sessions and CSRF.",
-      "generator": "secret"
-    },
-    "BINDING_HOST": {
-      "description": "The hostname for gunicorn to bind to.",
-      "value": "0.0.0.0",
-      "required": true
-    },
-    "ENABLE_HSTS": {
-      "description": "Enforce SSL via HSTS.",
-      "required": false
-    },
-    "FLASK_DEBUG": {
-      "description": "Disable Flask debug mode.",
-      "required": true,
-      "value": false
-    },
-    "HEROKU_APP_NAME": {
-      "required": false
-    },
-    "INTRANET_CDIRS": {
-      "description": "Whitelisted CDIRs don't require auth.",
-      "required": false
-    },
-    "MONGODB_URI": {
-      "description": "The MongoDB connection URI.",
-      "required": true
-    },
-    "OAUTH_REQUIRES_CLIENT_ID": {
-      "description": "Calls to /oauth/authorize require a client_id parameter",
-      "required": false,
-      "value": true
-    }
-  },
-  "buildpacks": [
-    {
-      "url": "heroku/python"
-    }
-  ]
+    "buildpacks": [
+        {
+            "url": "heroku/python"
+        }
+    ]
 }

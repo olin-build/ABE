@@ -19,7 +19,7 @@ from .routes.oauth_routes import profile as oauth_blueprint
 
 app = Flask(__name__)
 CORS(app, allow_headers=['Authorization', 'Content-Type'], supports_credentials=True)
-app.secret_key = os.environ['APP_SECRET_KEY'].encode() if 'APP_SECRET_KEY' in os.environ else os.urandom(32)
+app.secret_key = os.environ['SECRET_KEY'].encode() if 'SECRET_KEY' in os.environ else os.urandom(32)
 
 # Redirect HTTP to HTTPS.
 #
