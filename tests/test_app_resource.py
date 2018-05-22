@@ -1,4 +1,4 @@
-from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import BadRequest, NotFound
 
 from . import abe_unittest, admin_access_token, app
 
@@ -13,13 +13,12 @@ class AppsResourceTestCase(abe_unittest.TestCase):
         self.client_id = App.admin_app().client_id
         self.headers = {
             'Authorization': f'Bearer {admin_access_token}',
-            'X-Forwarded-For': '127.0.0.1',
         }
 
     def test_get(self):
-        api = AppApi()
-        with app.test_request_context('/', headers=self.headers):
-            response = api.get()
+        resource = AppApi()
+        with app.test_request_context(headers=self.headers):
+            response = resource.get()
         self.assertEqual(len(response), 1)
         client_app, = response
         self.assertEqual(client_app['name'], "ABE Admin")
@@ -27,39 +26,45 @@ class AppsResourceTestCase(abe_unittest.TestCase):
         self.assertRegex(client_app['client_id'], r'[0-9a-f]+')
 
     def test_get_id(self):
-        api = AppApi()
-        with app.test_request_context(f'/{self.client_id}', headers=self.headers):
-            response = api.get()
+        resource = AppApi()
+        with app.test_request_context(headers=self.headers):
+            response = resource.get()
         self.assertEqual(len(response), 1)
         client_app, = response
         self.assertEqual(client_app['name'], "ABE Admin")
 
     def test_post(self):
-        api = AppApi()
+        resource = AppApi()
         app_count = len(App.objects)
         data = {'name': "Test App"}
-        with app.test_request_context('/', data=data, headers=self.headers):
-            client_app, response_code, *_ = api.post()
+        with app.test_request_context(data=data, headers=self.headers):
+            client_app, response_code, *_ = resource.post()
+        self.assertEqual(response_code, 201)
         self.assertEqual(client_app['name'], 'Test App')
         self.assertRegex(client_app['client_id'], r'[0-9a-f]+')
         self.assertEqual(len(App.objects), app_count + 1)
 
     def test_put(self):
-        api = AppApi()
+        resource = AppApi()
         data = {'name': "Renamed App"}
-        with app.test_request_context('/', data=data, headers=self.headers):
-            client_app = api.put(self.client_id)
+        with app.test_request_context(data=data, headers=self.headers):
+            client_app = resource.put(self.client_id)
         self.assertEqual(client_app['name'], 'Renamed App')
 
         data = {'client_id': "spoofed client id"}
-        with app.test_request_context('/', data=data, headers=self.headers):
+        with app.test_request_context(data=data, headers=self.headers):
             with self.assertRaises(BadRequest):
-                client_app = api.put(self.client_id)
+                client_app = resource.put(self.client_id)
 
     def test_delete(self):
-        api = AppApi()
+        resource = AppApi()
         app_count = len(App.objects)
-        with app.test_request_context('/', headers=self.headers):
-            client_app = api.delete(self.client_id)
+        with app.test_request_context(headers=self.headers):
+            client_app = resource.delete(self.client_id)
         self.assertEqual(client_app['client_id'], self.client_id)
         self.assertEqual(len(App.objects), app_count - 1)
+
+        with self.subTest("fails on an invalid id"):
+            with app.test_request_context(headers=self.headers):
+                with self.assertRaises(NotFound):
+                    resource.delete(self.client_id)
