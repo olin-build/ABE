@@ -9,7 +9,7 @@ import flask
 import jwt
 import requests
 from flask import current_app as app
-from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
+from flask import Blueprint, abort, flash, jsonify, redirect, render_template, request, url_for
 from itsdangerous import BadSignature, Signer
 
 from abe import database as db
@@ -20,7 +20,7 @@ from flask_wtf import FlaskForm
 from wtforms import HiddenField, StringField, SubmitField, validators
 from wtforms.validators import DataRequired, Email
 
-OAUTH_REQUIRES_CLIENT_ID = os.environ.get('OAUTH_REQUIRES_CLIENT_ID')
+OAUTH_REQUIRES_CLIENT_ID = os.environ.get('OAUTH_REQUIRES_CLIENT_ID', False)
 
 # These are optional so that this module can load during development and
 # testing.
@@ -57,7 +57,7 @@ def authorize():
     response_mode = request.args.get('response_mode', 'fragment')
 
     client_id = request.args.get('client_id')
-    if not client_id:
+    if not client_id or client_id == '0':
         if OAUTH_REQUIRES_CLIENT_ID:
             abort(400, 'missing client_id')
         client_id = db.App.force_client(role='fallback').client_id
@@ -137,7 +137,6 @@ def slack_oauth():
     # TODO: beef up the unit case, and make this unconditional
     if 'code' in request.args:
         code = request.args['code']
-        print('I got a code!', request.args['code'])
         slack_client_redirect_uri = request.url_root.rstrip('/') + url_for('.slack_oauth')
         slack_client_redirect_uri += '?redirect_uri=' + url_quote_plus(client_redirect_uri)
         response = requests.get('https://slack.com/api/oauth.access',
@@ -243,11 +242,12 @@ def email_auth():
 
 
 @profile.route('/oauth/introspect')
-def introspect(self):
+def introspect():
     """OpenID token introspection <https://tools.ietf.org/html/rfc7662>"""
+    if 'token' not in request.args:
+        abort(400, 'missing token')
     token = request.args['token']
-    return {
+    return jsonify({
         'active': is_valid_token(token),
-        'scope': ' '.join(access_token_scopes(token),
-                          ),
-    }
+        'scope': ' '.join(access_token_scopes(token)),
+    })
