@@ -1,3 +1,0 @@
-#!/usr/bin/env bash -eu
-
-pipenv run env FLASK_APP=abe.app:app FLASK_ENV=development flask run --port=3000

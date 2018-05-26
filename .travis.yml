@@ -18,7 +18,7 @@ install:
   - pipenv install --dev --ignore-pipfile
 
 script:
-  - pipenv run flake8 abe tests *.py
+  - pipenv run lint
   - pipenv run pytest --cov=. --cov-report html:htmlcov -v
 
 after_success:

@@ -12,13 +12,13 @@ Please check out the [the open issues][issues].
 
 ABE uses [Pipenv][pipenv] for Python management.
 
-First, [install pipenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/#installing-pipenv). Most commonly:
+First, [install pipenv](https://docs.pipenv.org/#install-pipenv-today). Most commonly:
 
 ```shell
 $ pip install --user pipenv
 ```
 
-To resolve python dependencies:
+Install this project's package dependencies:
 
 ```shell
 $ pipenv install --dev
@@ -30,13 +30,17 @@ To enter a virtual environment:
 pipenv shell
 ```
 
-You can either develop within this virtual environment, or execute individual commands from outside with `pipenv run <COMMAND>`.
+You can either develop within this virtual environment, or execute individual
+commands with `pipenv run <COMMAND>`.
 
-You will also need to export `ABE_PASS` and `ABE_EMAIL`, as [found here](https://docs.google.com/document/d/1CZ45xYT33sTi5xpFJF8BkEeniCRszaxcfwiBmvMdmbk/edit).
+To test email, you will also need to export `ABE_PASS` and `ABE_EMAIL`, as [found here](https://docs.google.com/document/d/1CZ45xYT33sTi5xpFJF8BkEeniCRszaxcfwiBmvMdmbk/edit).
 
 ### RabbitMQ
 
-Install RabbitMQ and any dependencies. Use [these instructions](http://www.rabbitmq.com/download.html). It will likely require a download of [Erlang](https://packages.erlang-solutions.com/erlang/), which must be installed separately.
+Install RabbitMQ and any dependencies. Use [these
+instructions](http://www.rabbitmq.com/download.html). It will likely require a
+download of [Erlang](https://packages.erlang-solutions.com/erlang/), which must
+be installed separately.
 
 ### MongoDB
 
@@ -64,14 +68,14 @@ python -m abe.sample_data --labels label-data.json
 
 ### Running Locally
 
-Launch the API server in debug mode:
+Launch the API server:
 
 ```shell
-./scripts/server
+pipenv run server
 ```
 
-(In debug mode, it will reload files when you edit them. You don't need to
-quit and re-launch the server.)
+This runs the server in debug mode. In this mode, it will reload files as you
+edit them. You don't need to quit and re-launch the server after each change.)
 
 Visit <http://127.0.0.1:3000>. You should see a top hat.
 
@@ -102,8 +106,10 @@ in a separate terminal. These will run the "beat" and "worker" servers alongside
 ### Committing and Pushing changes
 
 Please make sure to run the tests before you commit your changes. Run
-`./scripts/pre-commit-check`. This runs the test suite and the linter. You can
-also run these separately:
+`./scripts/pre-commit-check`. This runs the test suite and the linter.
+
+You can also run test and lint separately, for more control over which test
+files to run:
 
 #### Testing
 
@@ -138,10 +144,8 @@ The test suite will print some `DeprecationWarning`s from files in `…/site-pac
 #### Linting
 
 ```shell
-$ flake8 abe tests *.py
+$ pipenv run lint
 ```
-
-[issues]: https://github.com/olin-build/ABE/issues
 
 ## Style Guides
 
@@ -150,7 +154,10 @@ $ flake8 abe tests *.py
 Code should follow [PEP 8](https://www.python.org/dev/peps/pep-0008/) and [PEP
 257](https://www.python.org/dev/peps/pep-0257/).
 
-Run `pipenv run flake8 abe` to check your code.
+Run `pipenv run lint` to check your code.
+
+Run `pipenv run format` to reformat code in the `abe` and `tests` directories to
+comply with PEP 8.
 
 ### Markdown Style Guide
 
