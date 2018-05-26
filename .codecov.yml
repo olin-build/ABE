@@ -3,14 +3,13 @@ coverage:
   status:
     project:
       default: false
-      tests:
-        target: 96%
-        threshold: 1
-        paths: tests/
       app:
         threshold: 1
         paths: "!tests/"
+      tests:
+        target: 100%
+        paths: tests/
     patch:
       app:
-        threshold: 1
+        target: 50%
         paths: "!tests/"

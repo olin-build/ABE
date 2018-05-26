@@ -110,9 +110,9 @@ class SubscriptionICS(Resource):
             return "Subscription not found with identifier '{}'".format(subscription_id), 404
 
         if 'labels' in req_dict:
-            logging.warning('ICS feed requested with manually-specified labels {}. '
-                            'They have been ignored in favor of the stored labels {}'.format(req_dict['labels'],
-                                                                                             sub.labels))
+            logging.warning('ICS feed requested with manually-specified labels %s. '
+                            'They have been ignored in favor of the stored labels %s',
+                            req_dict['labels'], sub.labels)
 
         req_dict['labels'] = sub.labels
 

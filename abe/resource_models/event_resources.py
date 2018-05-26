@@ -205,6 +205,8 @@ class EventApi(Resource):
                 received_data = {'deleted': True}
                 result = update_sub_event(received_data, cur_parent_event, objectid.ObjectId(event_id))
                 logging.debug("Edited sub_event deleted")
+            else:
+                abort(404)
         elif rec_id:  # if this is a sub_event of a recurring event that has not been created yet
             sub_event_dummy = placeholder_recurring_creation(rec_id, [], result, True)
             sub_event_dummy['deleted'] = True
