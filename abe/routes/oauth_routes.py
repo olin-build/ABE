@@ -136,6 +136,19 @@ def slack_oauth():
     email = None
     # TODO: beef up the unit case, and make this unconditional
     if 'code' in request.args:
+        # TODO: turn these into calls to client_redirect_uri
+        def check_slack_api_response(response, endpoint):
+            if response.status_code != 200:
+                msg = f"{endpoint} failed: code={response.status_code}"
+                logging.error(msg)
+                abort(500, msg)
+            json = response.json()
+            if not json.get('ok'):
+                msg = f"{endpoint} failed: error={json['error']}"
+                logging.error(msg)
+                abort(500, msg)
+            return json
+
         code = request.args['code']
         slack_client_redirect_uri = request.url_root.rstrip('/') + url_for('.slack_oauth')
         slack_client_redirect_uri += '?redirect_uri=' + url_quote_plus(client_redirect_uri)
@@ -146,15 +159,11 @@ def slack_oauth():
                                     code=code,
                                     redirect_uri=slack_client_redirect_uri,
                                 ))
-        # TODO: turn these into calls to client_redirect_uri
-        if response.status_code != 200 or not response.json().get('ok'):
-            abort(500)
-        slack_access_token = response.json()['access_token']
+        slack_access_token = check_slack_api_response(response, "Slack oauth.access")['access_token']
         response = requests.get('https://slack.com/api/users.identity',
                                 {'token': slack_access_token})
-        if response.status_code != 200 or not response.json().get('ok'):
-            abort(500)
-        email = response.json()['user']['email']
+        user_info = check_slack_api_response(response, "Slack users.identity")['user']
+        email = user_info['email']
 
     token = create_access_token(
         client_id=callback_params.pop('client_id'),
