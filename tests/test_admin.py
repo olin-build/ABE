@@ -17,7 +17,7 @@ class AdminTestCase(unittest.TestCase):
             self.assertEqual(response.status_code, 302)
             self.assertEqual(re.sub(r'\?.*', '', response.location), 'http://localhost/oauth/authorize')
             params = dict(parse_qsl(urlparse(response.location).query))
-            self.assertEqual(params['redirect_uri'], '/login/token')
+            self.assertEqual(params['redirect_uri'], 'http://localhost/login/token')
             self.assertEqual(params['response_type'], 'token')
             self.assertRegex(params['state'], r'[^.]+.[^.]+')
 
