@@ -1,59 +1,68 @@
-from unittest import skip
-
-from . import abe_unittest
+from . import abe_unittest, app, db
 
 # This import must occur after `from . import` sets the environment variables
-from abe.resource_models import subscription_resources  # isort:skip
+from abe.resource_models.subscription_resources import SubscriptionAPI, SubscriptionICS  # isort:skip
 
 
 class SubscriptionAPITestCase(abe_unittest.TestCase):
 
     def setUp(self):
-        self.resource = subscription_resources.SubscriptionAPI()
-        # TODO: populate the database with a dummy subscription object
-        # that we can test against below
+        self.resource = SubscriptionAPI()
+        data = {
+            'sid': 'test-id',
+            'labels': ['library'],
+        }
+        db.Subscription(**data).save()
 
     def test_get(self):
         with self.subTest('valid subscription id'):
-            self.skipTest('Unimplemented test')
-            # TODO: test this
-            # ics, status = self.resource.get('test-id')
-            # self.assertEqual(msg, None)
-            # self.assertEqual(error_code, 200)
+            ics = self.resource.get('test-id')
+            self.assertEqual(ics['id'], 'test-id')
+            self.assertEqual(ics['labels'], ['library'])
+            self.assertEqual(ics['ics_url'], '/subscriptions/test-id/ics')
 
-        with self.subTest('valid subscription id'):
+        with self.subTest('invalid subscription id'):
             msg, error_code = self.resource.get('invalid-id')
             self.assertIsInstance(msg, str)
             self.assertEqual(error_code, 404)
 
     def test_post(self):
         with self.subTest('new subscription'):
-            self.skipTest('Unimplemented test')
-            pass
-            # msg, status = self.resource.post('new-id')
-
-        with self.subTest('duplicate id'):
-            self.skipTest('Unimplemented test')
-            pass
-            # msg, status = self.resource.get('test-id')
-
-    skip('Unimplemented test')
+            data = {
+                'labels': ['library'],
+            }
+            with app.test_request_context(data=data):
+                ics = self.resource.post()
+            assert len(db.Subscription.objects(sid=ics['id'])) == 1
+            self.assertEqual(ics['labels'], ['library'])
 
     def test_put(self):
-        pass
-        # TODO: update labels
-        # TODO: validation error
-        # TODO: invalid subscription id
+        data = {
+            'labels': ['featured'],
+        }
+        with app.test_request_context(data=data):
+            ics = self.resource.put('test-id')
+        assert ics['labels'] == ['featured']
+        assert db.Subscription.objects(sid='test-id').first().labels == ['featured']
 
 
 class SubscriptionICSTestCase(abe_unittest.TestCase):
 
     def setUp(self):
-        self.resource = subscription_resources.SubscriptionICS()
+        self.resource = SubscriptionICS()
+        data = {
+            'sid': 'test-id',
+            'labels': ['library'],
+        }
+        db.Subscription(**data).save()
 
-    @skip('Unimplemented test')
     def test_get(self):
-        pass
-        # TODO: get
-        # TODO: manual labels
-        # TODO: invalid subscription id
+        with app.test_request_context():
+            res = self.resource.get('test-id')
+        assert res.mimetype == 'text/calendar'
+        self.assertRegex(res.headers['Content-Disposition'], r'attachment;filename=.+\.ics')
+        self.assertRegex(res.response[0].decode(), r'(?s)BEGIN:VCALENDAR.+END:VCALENDAR\s*$')
+
+        with app.test_request_context():
+            _, response_code = self.resource.get('invalid-id')
+        assert response_code == 404

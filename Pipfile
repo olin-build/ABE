@@ -3,11 +3,18 @@ name = "pypi"
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 
+[scripts]
+server = "env FLASK_APP=abe.app:app FLASK_ENV=development flask run --port=3000"
+test = "pytest"
+lint = "flake8 abe tests *.py"
+format = "autopep8 -ir abe tests"
+
 [requires]
 python_full_version = "3.6.5" #https://devcenter.heroku.com/articles/python-runtimes
 
 [packages]
 arrow = "*"
+blinker = "*"
 celery = ">=3.1.25"
 celery-with-mongodb = ">=3.0"
 Flask = "*"
@@ -24,17 +31,16 @@ netaddr = "*"
 PyJWT = "*"
 python-engineio = ">=1.7.0"
 requests = ">=2.18.1"
-# Are these necessary?:
-eventlet = "*"
-greenlet = "*"
-blinker = "*"
+eventlet = "*" # Is this necessary?
+greenlet = "*" # Is this necessary?
 
 [dev-packages]
+autopep8 = "*"
 codecov = "*"
 coverage = "*"
 flake8 = ">=3.3.0"
 mccabe = ">=0.6.1"
-pycodestyle = ">=2.3.1"
+pycodestyle = "==2.3.1"  # newer versions are broken https://github.com/PyCQA/pycodestyle/issues/741
 pyflakes = ">=1.5.0"
 pytest = "*"
 pytest-cov = "*"

@@ -7,5 +7,8 @@ from abe import sample_data
 from abe.app import app
 from abe.auth import create_access_token
 
+app.config['TESTING'] = True
+
+
 admin_access_token = create_access_token(provider='test', email='abe-admin@olin.edu', role='admin')
 user_access_token = create_access_token(provider='test', email='user@olin.edu')

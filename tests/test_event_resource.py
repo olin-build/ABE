@@ -1,9 +1,11 @@
-from unittest import skip
-
 import flask
 import isodate
+from werkzeug.exceptions import NotFound
 
 from . import abe_unittest, app, db, sample_data
+
+# This import must occur after `from . import` sets the environment variables
+from abe.resource_models.event_resources import EventApi  # isort:skip
 
 
 class EventsTestCase(abe_unittest.TestCase):
@@ -202,10 +204,18 @@ class EventsTestCase(abe_unittest.TestCase):
             )
             self.assertEqual(response.status_code, 401)
 
-    @skip("Unimplemented test")
     def test_delete(self):
-        # TODO: test success
-        # TODO: test invalid id
-        # TODO: test invalid data
         # TODO: test unauthorized user
-        pass
+        # TODO: test delete recurrences
+
+        resource = EventApi()
+        event = db.Event.objects(title='Coffee Break').first()
+        with app.test_request_context(headers={'X-Forwarded-For': '127.0.0.1'}):
+            resource.delete(event.id)
+        events = db.Event.objects(title='Coffee Break')
+        assert not events
+
+        with self.subTest("fails on an invalid id"):
+            with app.test_request_context(headers={'X-Forwarded-For': '127.0.0.1'}):
+                with self.assertRaises(NotFound):
+                    resource.delete(event.id)

@@ -1,4 +1,4 @@
 #!/usr/bin/env bash -eu
 
-pipenv run flake8 abe tests *.py
-pipenv run pytest -q
+pipenv run lint
+pipenv run test -q

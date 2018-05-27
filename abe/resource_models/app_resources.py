@@ -95,7 +95,7 @@ class AppApi(Resource):
         """Delete an app"""
         result = db.App.objects(client_id=client_id).first()
         if not result:
-            return "App not found with identifier '{}'".format(client_id), 404
+            abort(404, "App not found with identifier '{}'".format(client_id))
         result.delete()
         return result
 

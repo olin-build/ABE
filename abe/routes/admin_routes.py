@@ -1,3 +1,4 @@
+import os
 import time
 from urllib.parse import quote_plus as url_quote_plus
 
@@ -7,6 +8,9 @@ from itsdangerous import Signer
 from abe import database as db
 
 from ..resource_models.user_resources import UserApi
+
+OAUTH_BASE_URL = os.environ.get('OAUTH_BASE_URL', '')
+OAUTH_CLIENT_ID = os.environ.get('OAUTH_CLIENT_ID')
 
 profile = Blueprint('admin', __name__)
 
@@ -19,15 +23,19 @@ def signer():
 def login():
     # This is a roundabout way of logging in, but it exercises the same OAuth
     # flow that client apps use, so it doubles as testing that flow.
-    redirect_uri = url_for('admin.login_token')
     iat = int(time.time())
     sig = signer().sign(str(iat).encode())
-    return redirect(url_for('oauth.authorize',
-                            client_id=db.App.admin_app().client_id,
+    # create an absolute path, in case the OAuth server is a different host
+    redirect_uri = request.url_root.rstrip('/') + url_for('admin.login_token')
+    return redirect(OAUTH_BASE_URL.rstrip('/') +
+                    url_for('oauth.authorize',
+                            client_id=OAUTH_CLIENT_ID or db.App.admin_app().client_id,
                             redirect_uri=redirect_uri,
                             response_mode='query',
                             response_type='token',
-                            state=sig.decode()))
+                            scope='admin:apps admin:current-app',
+                            state=sig.decode(),
+                            ))
 
 
 @profile.route('/logout')

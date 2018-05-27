@@ -5,7 +5,7 @@
         "url": "http://127.0.0.1:3000",
         "scopes": ["admin:*"],
         "role": "admin",
-        "redirect_prefixes": ["/"]
+        "redirect_prefixes": ["/", "http://127.0.0.1:", "http://localhost:"]
     },
     {
         "name": "Fallback",
