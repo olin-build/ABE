@@ -28,6 +28,7 @@ class AbeTestCase(abe_unittest.TestCase):
                 '/events/',
                 data=flask.json.dumps(event),  # use flask.json for datetimes
                 content_type='application/json',
+                headers={'Authorization': f'Bearer {admin_access_token}'},
             )
             self.assertEqual(response.status_code, 201)  # check only status code
 
