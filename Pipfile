@@ -7,6 +7,7 @@ verify_ssl = true
 server = "env FLASK_APP=abe.app:app FLASK_ENV=development flask run --port=3000"
 test = "pytest"
 lint = "flake8 abe tests *.py"
+precommit = "bash ./scripts/pre-commit-check"
 format = "autopep8 -ir abe tests"
 
 [requires]
