@@ -84,7 +84,7 @@ def request_to_dict(request):
     req_dict = request.values.to_dict(flat=True)
     if request.is_json:
         req_dict = request.get_json()  # get_dict returns python dictionary object
-    keyMap = {'all_day': 'allDay'}
+    keyMap = {'allDay': 'all_day'}
     # FIXME: this test will keep a user from changing a location or description to "".
     # What is it trying to do?
     obj_dict = {keyMap.get(k, k): v for k, v in req_dict.items() if v != ""}
