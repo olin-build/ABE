@@ -31,7 +31,7 @@ model = api.model('Event', {
     'description': fields.String(example="Time for tea", documentation="The Markdown event description."),
     'visibility': fields.String(enum=['public', 'olin', 'students']),
     'labels': fields.List(fields.String, description="A list of Labels"),
-    'allDay': fields.Boolean
+    'all_day': fields.Boolean
 })
 
 
