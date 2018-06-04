@@ -21,6 +21,7 @@ class AbeTestCase(abe_unittest.TestCase):
         assert flask.json.loads(event_response.data) == []
         assert flask.json.loads(label_response.data) == []
 
+    # TODO: move this to test_events, or remove
     def test_add_sample_events(self):
         """Adds the sample events to the database"""
         for event in sample_data.load_sample_data().events:
@@ -32,12 +33,14 @@ class AbeTestCase(abe_unittest.TestCase):
             )
             self.assertEqual(response.status_code, 201)  # check only status code
 
+    # TODO: move this to test_ics, or remove
     def test_import_ics(self):
         """Imports an ICS feed by URL"""
         for feed in sample_data.load_sample_data().icss:
             response = self.client.post('/ics/', data=flask.json.dumps(feed), content_type='application/json')
             self.assertEqual(response.status_code, 200)
 
+    # TODO: move this to test_labels, or remove
     def test_add_sample_labels(self):
         """Adds the sample labels to the database"""
         for event in sample_data.load_sample_data().labels:

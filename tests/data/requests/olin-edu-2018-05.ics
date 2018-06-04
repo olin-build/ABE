@@ -1,0 +1,222 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Date iCal v3.1//NONSGML kigkonsult.se iCalcreator 2.18//
+METHOD:PUBLISH
+X-WR-CALNAME;VALUE=TEXT:Event Calendar
+BEGIN:VTIMEZONE
+TZID:America/New_York
+BEGIN:STANDARD
+DTSTART:20181104T020000
+TZOFFSETFROM:-0400
+TZOFFSETTO:-0500
+TZNAME:EST
+END:STANDARD
+BEGIN:DAYLIGHT
+DTSTART:20190310T020000
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0400
+TZNAME:EDT
+END:DAYLIGHT
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:calendar.20536.field_event_date.0@www.olin.edu
+DTSTAMP:20180604T164543Z
+CREATED:20180515T174835Z
+DESCRIPTION:Return To News & Events [1]\n\n23 June\, 2018 -----------------
+ -----------------------------------------------\n\n\nAdd to Outlook [2]\n
+ \n\n.. Saturday\, June 23 2018 from 12pm-3pm\n\n.. 42242 Sand Pine Place\n
+ \n.. Chantilly\, VA 20152\n\n \n\nA get together for Olin students\, famil
+ ies & alumni featuring a taco bar.  Feel free to bring your favorite bever
+ age. Potluck contributions of fruit\,  salads/sides\, desserts\, etc. welc
+ ome. Please RSVP by June 15\, 2018. \n\n \n\nHosted by Catherine Hall ('07
+ ) and Ed Hall\n\n.... For More info\n\nCatherine	\n\n			Hall CatherineAndEd@gm
+ ail.com\n\n\n[1] http://www.olin.edu/news-events/ [2] http://www.olin.edu/
+ events/feed/20536/event.ics
+DTSTART;TZID=America/New_York:20180623T120000
+DTEND;TZID=America/New_York:20180623T120000
+LAST-MODIFIED:20180604T151033Z
+SUMMARY:Chantilly\, VA - Olin Summer Party
+URL;TYPE=URI:http://www.olin.edu/events/chantilly-va-olin-summer-party/
+END:VEVENT
+BEGIN:VEVENT
+UID:calendar.20531.field_event_date.0@www.olin.edu
+DTSTAMP:20180604T164543Z
+CREATED:20180515T174622Z
+DESCRIPTION:Return To News & Events [1]\n\n30 June\, 2018 -----------------
+ -----------------------------------------------\n\n\nAdd to Outlook [2]\n
+ \n\n.. Saturday\, June 30 2018 (Time TBD)\n\n.. 1379 Pennsridge Place\n\n.
+ . Downingtown\, PA 19335\n\n \n\nA get together for Olin students\, famili
+ es & alumni! RSVP by June 20. Please  bring a side dish\, salad\, or desse
+ rt. Main dishes will be provided\, including  vegetarian options. Please i
+ nform us of any allergies or dietary  restrictions. We will play board gam
+ es: Catan\, Airlock!! \n\n \n\nGlenn and Robin (P '20) and MJ ('20) McMill
+ en\n\n.... For More info\n\nGlenn	\n\n			McMillen g0189a@yahoo.com\n\n\n[1] ht
+ tp://www.olin.edu/news-events/ [2] http://www.olin.edu/events/feed/20531/e
+ vent.ics
+DTSTART;TZID=America/New_York:20180630T130000
+DTEND;TZID=America/New_York:20180630T130000
+LAST-MODIFIED:20180604T145617Z
+SUMMARY:Downington\, PA - Olin Summer Party
+URL;TYPE=URI:http://www.olin.edu/events/downington-pa-olin-summer-party/
+END:VEVENT
+BEGIN:VEVENT
+UID:calendar.20526.field_event_date.0@www.olin.edu
+DTSTAMP:20180604T164543Z
+CREATED:20180515T174257Z
+DESCRIPTION:Return To News & Events [1]\n\n30 June\, 2018 -----------------
+ -----------------------------------------------\n\n\nAdd to Outlook [2]\n
+ \n\n.. Saturday\, June 30 2018 from 1pm-4pm (CDT)\n\n.. 12804 Alhambra St.
+ \n\n.. Leawood\, KS 66209\n\n \n\nA get together for Olin students\, famil
+ ies & alumni! RSVP by June 15. Lunch  and drinks provided. You are welcome
+  to bring a favorite dessert. If you have  any dietary requirements\, plea
+ se let us know.\n\n \n\nHosted by Lucy & Bob (P '19) and Lauren ('19) Pudv
+ an\n\n.... For More info\n\nLucy	\n\n			Pudvan olinsummerparty.leawoodks@gmail
+ .com\n\n\n[1] http://www.olin.edu/news-events/ [2] http://www.olin.edu/eve
+ nts/feed/20526/event.ics
+DTSTART;TZID=America/New_York:20180630T130000
+DTEND;TZID=America/New_York:20180630T130000
+LAST-MODIFIED:20180515T174257Z
+SUMMARY:Leawood\, KS - Olin Summer Party
+URL;TYPE=URI:http://www.olin.edu/events/leawood-ks-olin-summer-party/
+END:VEVENT
+BEGIN:VEVENT
+UID:calendar.20521.field_event_date.0@www.olin.edu
+DTSTAMP:20180604T164543Z
+CREATED:20180515T174048Z
+DESCRIPTION:Return To News & Events [1]\n\n07 July\, 2018 -----------------
+ -----------------------------------------------\n\n\nAdd to Outlook [2]\n
+ \n\n.. Saturday\, July 7 2018 at 3pm (PT)\n\n.. 2802 17th Ave NE\n\n.. Red
+ mond\, WA 98052\n\n \n\nA get together for Olin students\, families & alum
+ ni! Join as for a BBQ! RSVP  by June 30. Basic grill fare provided includi
+ ng veggie options. Please bring  your favorite side\, drinks\, or dessert 
+ to share. Feel free to drop by early  or late\; We'll have the grill going
+  into the evening. \n\n \n\nHosted by Eric Jones '13\, Robert McMullen '13
+ \, Travis St. Onge '13\, & Colden  Rouleau '11\n\n.... For More info\n\nEr
+ ic	\n\n			Jones eric@ercjns.com\n\n\n[1] http://www.olin.edu/news-events/ [2] 
+ http://www.olin.edu/events/feed/20521/event.ics
+DTSTART;TZID=America/New_York:20180707T150000
+DTEND;TZID=America/New_York:20180707T150000
+LAST-MODIFIED:20180604T150134Z
+SUMMARY:Redmond\, WA - Olin Summer Party
+URL;TYPE=URI:http://www.olin.edu/events/redmond-wa-olin-summer-party/
+END:VEVENT
+BEGIN:VEVENT
+UID:calendar.20516.field_event_date.0@www.olin.edu
+DTSTAMP:20180604T164543Z
+CREATED:20180515T173553Z
+DESCRIPTION:Return To News & Events [1]\n\n15 July\, 2018 -----------------
+ -----------------------------------------------\n\n\nAdd to Outlook [2]\n
+ \n\n.. Sunday\, July 15 2018 from 4pm-8pm\n\n.. 226 Park St.\n\n.. Newton\
+ , MA 02458\n\n \n\nA get together for Olin students\, families & alumni! R
+ SVP by July 7. Potluck  style. Arnold and Faith will provide the main cour
+ ses and side dishes. Feel  free to bring an appetizer\, dessert\, or drink
+ s\, as well as a chair.\n\n \n\nHosted by Faith and Arnold Paul (P '19) \n
+ \n.... For More info\n\nFaith	\n\n			Paul OSP@gardeneast.com\n\n\n[1] http://w
+ ww.olin.edu/news-events/ [2] http://www.olin.edu/events/feed/20516/event.i
+ cs
+DTSTART;TZID=America/New_York:20180715T160000
+DTEND;TZID=America/New_York:20180715T160000
+LAST-MODIFIED:20180604T145302Z
+SUMMARY:Newton\, MA - Olin Summer Party
+URL;TYPE=URI:http://www.olin.edu/events/newton-ma-olin-summer-party/
+END:VEVENT
+BEGIN:VEVENT
+UID:calendar.20511.field_event_date.0@www.olin.edu
+DTSTAMP:20180604T164543Z
+CREATED:20180515T155232Z
+DESCRIPTION:Return To News & Events [1]\n\n15 July\, 2018 -----------------
+ -----------------------------------------------\n\n\nAdd to Outlook [2]\n
+ \n\n.. Sunday\, July 15 2018 from 4pm-6pm\n\n.. 650 Ocean Drive\, Apt 7B\n
+ \n.. Key Biscayne\, FL 33149\n\n \n\nA get together for Olin students\, fa
+ milies & alumni! Tapas party (light  appetizers) and drinks. Please RSVP b
+ y August 5. \n\n \n\nHosted by Cybele and Kiko Botran (P '21)\n\n.... For 
+ More info\n\nCybele	\n\n			Botran miamiolinparty@gmail.com\n\n\n[1] http://www
+ .olin.edu/news-events/ [2] http://www.olin.edu/events/feed/20511/event.ics
+DTSTART;TZID=America/New_York:20180715T160000
+DTEND;TZID=America/New_York:20180715T160000
+LAST-MODIFIED:20180604T150611Z
+SUMMARY:Key Biscayne\, FL - Olin Summer Party
+URL;TYPE=URI:http://www.olin.edu/events/key-biscayne-fl-olin-summer-party/
+END:VEVENT
+BEGIN:VEVENT
+UID:calendar.20561.field_event_date.0@www.olin.edu
+DTSTAMP:20180604T164543Z
+CREATED:20180516T150458Z
+DESCRIPTION:Return To News & Events [1]\n\n21 July\, 2018 -----------------
+ -----------------------------------------------\n\n\nAdd to Outlook [2]\n
+ \n\n.. Saturday\, July 21 2018 from 2pm-6pm\n\n.. 1 Neptune Drive\n\n.. So
+ mers Point\, NJ 08244\n\n \n\nA get together for Olin students\, families 
+ & alumni! Food will feature a BBQ  from the neighborhood restaurant\, Back
+  Bay BBQ. Bringing a salad or desert is  optional but not required. Please
+  bring a towel\, bathing suit\, sunscreen and  a pool float if you would l
+ ike to relax on the dock or in the bay. Or\, just  chill out inside the ho
+ use! Please RSVP by July 15. \n\n \n\nHosted by Lauren\, Josh (P '21) and 
+ Raquel ('21) Dunoff\n\n \n\n.... For More info\n\nLauren	\n\n			Dunoff OlinSPN
+ J@mail.com\n\n\n[1] http://www.olin.edu/news-events/ [2] http://www.olin.e
+ du/events/feed/20561/event.ics
+DTSTART;TZID=America/New_York:20180721T140000
+DTEND;TZID=America/New_York:20180721T140000
+LAST-MODIFIED:20180604T150714Z
+SUMMARY:Somers Point\, NJ - Olin Summer Party
+URL;TYPE=URI:http://www.olin.edu/events/somers-point-nj-olin-summer-party/
+END:VEVENT
+BEGIN:VEVENT
+UID:calendar.20501.field_event_date.0@www.olin.edu
+DTSTAMP:20180604T164543Z
+CREATED:20180515T154647Z
+DESCRIPTION:Return To News & Events [1]\n\n28 July\, 2018 -----------------
+ -----------------------------------------------\n\n\nAdd to Outlook [2]\n
+ \n\n.. Saturday\, July 28 2018 at 11am\n\n.. TBD - Local Park\n\nA get tog
+ ether for Olin students\, families & alumni! Potluck in the park!  Please 
+ contact Sara for which park and what you will contribute to the  potluck l
+ unch. \n\n \n\nHosted by Sara Wheeland ('07) and Cody Wheeland ('07)\n\n..
+ .. For More info\n\nSara	\n\n			Wheeland srwheeland at gmail dot com\n\n\n[1] 
+ http://www.olin.edu/news-events/ [2] http://www.olin.edu/events/feed/20501
+ /event.ics
+DTSTART;TZID=America/New_York:20180728T110000
+DTEND;TZID=America/New_York:20180728T110000
+LAST-MODIFIED:20180604T150451Z
+SUMMARY:San Diego\, CA - Olin Summer Party
+URL;TYPE=URI:http://www.olin.edu/events/san-diego-ca-olin-summer-party/
+END:VEVENT
+BEGIN:VEVENT
+UID:calendar.20551.field_event_date.0@www.olin.edu
+DTSTAMP:20180604T164543Z
+CREATED:20180516T143935Z
+DESCRIPTION:Return To News & Events [1]\n\n28 July\, 2018 -----------------
+ -----------------------------------------------\n\n\nAdd to Outlook [2]\n
+ \n\nSaturday\, July 28 2018\, location & time TBD\n\n \n\nA get together f
+ or Olin students\, families & alumni! RSVP by July 21. Please  bring a fav
+ orite dish to share. We will do the same and also provide drinks\,  napkin
+ s\, and utensils.\n\n \n\nHosted by Julianne Jorgensen ('15)\, Mike Jorgen
+ sen (P '15)\, and Jody Yoxsimer  (P '15)\n\n.... For More info\n\nJody	\n\n
+ 			Yoxsimer jodyyoxsimer@gmail.com\n\n\n[1] http://www.olin.edu/news-events/ 
+ [2] http://www.olin.edu/events/feed/20551/event.ics
+DTSTART;TZID=America/New_York:20180728T120000
+DTEND;TZID=America/New_York:20180728T120000
+LAST-MODIFIED:20180516T143935Z
+SUMMARY:Mountian View\, CA - Olin Summer Party
+URL;TYPE=URI:http://www.olin.edu/events/mountian-view-ca-olin-summer-party/
+END:VEVENT
+BEGIN:VEVENT
+UID:calendar.20556.field_event_date.0@www.olin.edu
+DTSTAMP:20180604T164543Z
+CREATED:20180516T144209Z
+DESCRIPTION:Return To News & Events [1]\n\n28 July\, 2018 -----------------
+ -----------------------------------------------\n\n\nAdd to Outlook [2]\n
+ \n\n.. Saturday\, July 28 2018 from 1pm-5pm (CT)\n\n.. 1920 Hawthrone Ave
+ \n\n.. Rockford\, IL 61107\n\n..  \n\nA get together for Olin students\, f
+ amilies & alumni! Burgers\, bratwursts\, and  beverages provided. Please b
+ ring either a favorite side dish or dessert to  share. If you have any spe
+ cial requirements or dietary needs let us know.  Please RSVP by July 21. 
+ \n\n \n\nHosted by Ann Marie (Rynning) Getchius ('06) & Jamie Getchius\n\n
+ .... For More info\n\nAnne Marie	\n\n			Rynning annmarie.rynning@alumni.olin.e
+ du\n\n\n[1] http://www.olin.edu/news-events/ [2] http://www.olin.edu/event
+ s/feed/20556/event.ics
+DTSTART;TZID=America/New_York:20180728T130000
+DTEND;TZID=America/New_York:20180728T130000
+LAST-MODIFIED:20180604T145408Z
+SUMMARY:Rockford\, IL - Olin Summer Party
+URL;TYPE=URI:http://www.olin.edu/events/rockford-il-olin-summer-party/
+END:VEVENT
+END:VCALENDAR
