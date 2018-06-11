@@ -1,4 +1,6 @@
-#!/usr/bin/env bash -eu
+#!/usr/bin/env bash
+
+set -euo pipefail
 
 pipenv run lint
 pipenv run test -q

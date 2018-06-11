@@ -2,7 +2,7 @@ from datetime import datetime
 
 from . import abe_unittest, db
 
-# This imports must occur after `from . import` sets the environment variables
+# This import must occur after `from . import` sets the environment variables
 from abe.helper_functions import recurring_helpers, sub_event_helpers  # isort:skip
 
 # TODO: add test cases for YEARLY frequency (are there others)?

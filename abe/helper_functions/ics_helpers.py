@@ -63,7 +63,7 @@ def create_ics_event(event: db.Event, recurrence=False, sub: db.Subscription = N
 
     new_event.add('description', description)
 
-    if event['allDay']:
+    if event['all_day']:
         start_string = 'dtstart;VALUE=DATE'
         end_string = 'dtend;VALUE=DATE'
         event_start_datetime = ensure_date_time(event['start'])
@@ -201,8 +201,8 @@ def ics_to_dict(component, labels, ics_id=None):
     elif isinstance(event_def['end'], datetime.date):
         event_def['end'] = event_def['end'] - timedelta(days=1)
         midnight_time = time(23, 59, 59)
-        event_def['end'] = datetime.datetime.combine(event_def['end'], midnight_time)
-        event_def['allDay'] = True
+        event_def['end'] = datetime.combine(event_def['end'], midnight_time)
+        event_def['all_day'] = True
 
     event_def['labels'] = labels
 

@@ -129,7 +129,7 @@ class RecurringEventExc(EmbeddedDocument):  # TODO: get a better name
                     Takes a datetime object
                     Example: datetime(2017, 9, 06, 23)
 
-    allDay          Indicates whether this event is an all day event. Optional
+    all_day          Indicates whether this event is an all day event. Optional
                     Takes a boolean
                     Example: True (event runs all day)
 
@@ -155,7 +155,7 @@ class RecurringEventExc(EmbeddedDocument):  # TODO: get a better name
 
     start = DateTimeField()
     end = DateTimeField()
-    allDay = BooleanField(default=False)
+    all_day = BooleanField(default=False)
 
     deleted = BooleanField(required=True, default=False)
 
@@ -221,7 +221,7 @@ class Event(Document):
                     Takes a datetime object
                     Example: datetime(2017, 9, 06, 23)
 
-    allDay          Indicates whether this event is an all day event. Optional (but defaults to False)
+    all_day          Indicates whether this event is an all day event. Optional (but defaults to False)
                     Takes a boolean
                     Example: True (event runs all day)
 
@@ -249,7 +249,7 @@ class Event(Document):
 
     start = DateTimeField(required=True)
     end = DateTimeField()
-    allDay = BooleanField(default=False)
+    all_day = BooleanField(default=False)
 
     recurrence = EmbeddedDocumentField(RecurringEventDefinition)
     recurrence_end = DateTimeField()
