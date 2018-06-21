@@ -11,37 +11,37 @@ precommit = "bash ./scripts/pre-commit-check"
 format = "autopep8 -ir abe tests"
 
 [requires]
-python_full_version = "3.6.5" #https://devcenter.heroku.com/articles/python-runtimes
+python_full_version = "3.6.5"  # https://devcenter.heroku.com/articles/python-runtimes
 
 [packages]
 arrow = "*"
 blinker = "*"
-celery = ">=3.1.25"
-celery-with-mongodb = ">=3.0"
+celery = "*"
+celery-with-mongodb = "*"
 Flask = "*"
 Flask-Cors = "*"
 flask-restplus = "*"
 Flask-SSLify = "*"
 Flask-WTF = "*"
 gunicorn = "*"
-honcho = ">=1.0.1"
-icalendar = ">=3.11.4"
-isodate = ">=0.5.4"
-mongoengine = ">=0.13.0"
+honcho = "*"
+icalendar = "*"
+isodate = "*"
+mongoengine = "*"
 netaddr = "*"
 PyJWT = "*"
-python-engineio = ">=1.7.0"
-requests = ">=2.18.1"
-eventlet = "*" # Is this necessary?
-greenlet = "*" # Is this necessary?
+python-engineio = "*"
+requests = "*"
+eventlet = "*"  # is this package used?
+greenlet = "*"  # is this package used?
 
 [dev-packages]
 autopep8 = "*"
 codecov = "*"
 coverage = "*"
-flake8 = ">=3.3.0"
-mccabe = ">=0.6.1"
-pycodestyle = "==2.3.1"  # newer versions are broken https://github.com/PyCQA/pycodestyle/issues/741
-pyflakes = ">=1.5.0"
+flake8 = "*"
+mccabe = "*"
+pycodestyle = "==2.3.1"  # newer versions are incompatible with flake8 https://github.com/PyCQA/pycodestyle/issues/741
+pyflakes = "*"
 pytest = "*"
 pytest-cov = "*"
