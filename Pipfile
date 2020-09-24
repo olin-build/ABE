@@ -34,6 +34,8 @@ python-engineio = ">=1.7.0"
 requests = ">=2.18.1"
 eventlet = "*" # Is this necessary?
 greenlet = "*" # Is this necessary?
+werkzeug = "<1.0.0"
+email-validator = "*"
 
 [dev-packages]
 autopep8 = "*"
@@ -41,7 +43,7 @@ codecov = "*"
 coverage = "*"
 flake8 = ">=3.3.0"
 mccabe = ">=0.6.1"
-pycodestyle = "==2.3.1"  # newer versions are broken https://github.com/PyCQA/pycodestyle/issues/741
+pycodestyle = ">=2.3.1"  # newer versions are broken https://github.com/PyCQA/pycodestyle/issues/741
 pyflakes = ">=1.5.0"
 pytest = "*"
 pytest-cov = "*"
