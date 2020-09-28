@@ -1,1 +1,1 @@
-web: honcho start -f ProcfileHoncho
+web: gunicorn -c guniconf.py abe.app:app
