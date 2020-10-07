@@ -37,32 +37,12 @@ To test email, you will also need to export `ABE_PASS` and `ABE_EMAIL`, as [foun
 
 ### RabbitMQ
 
+@kylecombes 10/7/2020: Unclear if this is necessary, but I'll leave it for now. You can probably skip this though.
+
 Install RabbitMQ and any dependencies. Use [these
 instructions](http://www.rabbitmq.com/download.html). It will likely require a
 download of [Erlang](https://packages.erlang-solutions.com/erlang/), which must
 be installed separately.
-
-### MongoDB
-
-Install MongoDB. Use [these
-instructions](https://docs.mongodb.com/getting-started/shell/installation/). On
-macOS with [Homebrew](https://brew.sh/) installed, you can instead run `brew install mongodb`.
-
-#### Load Sample Data
-
-To load [sample data](../abe/sample_data.py) into the database, run:
-
-```shell
-python -m abe.sample_data
-```
-
-Load additional sample data via the following. Look at the files in
- `./tests/data` to see the format of the event and label JSON files.
-
-```shell
-python -m abe.sample_data --events event-data.json
-python -m abe.sample_data --labels label-data.json
-```
 
 ## Development
 
@@ -79,8 +59,7 @@ edit them. You don't need to quit and re-launch the server after each change.)
 
 Visit <http://127.0.0.1:3000>. You should see a top hat.
 
-Visit <http://127.0.0.1:3000/events/>. You should see `[]`. (This is an empty
-JSON list of events.)
+Visit <http://127.0.0.1:3000/events/>. You should see some event data.
 
 ### Running the celery tasks
 
