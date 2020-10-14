@@ -33,7 +33,7 @@ pipenv shell
 You can either develop within this virtual environment, or execute individual
 commands with `pipenv run <COMMAND>`.
 
-To test email, you will also need to export `ABE_PASS` and `ABE_EMAIL`, as [found here](https://docs.google.com/document/d/1CZ45xYT33sTi5xpFJF8BkEeniCRszaxcfwiBmvMdmbk/edit).
+To test email, you will also need to export `EMAIL_PASSWORD` and `EMAIL_USERNAME`, as [found here](https://docs.google.com/document/d/1CZ45xYT33sTi5xpFJF8BkEeniCRszaxcfwiBmvMdmbk/edit).
 
 ### RabbitMQ
 
